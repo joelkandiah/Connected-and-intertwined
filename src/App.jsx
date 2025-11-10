@@ -178,11 +178,11 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-4 sm:py-8 px-3 sm:px-4">
-      <div className="w-full max-w-[min(95vw,600px)] mx-auto">
+      <div className="w-full max-w-[min(96vw,650px)] mx-auto">
         <header className="text-center mb-6 sm:mb-8">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2">Connections</h1>
-          <p className="text-base sm:text-lg text-gray-600">Wedding Edition</p>
-          <p className="text-xs sm:text-sm text-gray-500 mt-2">Create four groups of four!</p>
+          <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)'}} className="font-bold mb-2">Connections</h1>
+          <p style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}} className="text-gray-600">Wedding Edition</p>
+          <p style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} className="text-gray-500 mt-2">Create four groups of four!</p>
         </header>
 
         {/* Solved categories */}
@@ -192,10 +192,10 @@ function App() {
               key={idx}
               className={`${DIFFICULTY_COLORS[category.difficulty]} p-3 sm:p-4 rounded-lg animate-slideIn`}
             >
-              <h3 className="font-bold text-center mb-2 uppercase text-xs sm:text-sm">
+              <h3 style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} className="font-bold text-center mb-2 uppercase">
                 {category.name}
               </h3>
-              <p className="text-center uppercase text-xs sm:text-sm">
+              <p style={{fontSize: 'clamp(0.7rem, 1.8vw, 0.875rem)'}} className="text-center uppercase">
                 {category.words.join(', ')}
               </p>
             </div>
@@ -206,10 +206,10 @@ function App() {
             <div 
               className={`${DIFFICULTY_COLORS[animatingCategory.difficulty]} p-3 sm:p-4 rounded-lg animate-slideIn`}
             >
-              <h3 className="font-bold text-center mb-2 uppercase text-xs sm:text-sm">
+              <h3 style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} className="font-bold text-center mb-2 uppercase">
                 {animatingCategory.name}
               </h3>
-              <p className="text-center uppercase text-xs sm:text-sm">
+              <p style={{fontSize: 'clamp(0.7rem, 1.8vw, 0.875rem)'}} className="text-center uppercase">
                 {animatingCategory.words.join(', ')}
               </p>
             </div>
@@ -223,9 +223,12 @@ function App() {
               <button
                 key={idx}
                 onClick={() => handleWordClick(item.word)}
+                style={{
+                  fontSize: 'clamp(0.7rem, 2.5vw, 1rem)'
+                }}
                 className={`
                   aspect-square flex items-center justify-center
-                  p-2 sm:p-4 md:p-6 rounded-lg font-semibold text-[0.65rem] sm:text-xs md:text-sm uppercase
+                  p-1.5 sm:p-3 md:p-4 rounded-lg font-semibold uppercase
                   transition-all duration-200
                   ${selected.includes(item.word) 
                     ? 'bg-gray-700 text-white scale-95' 
@@ -237,7 +240,7 @@ function App() {
                   }
                 `}
               >
-                <span className="leading-tight text-center break-words">{item.word}</span>
+                <span className="leading-tight text-center break-words px-1">{item.word}</span>
               </button>
             ))}
           </div>
@@ -245,7 +248,7 @@ function App() {
 
         {/* Message */}
         {message && (
-          <div className="text-center mb-4 font-semibold text-base sm:text-lg">
+          <div style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}} className="text-center mb-4 font-semibold">
             {message}
           </div>
         )}
@@ -253,16 +256,16 @@ function App() {
         {/* Completion message for won games */}
         {isGameOver && solved.length === PUZZLE.categories.length && !message && (
           <div className="text-center mb-4">
-            <p className="text-xl sm:text-2xl font-bold text-green-600 mb-2">🎉 Congratulations! 🎉</p>
-            <p className="text-sm sm:text-base text-gray-700">You solved the puzzle!</p>
+            <p style={{fontSize: 'clamp(1.25rem, 3vw, 1.5rem)'}} className="font-bold text-green-600 mb-2">🎉 Congratulations! 🎉</p>
+            <p style={{fontSize: 'clamp(0.875rem, 2vw, 1rem)'}} className="text-gray-700">You solved the puzzle!</p>
           </div>
         )}
         
         {/* Game over message for lost games */}
         {isGameOver && solved.length < PUZZLE.categories.length && !message && (
           <div className="text-center mb-4">
-            <p className="text-lg sm:text-xl font-bold text-red-600 mb-2">Game Over</p>
-            <p className="text-sm sm:text-base text-gray-700">You ran out of tries. Better luck next time!</p>
+            <p style={{fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)'}} className="font-bold text-red-600 mb-2">Game Over</p>
+            <p style={{fontSize: 'clamp(0.875rem, 2vw, 1rem)'}} className="text-gray-700">You ran out of tries. Better luck next time!</p>
           </div>
         )}
 
@@ -270,12 +273,16 @@ function App() {
         {!isGameOver && (
           <div className="flex justify-center mb-6">
             <div className="flex gap-2 items-center">
-              <span className="text-xs sm:text-sm text-gray-600">Mistakes remaining:</span>
+              <span style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} className="text-gray-600">Mistakes remaining:</span>
               <div className="flex gap-1">
                 {[...Array(4)].map((_, idx) => (
                   <div 
                     key={idx}
-                    className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${
+                    style={{
+                      width: 'clamp(10px, 2vw, 12px)',
+                      height: 'clamp(10px, 2vw, 12px)'
+                    }}
+                    className={`rounded-full ${
                       idx < (4 - mistakes) ? 'bg-gray-700' : 'bg-gray-300'
                     }`}
                   />
@@ -290,20 +297,23 @@ function App() {
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
             <button
               onClick={handleShuffle}
-              className="px-4 sm:px-6 py-2 text-xs sm:text-sm bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+              style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}
+              className="px-4 sm:px-6 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-100 transition-colors"
             >
               Shuffle
             </button>
             <button
               onClick={handleDeselectAll}
-              className="px-4 sm:px-6 py-2 text-xs sm:text-sm bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+              style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}
+              className="px-4 sm:px-6 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-100 transition-colors"
               disabled={selected.length === 0}
             >
               Deselect All
             </button>
             <button
               onClick={handleSubmit}
-              className={`px-4 sm:px-6 py-2 text-xs sm:text-sm rounded-full font-semibold transition-colors ${
+              style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}
+              className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors ${
                 selected.length === 4
                   ? 'bg-gray-900 text-white hover:bg-gray-700'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -320,7 +330,8 @@ function App() {
           <div className="flex justify-center">
             <button
               onClick={handleNewGame}
-              className="px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base bg-gray-900 text-white rounded-full font-semibold hover:bg-gray-700 transition-colors"
+              style={{fontSize: 'clamp(0.875rem, 2.5vw, 1rem)'}}
+              className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gray-900 text-white rounded-full font-semibold hover:bg-gray-700 transition-colors"
             >
               New Game
             </button>
@@ -329,8 +340,8 @@ function App() {
 
         {/* How to Play */}
         <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-white rounded-lg shadow-sm">
-          <h2 className="text-lg sm:text-xl font-bold mb-3">How to Play</h2>
-          <ul className="space-y-2 text-xs sm:text-sm text-gray-700">
+          <h2 style={{fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)'}} className="font-bold mb-3">How to Play</h2>
+          <ul style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} className="space-y-2 text-gray-700">
             <li>• Find groups of four items that share something in common.</li>
             <li>• Select four items and tap 'Submit' to check if your guess is correct.</li>
             <li>• Find the groups without making 4 mistakes!</li>
