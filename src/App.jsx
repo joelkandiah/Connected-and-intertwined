@@ -217,23 +217,41 @@ function App() {
             {message}
           </div>
         )}
+        
+        {/* Completion message for won games */}
+        {isGameOver && solved.length === PUZZLE.categories.length && !message && (
+          <div className="text-center mb-4">
+            <p className="text-2xl font-bold text-green-600 mb-2">🎉 Congratulations! 🎉</p>
+            <p className="text-gray-700">You solved the puzzle!</p>
+          </div>
+        )}
+        
+        {/* Game over message for lost games */}
+        {isGameOver && solved.length < PUZZLE.categories.length && !message && (
+          <div className="text-center mb-4">
+            <p className="text-xl font-bold text-red-600 mb-2">Game Over</p>
+            <p className="text-gray-700">You ran out of tries. Better luck next time!</p>
+          </div>
+        )}
 
         {/* Mistakes */}
-        <div className="flex justify-center mb-6">
-          <div className="flex gap-2">
-            <span className="text-gray-600">Mistakes remaining:</span>
-            <div className="flex gap-1">
-              {[...Array(4)].map((_, idx) => (
-                <div 
-                  key={idx}
-                  className={`w-3 h-3 rounded-full ${
-                    idx < (4 - mistakes) ? 'bg-gray-700' : 'bg-gray-300'
-                  }`}
-                />
-              ))}
+        {!isGameOver && (
+          <div className="flex justify-center mb-6">
+            <div className="flex gap-2">
+              <span className="text-gray-600">Mistakes remaining:</span>
+              <div className="flex gap-1">
+                {[...Array(4)].map((_, idx) => (
+                  <div 
+                    key={idx}
+                    className={`w-3 h-3 rounded-full ${
+                      idx < (4 - mistakes) ? 'bg-gray-700' : 'bg-gray-300'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Controls */}
         {!isGameOver && words.length > 0 && (
