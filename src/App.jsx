@@ -43,6 +43,7 @@ function App() {
   const [mistakes, setMistakes] = useState(0);
   const [message, setMessage] = useState('');
   const [isGameOver, setIsGameOver] = useState(false);
+  const [animatingCategory, setAnimatingCategory] = useState(null);
 
   // Initialize or load game
   useEffect(() => {
@@ -100,19 +101,31 @@ function App() {
       // Correct!
       const category = PUZZLE.categories.find(c => c.name === categories[0]);
       setMessage(`Correct! ${category.name}`);
-      setSolved([...solved, {
+      
+      // Set animating category for animation
+      setAnimatingCategory({
         name: category.name,
         words: selected,
         difficulty: category.difficulty
-      }]);
-      setWords(words.filter(item => !selected.includes(item.word)));
-      setSelected([]);
+      });
+      
+      // Delay adding to solved to show animation
+      setTimeout(() => {
+        setSolved([...solved, {
+          name: category.name,
+          words: selected,
+          difficulty: category.difficulty
+        }]);
+        setWords(words.filter(item => !selected.includes(item.word)));
+        setSelected([]);
+        setAnimatingCategory(null);
 
-      // Check if game is won
-      if (solved.length + 1 === PUZZLE.categories.length) {
-        setIsGameOver(true);
-        setMessage('Congratulations! You solved the puzzle!');
-      }
+        // Check if game is won
+        if (solved.length + 1 === PUZZLE.categories.length) {
+          setIsGameOver(true);
+          setMessage('Congratulations! You solved the puzzle!');
+        }
+      }, 600);
 
       setTimeout(() => setMessage(''), 2000);
     } else {
@@ -164,12 +177,12 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-2xl mx-auto">
-        <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">Connections</h1>
-          <p className="text-gray-600">Wedding Edition</p>
-          <p className="text-sm text-gray-500 mt-2">Create four groups of four!</p>
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-8 px-3 sm:px-4">
+      <div className="w-full max-w-[min(95vw,600px)] mx-auto">
+        <header className="text-center mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2">Connections</h1>
+          <p className="text-base sm:text-lg text-gray-600">Wedding Edition</p>
+          <p className="text-xs sm:text-sm text-gray-500 mt-2">Create four groups of four!</p>
         </header>
 
         {/* Solved categories */}
@@ -177,35 +190,54 @@ function App() {
           {solved.sort((a, b) => a.difficulty - b.difficulty).map((category, idx) => (
             <div 
               key={idx}
-              className={`${DIFFICULTY_COLORS[category.difficulty]} p-4 rounded-lg`}
+              className={`${DIFFICULTY_COLORS[category.difficulty]} p-3 sm:p-4 rounded-lg animate-slideIn`}
             >
-              <h3 className="font-bold text-center mb-2 uppercase text-sm">
+              <h3 className="font-bold text-center mb-2 uppercase text-xs sm:text-sm">
                 {category.name}
               </h3>
-              <p className="text-center uppercase text-sm">
+              <p className="text-center uppercase text-xs sm:text-sm">
                 {category.words.join(', ')}
               </p>
             </div>
           ))}
+          
+          {/* Animating category */}
+          {animatingCategory && (
+            <div 
+              className={`${DIFFICULTY_COLORS[animatingCategory.difficulty]} p-3 sm:p-4 rounded-lg animate-slideIn`}
+            >
+              <h3 className="font-bold text-center mb-2 uppercase text-xs sm:text-sm">
+                {animatingCategory.name}
+              </h3>
+              <p className="text-center uppercase text-xs sm:text-sm">
+                {animatingCategory.words.join(', ')}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Word grid */}
         {!isGameOver && words.length > 0 && (
-          <div className="grid grid-cols-4 gap-2 mb-6">
+          <div className="grid grid-cols-4 gap-1.5 sm:gap-2 mb-6">
             {words.map((item, idx) => (
               <button
                 key={idx}
                 onClick={() => handleWordClick(item.word)}
                 className={`
-                  p-6 rounded-lg font-semibold text-sm uppercase
+                  aspect-square flex items-center justify-center
+                  p-2 sm:p-4 md:p-6 rounded-lg font-semibold text-[0.65rem] sm:text-xs md:text-sm uppercase
                   transition-all duration-200
                   ${selected.includes(item.word) 
-                    ? 'bg-gray-700 text-white' 
+                    ? 'bg-gray-700 text-white scale-95' 
                     : 'bg-gray-200 hover:bg-gray-300 text-gray-900'
+                  }
+                  ${animatingCategory && animatingCategory.words.includes(item.word) 
+                    ? 'opacity-0 scale-75' 
+                    : 'opacity-100 scale-100'
                   }
                 `}
               >
-                {item.word}
+                <span className="leading-tight text-center break-words">{item.word}</span>
               </button>
             ))}
           </div>
@@ -213,7 +245,7 @@ function App() {
 
         {/* Message */}
         {message && (
-          <div className="text-center mb-4 font-semibold text-lg">
+          <div className="text-center mb-4 font-semibold text-base sm:text-lg">
             {message}
           </div>
         )}
@@ -221,29 +253,29 @@ function App() {
         {/* Completion message for won games */}
         {isGameOver && solved.length === PUZZLE.categories.length && !message && (
           <div className="text-center mb-4">
-            <p className="text-2xl font-bold text-green-600 mb-2">🎉 Congratulations! 🎉</p>
-            <p className="text-gray-700">You solved the puzzle!</p>
+            <p className="text-xl sm:text-2xl font-bold text-green-600 mb-2">🎉 Congratulations! 🎉</p>
+            <p className="text-sm sm:text-base text-gray-700">You solved the puzzle!</p>
           </div>
         )}
         
         {/* Game over message for lost games */}
         {isGameOver && solved.length < PUZZLE.categories.length && !message && (
           <div className="text-center mb-4">
-            <p className="text-xl font-bold text-red-600 mb-2">Game Over</p>
-            <p className="text-gray-700">You ran out of tries. Better luck next time!</p>
+            <p className="text-lg sm:text-xl font-bold text-red-600 mb-2">Game Over</p>
+            <p className="text-sm sm:text-base text-gray-700">You ran out of tries. Better luck next time!</p>
           </div>
         )}
 
         {/* Mistakes */}
         {!isGameOver && (
           <div className="flex justify-center mb-6">
-            <div className="flex gap-2">
-              <span className="text-gray-600">Mistakes remaining:</span>
+            <div className="flex gap-2 items-center">
+              <span className="text-xs sm:text-sm text-gray-600">Mistakes remaining:</span>
               <div className="flex gap-1">
                 {[...Array(4)].map((_, idx) => (
                   <div 
                     key={idx}
-                    className={`w-3 h-3 rounded-full ${
+                    className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${
                       idx < (4 - mistakes) ? 'bg-gray-700' : 'bg-gray-300'
                     }`}
                   />
@@ -255,23 +287,23 @@ function App() {
 
         {/* Controls */}
         {!isGameOver && words.length > 0 && (
-          <div className="flex justify-center gap-3 mb-6">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
             <button
               onClick={handleShuffle}
-              className="px-6 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+              className="px-4 sm:px-6 py-2 text-xs sm:text-sm bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-100 transition-colors"
             >
               Shuffle
             </button>
             <button
               onClick={handleDeselectAll}
-              className="px-6 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+              className="px-4 sm:px-6 py-2 text-xs sm:text-sm bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-100 transition-colors"
               disabled={selected.length === 0}
             >
               Deselect All
             </button>
             <button
               onClick={handleSubmit}
-              className={`px-6 py-2 rounded-full font-semibold transition-colors ${
+              className={`px-4 sm:px-6 py-2 text-xs sm:text-sm rounded-full font-semibold transition-colors ${
                 selected.length === 4
                   ? 'bg-gray-900 text-white hover:bg-gray-700'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -288,7 +320,7 @@ function App() {
           <div className="flex justify-center">
             <button
               onClick={handleNewGame}
-              className="px-8 py-3 bg-gray-900 text-white rounded-full font-semibold hover:bg-gray-700 transition-colors"
+              className="px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base bg-gray-900 text-white rounded-full font-semibold hover:bg-gray-700 transition-colors"
             >
               New Game
             </button>
@@ -296,9 +328,9 @@ function App() {
         )}
 
         {/* How to Play */}
-        <div className="mt-12 p-6 bg-white rounded-lg shadow-sm">
-          <h2 className="text-xl font-bold mb-3">How to Play</h2>
-          <ul className="space-y-2 text-gray-700">
+        <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-white rounded-lg shadow-sm">
+          <h2 className="text-lg sm:text-xl font-bold mb-3">How to Play</h2>
+          <ul className="space-y-2 text-xs sm:text-sm text-gray-700">
             <li>• Find groups of four items that share something in common.</li>
             <li>• Select four items and tap 'Submit' to check if your guess is correct.</li>
             <li>• Find the groups without making 4 mistakes!</li>
