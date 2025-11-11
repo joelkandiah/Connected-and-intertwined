@@ -1,291 +1,77 @@
 {
-  "title": "Wedding Celebration",
+  "title": "Wedding Mini",
   "author": "Connected & Intertwined",
-  "size": 15,
+  "size": 5,
   "grid": [
-    "VOWS###BRIDE###",
-    "ORAL##ROMANCE#",
-    "WEDS#ELOPEMENT",
-    "###ALTAR#VEIL#",
-    "FLOWERS##TOAST",
-    "#RING###COUPLE",
-    "FOREVER#CHAPEL",
-    "##UNITY#######",
-    "HONEYMOON#KISS",
-    "AISLE###MAID##",
-    "PARTY##LOVE###",
-    "#GROOM#ALWAYS#",
-    "COMMITMENT####",
-    "#DANCE#FAMILY#",
-    "###JOY###CAKE#"
+    "RINGS",
+    "AISLE",
+    "VOWED",
+    "ENTER",
+    "DRESS"
   ],
   "clues": {
     "across": {
       "1": {
-        "clue": "Promises exchanged at the altar",
-        "answer": "VOWS",
+        "clue": "Wedding bands",
+        "answer": "RINGS",
         "row": 0,
         "col": 0
       },
-      "5": {
-        "clue": "Woman getting married",
-        "answer": "BRIDE",
-        "row": 0,
-        "col": 7
-      },
       "6": {
-        "clue": "Spoken, not written",
-        "answer": "ORAL",
+        "clue": "Bride's walk",
+        "answer": "AISLE",
         "row": 1,
         "col": 0
       },
       "7": {
-        "clue": "Love story",
-        "answer": "ROMANCE",
-        "row": 1,
-        "col": 6
+        "clue": "Made promises",
+        "answer": "VOWED",
+        "row": 2,
+        "col": 0
       },
       "8": {
-        "clue": "Gets married",
-        "answer": "WEDS",
-        "row": 2,
+        "clue": "Go in",
+        "answer": "ENTER",
+        "row": 3,
         "col": 0
       },
       "9": {
-        "clue": "Running away to marry",
-        "answer": "ELOPEMENT",
-        "row": 2,
-        "col": 5
-      },
-      "11": {
-        "clue": "Where vows are exchanged",
-        "answer": "ALTAR",
-        "row": 3,
-        "col": 3
-      },
-      "12": {
-        "clue": "Bride's face covering",
-        "answer": "VEIL",
-        "row": 3,
-        "col": 9
-      },
-      "13": {
-        "clue": "Bouquet blooms",
-        "answer": "FLOWERS",
+        "clue": "Wedding gown",
+        "answer": "DRESS",
         "row": 4,
         "col": 0
-      },
-      "15": {
-        "clue": "Champagne celebration",
-        "answer": "TOAST",
-        "row": 4,
-        "col": 9
-      },
-      "17": {
-        "clue": "Wedding band",
-        "answer": "RING",
-        "row": 5,
-        "col": 1
-      },
-      "19": {
-        "clue": "Newlyweds",
-        "answer": "COUPLE",
-        "row": 5,
-        "col": 8
-      },
-      "20": {
-        "clue": "Eternally",
-        "answer": "FOREVER",
-        "row": 6,
-        "col": 0
-      },
-      "21": {
-        "clue": "Small wedding venue",
-        "answer": "CHAPEL",
-        "row": 6,
-        "col": 8
-      },
-      "23": {
-        "clue": "Togetherness",
-        "answer": "UNITY",
-        "row": 7,
-        "col": 2
-      },
-      "24": {
-        "clue": "Post-wedding vacation",
-        "answer": "HONEYMOON",
-        "row": 8,
-        "col": 0
-      },
-      "26": {
-        "clue": "Romantic gesture",
-        "answer": "KISS",
-        "row": 8,
-        "col": 10
-      },
-      "27": {
-        "clue": "Path to the altar",
-        "answer": "AISLE",
-        "row": 9,
-        "col": 0
-      },
-      "29": {
-        "clue": "Bridesmaid of honor",
-        "answer": "MAID",
-        "row": 9,
-        "col": 9
-      },
-      "30": {
-        "clue": "Reception celebration",
-        "answer": "PARTY",
-        "row": 10,
-        "col": 0
-      },
-      "32": {
-        "clue": "Affection",
-        "answer": "LOVE",
-        "row": 10,
-        "col": 7
-      },
-      "34": {
-        "clue": "Man getting married",
-        "answer": "GROOM",
-        "row": 11,
-        "col": 1
-      },
-      "35": {
-        "clue": "For all time",
-        "answer": "ALWAYS",
-        "row": 11,
-        "col": 7
-      },
-      "36": {
-        "clue": "Pledge of devotion",
-        "answer": "COMMITMENT",
-        "row": 12,
-        "col": 1
-      },
-      "38": {
-        "clue": "First ___ as married couple",
-        "answer": "DANCE",
-        "row": 13,
-        "col": 1
-      },
-      "39": {
-        "clue": "Relatives and loved ones",
-        "answer": "FAMILY",
-        "row": 13,
-        "col": 7
-      },
-      "41": {
-        "clue": "Happiness",
-        "answer": "JOY",
-        "row": 14,
-        "col": 3
-      },
-      "42": {
-        "clue": "Sweet tiered dessert",
-        "answer": "CAKE",
-        "row": 14,
-        "col": 9
       }
     },
     "down": {
       "1": {
-        "clue": "Marriage promises",
-        "answer": "VOW",
+        "clue": "To be wed",
+        "answer": "RAVED",
         "row": 0,
         "col": 0
       },
       "2": {
-        "clue": "Type of history",
-        "answer": "ORAL",
+        "clue": "Singular pronoun",
+        "answer": "I",
         "row": 0,
         "col": 1
       },
       "3": {
-        "clue": "Married on this day",
-        "answer": "WEDDING",
+        "clue": "Wedding cheer",
+        "answer": "NOWEL",
         "row": 0,
         "col": 2
       },
       "4": {
-        "clue": "Flower holder",
-        "answer": "STEM",
+        "clue": "Bride and groom",
+        "answer": "GLIDE",
         "row": 0,
         "col": 3
       },
       "5": {
-        "clue": "Wedding party member",
-        "answer": "BRIDESMAID",
+        "clue": "Exchanged",
+        "answer": "SEEDS",
         "row": 0,
-        "col": 7
-      },
-      "10": {
-        "clue": "Saying 'I do'",
-        "answer": "MARRYING",
-        "row": 1,
-        "col": 13
-      },
-      "14": {
-        "clue": "Union",
-        "answer": "WEDLOCK",
-        "row": 3,
-        "col": 11
-      },
-      "16": {
-        "clue": "Celebrations",
-        "answer": "FETES",
-        "row": 4,
-        "col": 6
-      },
-      "18": {
-        "clue": "Matrimony",
-        "answer": "MARRIAGE",
-        "row": 5,
         "col": 4
-      },
-      "22": {
-        "clue": "Love deeply",
-        "answer": "CHERISH",
-        "row": 6,
-        "col": 12
-      },
-      "25": {
-        "clue": "Joined in marriage",
-        "answer": "UNITED",
-        "row": 7,
-        "col": 4
-      },
-      "28": {
-        "clue": "Best ___",
-        "answer": "MAN",
-        "row": 9,
-        "col": 2
-      },
-      "31": {
-        "clue": "Husband or wife",
-        "answer": "SPOUSE",
-        "row": 10,
-        "col": 5
-      },
-      "33": {
-        "clue": "Adore",
-        "answer": "WORSHIP",
-        "row": 10,
-        "col": 10
-      },
-      "37": {
-        "clue": "Lasting bond",
-        "answer": "TIE",
-        "row": 12,
-        "col": 4
-      },
-      "40": {
-        "clue": "Romantic emotion",
-        "answer": "AMOUR",
-        "row": 13,
-        "col": 11
       }
     }
   }

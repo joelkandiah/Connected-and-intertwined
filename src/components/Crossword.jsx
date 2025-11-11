@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Cell from './Cell';
 import ClueList from './ClueList';
 import puzzleData from '../data/wedding-crossword.json';
@@ -10,6 +10,7 @@ const Crossword = () => {
   const [direction, setDirection] = useState('across'); // 'across' or 'down'
   const [incorrectCells, setIncorrectCells] = useState(new Set());
   const [revealedCells, setRevealedCells] = useState(new Set());
+  const inputRef = useRef(null);
 
   // Initialize grid from puzzle data
   useEffect(() => {
@@ -121,6 +122,11 @@ const Crossword = () => {
     } else {
       setSelectedCell({ row, col });
     }
+    
+    // Focus the hidden input to trigger mobile keyboard
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
   };
 
   // Handle keyboard input
@@ -133,6 +139,9 @@ const Crossword = () => {
     if (/^[a-zA-Z]$/.test(e.key)) {
       e.preventDefault();
       const newGrid = [...grid];
+      
+      // If cell already has a value, replace it and move to next cell
+      const hadValue = newGrid[row][col].value !== '';
       newGrid[row][col].value = e.key.toUpperCase();
       setGrid(newGrid);
 
@@ -148,7 +157,7 @@ const Crossword = () => {
         return newSet;
       });
 
-      // Move to next cell
+      // Always move to next cell after typing
       moveToNextCell();
     }
     // Handle backspace/delete
@@ -364,6 +373,18 @@ const Crossword = () => {
           </p>
         </header>
 
+        {/* Hidden input for mobile keyboard */}
+        <input
+          ref={inputRef}
+          type="text"
+          inputMode="text"
+          autoComplete="off"
+          autoCapitalize="characters"
+          className="absolute opacity-0 pointer-events-none"
+          style={{ position: 'absolute', left: '-9999px' }}
+          aria-hidden="true"
+        />
+
         {/* Current clue display */}
         {currentClue && (
           <div className="mb-6 p-4 bg-white rounded-lg shadow-sm border-2 border-pink-200">
@@ -376,15 +397,16 @@ const Crossword = () => {
           </div>
         )}
 
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+        <div className="flex flex-col gap-6">
           {/* Crossword grid */}
-          <div className="flex-shrink-0">
+          <div className="w-full flex justify-center">
             <div 
-              className="inline-grid gap-0 bg-white p-2 sm:p-4 rounded-lg shadow-lg border-2 border-pink-100"
+              className="grid gap-0 bg-white p-2 sm:p-4 rounded-lg shadow-lg border-2 border-pink-100"
               style={{ 
                 gridTemplateColumns: `repeat(${puzzleData.size}, minmax(0, 1fr))`,
-                maxWidth: 'min(90vw, 600px)',
-                width: '100%'
+                width: '100%',
+                maxWidth: 'min(100vw - 2rem, 500px)',
+                aspectRatio: '1/1'
               }}
               role="grid"
               aria-label="Crossword puzzle grid"
@@ -454,8 +476,8 @@ const Crossword = () => {
           </div>
 
           {/* Clues */}
-          <div className="flex-1 min-w-0">
-            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg border-2 border-pink-100">
+          <div className="w-full">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg border-2 border-pink-100 max-w-2xl mx-auto">
               <ClueList
                 title="Across"
                 clues={puzzleData.clues.across}
