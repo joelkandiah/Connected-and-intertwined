@@ -457,15 +457,12 @@ const Crossword = () => {
   const wordCells = getCurrentWordCells();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 py-4 sm:py-8 px-3 sm:px-4">
+    <div className="min-h-screen py-4 sm:py-8 px-3 sm:px-4">
       <div className="max-w-7xl mx-auto">
         <header className="text-center mb-6 sm:mb-8">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-            Wedding Crossword
-          </h1>
-          <p className="text-gray-600 text-sm sm:text-base">
-            A celebration of love and unity
-          </p>
+          <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)'}} className="font-bold mb-2">The Mini</h1>
+          <p style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}} className="text-gray-600">Wedding Edition</p>
+          <p style={{fontSize: 'clamp(0.55rem, 2vw, 0.75rem)'}} className="text-gray-500 mt-2">Piece together all the clues!</p>
           {/* Timer display */}
           <div className="mt-3 text-lg font-semibold text-gray-700">
             Time: {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}

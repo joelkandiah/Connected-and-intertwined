@@ -5,8 +5,8 @@ const PUZZLE = {
   categories: [
     { name: "The Couple", difficulty: 1, words: ["SOFIA", "JOEL", "BRIDE", "GROOM"] },
     { name: "Places of Love", difficulty: 2, words: ["CAMBRIDGE", "WINSTON-SALEM", "HENLEY", "RANDLEMAN"] },
-    { name: "Journey Together", difficulty: 2, words: ["TRANSATLANTIC", "HONEYMOON", "ADVENTURE", "MEMORIES"] },
-    { name: "Symbols of Love", difficulty: 3, words: ["VOWS", "RING", "FOREVER", "PASSION"] }
+    { name: "Journey Together", difficulty: 3, words: ["TRANSATLANTIC", "HONEYMOON", "ADVENTURE", "MEMORIES"] },
+    { name: "Symbols of Love", difficulty: 4, words: ["VOWS", "RING", "FOREVER", "PASSION"] }
   ]
 };
 

@@ -12,19 +12,19 @@
   "clues": {
     "across": {
       "1": {
-        "clue": "Groom's name (4)",
+        "clue": "Old Testament Prophet (4)",
         "answer": "JOEL",
         "row": 0,
         "col": 1
       },
       "5": {
-        "clue": "Bride's name (5)",
+        "clue": "Capital of Bulgaria (5)",
         "answer": "SOFIA",
         "row": 1,
         "col": 0
       },
-      "7": {
-        "clue": "Wedding vow words (2)",
+      "6": {
+        "clue": "Wedding vow words, I __ (2)",
         "answer": "DO",
         "row": 2,
         "col": 3
@@ -35,8 +35,8 @@
         "row": 4,
         "col": 4
       },
-      "9": {
-        "clue": "Writing fluids (4)",
+      "8": {
+        "clue": "Sign their new names (4)",
         "answer": "INKS",
         "row": 4,
         "col": 0
@@ -50,14 +50,14 @@
         "col": 2
       },
       "3": {
-        "clue": "Bride's name last letter (1)",
+        "clue": "Hindu Celebration (3)",
         "answer": "E",
         "row": 0,
         "col": 3
       },
       "4": {
-        "clue": "Groom's name last letter (1)",
-        "answer": "L",
+        "clue": "Honeymoon Destination (4)",
+        "answer": "LAOS",
         "row": 0,
         "col": 4
       },
@@ -67,15 +67,15 @@
         "row": 1,
         "col": 0
       },
-      "6": {
+      "1": {
         "clue": "Wedding affirmative (3)",
         "answer": "IDO",
-        "row": 1,
+        "row": 0,
         "col": 1
       },
-      "8": {
-        "clue": "Preposition (2)",
-        "answer": "OS",
+      "7": {
+        "clue": "Agreed (2)",
+        "answer": "OK",
         "row": 3,
         "col": 2
       }
