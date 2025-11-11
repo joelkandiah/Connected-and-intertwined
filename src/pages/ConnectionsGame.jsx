@@ -321,7 +321,7 @@ function ConnectionsGame() {
         )}
 
         {/* New Game */}
-        {isGameOver && (
+        {isGameOver && !viewOnlyMode && (
           <div className="flex justify-center">
             <button onClick={handleNewGame} className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gray-900 text-white rounded-full font-semibold hover:bg-gray-700 transition-colors" style={{fontSize: 'clamp(0.875rem, 2.5vw, 1rem)'}}>New Game</button>
           </div>

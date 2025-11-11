@@ -37,6 +37,18 @@ const Cell = ({
           {number}
         </span>
       )}
+      {!isBlack && isRevealed && (
+        <div 
+          className="absolute top-0 right-0 w-0 h-0 border-t-[12px] border-r-[12px]"
+          style={{
+            borderTopColor: '#3b82f6',
+            borderRightColor: '#3b82f6',
+            borderBottomColor: 'transparent',
+            borderLeftColor: 'transparent'
+          }}
+          title="Revealed cell"
+        />
+      )}
       {!isBlack && (
         <span className="text-base sm:text-lg md:text-xl font-bold uppercase text-gray-900">
           {value}
