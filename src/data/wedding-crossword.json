@@ -6,7 +6,7 @@
     "#JOEL",
     "SOFIA",
     "#Y#DO",
-    "###O#S",
+    "###OS",
     "INKS#"
   ],
   "clues": {
@@ -29,13 +29,13 @@
         "row": 2,
         "col": 3
       },
-      "9": {
-        "clue": "Plural of self (1)",
-        "answer": "S",
+      "8": {
+        "clue": "Preposition (2)",
+        "answer": "OS",
         "row": 3,
-        "col": 4
+        "col": 3
       },
-      "10": {
+      "9": {
         "clue": "Writing fluids (4)",
         "answer": "INKS",
         "row": 4,
@@ -44,19 +44,19 @@
     },
     "down": {
       "2": {
-        "clue": "Sphere shape (1)",
-        "answer": "O",
+        "clue": "Preposition (2)",
+        "answer": "OF",
         "row": 0,
         "col": 2
       },
       "3": {
-        "clue": "Bride's name first letter (1)",
+        "clue": "Bride's name last letter (1)",
         "answer": "E",
         "row": 0,
         "col": 3
       },
       "4": {
-        "clue": "Not you (1)",
+        "clue": "Groom's name last letter (1)",
         "answer": "L",
         "row": 0,
         "col": 4
@@ -72,12 +72,6 @@
         "answer": "IDO",
         "row": 1,
         "col": 1
-      },
-      "8": {
-        "clue": "Preposition (2)",
-        "answer": "OS",
-        "row": 3,
-        "col": 3
       }
     }
   }

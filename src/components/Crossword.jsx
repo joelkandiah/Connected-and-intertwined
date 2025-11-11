@@ -10,7 +10,11 @@ const Crossword = () => {
   const [direction, setDirection] = useState('across'); // 'across' or 'down'
   const [incorrectCells, setIncorrectCells] = useState(new Set());
   const [revealedCells, setRevealedCells] = useState(new Set());
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
   const inputRef = useRef(null);
+  const timerIntervalRef = useRef(null);
 
   // Initialize grid from puzzle data
   useEffect(() => {
@@ -54,9 +58,78 @@ const Crossword = () => {
   // Save progress whenever grid changes
   useEffect(() => {
     if (grid.length > 0) {
-      saveCrosswordProgress({ grid });
+      saveCrosswordProgress({ grid, elapsedTime });
     }
-  }, [grid]);
+  }, [grid, elapsedTime]);
+
+  // Load saved time on initial load
+  useEffect(() => {
+    const savedProgress = loadCrosswordProgress();
+    if (savedProgress && savedProgress.elapsedTime) {
+      setElapsedTime(savedProgress.elapsedTime);
+    }
+  }, []);
+
+  // Timer logic - only runs when page is visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setIsTimerRunning(false);
+      } else if (!isCompleted) {
+        setIsTimerRunning(true);
+      }
+    };
+
+    // Start timer when component mounts (if not completed)
+    if (!isCompleted) {
+      setIsTimerRunning(true);
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+    };
+  }, [isCompleted]);
+
+  // Timer interval
+  useEffect(() => {
+    if (isTimerRunning && !isCompleted) {
+      timerIntervalRef.current = setInterval(() => {
+        setElapsedTime(prev => prev + 1);
+      }, 1000);
+    } else {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+    }
+
+    return () => {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+    };
+  }, [isTimerRunning, isCompleted]);
+
+  // Check if puzzle is completed
+  useEffect(() => {
+    if (grid.length === 0) return;
+
+    const allCellsCorrect = grid.every(row =>
+      row.every(cell => {
+        if (cell.isBlock) return true;
+        return cell.value.toUpperCase() === cell.solution;
+      })
+    );
+
+    if (allCellsCorrect && !isCompleted) {
+      setIsCompleted(true);
+      setIsTimerRunning(false);
+    }
+  }, [grid, isCompleted]);
 
   // Get current word cells based on selected cell and direction
   const getCurrentWordCells = useCallback(() => {
@@ -345,6 +418,9 @@ const Crossword = () => {
       setGrid(newGrid);
       setIncorrectCells(new Set());
       setRevealedCells(new Set());
+      setIsCompleted(false);
+      setElapsedTime(0);
+      setIsTimerRunning(true);
       clearCrosswordProgress();
     }
   };
@@ -371,7 +447,36 @@ const Crossword = () => {
           <p className="text-gray-600 text-sm sm:text-base">
             A celebration of love and unity
           </p>
+          {/* Timer display */}
+          <div className="mt-3 text-lg font-semibold text-gray-700">
+            Time: {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
+          </div>
         </header>
+
+        {/* Completion Modal */}
+        {isCompleted && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full">
+              <div className="text-center">
+                <div className="text-6xl mb-4">🎉</div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">Congratulations!</h2>
+                <p className="text-lg text-gray-700 mb-4">You completed the puzzle!</p>
+                <div className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg p-4 mb-6">
+                  <div className="text-sm text-gray-600 mb-1">Your Time</div>
+                  <div className="text-4xl font-bold text-gray-900">
+                    {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsCompleted(false)}
+                  className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Hidden input for mobile keyboard */}
         <input
