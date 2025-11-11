@@ -33,36 +33,80 @@ function ConnectionsGame() {
   const [solving, setSolving] = useState(null); // Step 2
   const [isFading, setIsFading] = useState(false); // Banner fade
 
-  // Initialize or load game
-  useEffect(() => {
+// Initialize or load game
+useEffect(() => {
     const savedState = localStorage.getItem(STORAGE_KEY);
+
+    let stateToLoad = null; // We'll set this if a valid state is found
+
     if (savedState) {
-      const state = JSON.parse(savedState);
-      setWords(state.words);
-      setSelected(state.selected || []);
-      setSolved(state.solved || []);
-      setMistakes(state.mistakes || 0);
-      setIsGameOver(state.isGameOver || false);
-      setViewOnlyMode(state.viewOnlyMode || false);
-      
-      // If all categories are solved, ensure view-only mode is active
-      if (state.solved && state.solved.length === PUZZLE.categories.length) {
-        setViewOnlyMode(true);
-      }
-    } else {
-      const allWords = PUZZLE.categories.flatMap(cat =>
-        cat.words.map(word => ({ word, category: cat.name, difficulty: cat.difficulty }))
-      );
-      setWords(allWords.sort(() => Math.random() - 0.5));
+        const state = JSON.parse(savedState);
+        
+        // 1. Check for a fully COMPLETE state (words.length = 0 is expected)
+        const isGameComplete = state.solved && state.solved.length === PUZZLE.categories.length;
+        
+        // 2. Check for a playable MID-GAME state (words.length > 0 is expected)
+        const isGamePlayable = state.words && state.words.length > 0;
+
+        if (isGameComplete || isGamePlayable) {
+            // State is valid (either fully solved or mid-play)
+            stateToLoad = state;
+        } else {
+            // Case: Saved state exists but has 0 words and is NOT marked as complete.
+            // This is the corrupted state, so we ignore it and proceed to new game.
+            console.error("Corrupted/Blank save state detected. Starting new game.");
+            localStorage.removeItem(STORAGE_KEY); // Clean up the bad save
+        }
     }
-  }, []);
+
+    if (stateToLoad) {
+        // --- LOAD VALID SAVED STATE ---
+        const state = stateToLoad;
+        
+        setWords(state.words || []);
+        setSelected(state.selected || []);
+        setSolved(state.solved || []);
+        setMistakes(state.mistakes || 0);
+        setIsGameOver(state.isGameOver || false);
+        setViewOnlyMode(state.viewOnlyMode || false);
+
+        setSolving(null);
+        setRearranging(null);
+        
+        // Final safety check for a completed game
+        if (state.solved && state.solved.length === PUZZLE.categories.length) {
+            setViewOnlyMode(true);
+            setIsGameOver(true);
+            setShowCompletionModal(false);
+        }
+        
+    } else {
+        // --- INITIALIZE NEW GAME (No valid state to load) ---
+        const allWords = PUZZLE.categories.flatMap(cat =>
+            cat.words.map(word => ({ word, category: cat.name, difficulty: cat.difficulty }))
+        );
+        setWords(allWords.sort(() => Math.random() - 0.5));
+        setSelected([]);
+        setSolved([]);
+        setMistakes(0);
+        setIsGameOver(false);
+        setShowCompletionModal(false);
+        setViewOnlyMode(false);
+    }
+}, []);
 
   // Save state
   useEffect(() => {
-    if (words.length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        words, selected, solved, mistakes, isGameOver, viewOnlyMode
-      }));
+    const totalWords = words.length + solved.reduce((sum, cat) => sum + cat.words.length, 0);
+
+    // Only save if the game is in a valid state: 
+    // 1. All words are accounted for (16 total), OR
+    // 2. The game is complete (isGameOver is true).
+    // The total word count check prevents saving an empty or partial state during bad initializations.
+    if (totalWords === 16 || isGameOver) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            words, selected, solved, mistakes, isGameOver, viewOnlyMode
+        }));
     }
   }, [words, selected, solved, mistakes, isGameOver, viewOnlyMode]);
 
@@ -104,21 +148,26 @@ function ConnectionsGame() {
 
         // Remove banner and move tiles to solved after 1200ms
         setTimeout(() => {
-          setSolved([...solved, {
+          setSolved(prev => {
+          const next = [
+            ...prev, {
             name: category.name,
             words: selected,
             difficulty: category.difficulty
-          }]);
-          setWords(prev => prev.filter(item => !selected.includes(item.word)));
-          setSelected([]);
-          setSolving(null);
-          setIsFading(false);
-
-          if (solved.length + 1 === PUZZLE.categories.length) {
+          }];
+          if (next.length === PUZZLE.categories.length) {
             setIsGameOver(true);
             setShowCompletionModal(true);
             setMessage('Congratulations! You solved the puzzle!');
           }
+            return next;
+          });
+
+          setWords(prev => prev.filter(item => !selected.includes(item.word)));
+          setSelected(() => []);
+          setSolving(null);
+          setIsFading(false);
+
         }, 1200);
 
       }, 400);

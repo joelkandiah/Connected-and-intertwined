@@ -17,7 +17,7 @@ const HamburgerMenu = () => {
       {/* Hamburger button */}
       <button
         onClick={toggleMenu}
-        className="fixed top-4 right-4 z-50 p-2 bg-white rounded-lg shadow-lg hover:bg-gray-50 transition-colors"
+        className="fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg hover:bg-gray-50 transition-colors"
         aria-label="Menu"
         aria-expanded={isOpen}
       >
@@ -40,9 +40,9 @@ const HamburgerMenu = () => {
       {/* Menu panel */}
       <div
         className={`
-          fixed top-0 right-0 h-full w-64 bg-white shadow-2xl z-40
+          fixed top-0 left-0 h-full w-64 bg-white shadow-2xl z-40
           transform transition-transform duration-300 ease-in-out
-          ${isOpen ? 'translate-x-0' : 'translate-x-full'}
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
         <nav className="pt-20 px-6">
@@ -53,7 +53,7 @@ const HamburgerMenu = () => {
                 onClick={closeMenu}
                 className="block py-3 px-4 text-lg font-semibold text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                Connections Game
+                Connections
               </Link>
             </li>
             <li>
@@ -62,7 +62,7 @@ const HamburgerMenu = () => {
                 onClick={closeMenu}
                 className="block py-3 px-4 text-lg font-semibold text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                Wedding Crossword
+               The Mini 
               </Link>
             </li>
           </ul>
