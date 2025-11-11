@@ -436,43 +436,43 @@ const Crossword = () => {
                 })
               )}
             </div>
+          </div>
 
-            {/* Control buttons */}
-            <div className="mt-6 flex flex-wrap gap-2 justify-center">
-              <button
-                onClick={handleCheck}
-                className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-50 transition-colors text-sm"
-                disabled={!selectedCell}
-              >
-                Check Word
-              </button>
-              <button
-                onClick={handleReveal}
-                className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-50 transition-colors text-sm"
-                disabled={!selectedCell}
-              >
-                Reveal Word
-              </button>
-              <button
-                onClick={handleClear}
-                className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-50 transition-colors text-sm"
-                disabled={!selectedCell}
-              >
-                Clear Word
-              </button>
-              <button
-                onClick={handleRevealAll}
-                className="px-4 py-2 bg-pink-100 border-2 border-pink-300 rounded-full font-semibold hover:bg-pink-200 transition-colors text-sm"
-              >
-                Reveal All
-              </button>
-              <button
-                onClick={handleReset}
-                className="px-4 py-2 bg-purple-100 border-2 border-purple-300 rounded-full font-semibold hover:bg-purple-200 transition-colors text-sm"
-              >
-                Reset Puzzle
-              </button>
-            </div>
+          {/* Control buttons */}
+          <div className="flex flex-wrap gap-2 justify-center">
+            <button
+              onClick={handleCheck}
+              className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-50 transition-colors text-sm"
+              disabled={!selectedCell}
+            >
+              Check Word
+            </button>
+            <button
+              onClick={handleReveal}
+              className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-50 transition-colors text-sm"
+              disabled={!selectedCell}
+            >
+              Reveal Word
+            </button>
+            <button
+              onClick={handleClear}
+              className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-50 transition-colors text-sm"
+              disabled={!selectedCell}
+            >
+              Clear Word
+            </button>
+            <button
+              onClick={handleRevealAll}
+              className="px-4 py-2 bg-pink-100 border-2 border-pink-300 rounded-full font-semibold hover:bg-pink-200 transition-colors text-sm"
+            >
+              Reveal All
+            </button>
+            <button
+              onClick={handleReset}
+              className="px-4 py-2 bg-purple-100 border-2 border-purple-300 rounded-full font-semibold hover:bg-purple-200 transition-colors text-sm"
+            >
+              Reset Puzzle
+            </button>
           </div>
 
           {/* Clues */}
