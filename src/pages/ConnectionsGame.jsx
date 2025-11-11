@@ -43,6 +43,12 @@ function ConnectionsGame() {
       setSolved(state.solved || []);
       setMistakes(state.mistakes || 0);
       setIsGameOver(state.isGameOver || false);
+      setViewOnlyMode(state.viewOnlyMode || false);
+      
+      // If all categories are solved, ensure view-only mode is active
+      if (state.solved && state.solved.length === PUZZLE.categories.length) {
+        setViewOnlyMode(true);
+      }
     } else {
       const allWords = PUZZLE.categories.flatMap(cat =>
         cat.words.map(word => ({ word, category: cat.name, difficulty: cat.difficulty }))
@@ -55,10 +61,10 @@ function ConnectionsGame() {
   useEffect(() => {
     if (words.length > 0) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        words, selected, solved, mistakes, isGameOver
+        words, selected, solved, mistakes, isGameOver, viewOnlyMode
       }));
     }
-  }, [words, selected, solved, mistakes, isGameOver]);
+  }, [words, selected, solved, mistakes, isGameOver, viewOnlyMode]);
 
   const handleWordClick = (word) => {
     if (isGameOver || viewOnlyMode) return;
