@@ -11,6 +11,8 @@ const Crossword = () => {
   const [incorrectCells, setIncorrectCells] = useState(new Set());
   const [revealedCells, setRevealedCells] = useState(new Set());
   const [isCompleted, setIsCompleted] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [viewOnlyMode, setViewOnlyMode] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const inputRef = useRef(null);
@@ -127,6 +129,7 @@ const Crossword = () => {
 
     if (allCellsCorrect && !isCompleted) {
       setIsCompleted(true);
+      setShowCompletionModal(true);
       setIsTimerRunning(false);
     }
   }, [grid, isCompleted]);
@@ -186,6 +189,7 @@ const Crossword = () => {
 
   // Handle cell click
   const handleCellClick = (row, col) => {
+    if (viewOnlyMode) return; // Don't allow interaction in view-only mode
     const cell = grid[row][col];
     if (cell.isBlock) return;
 
@@ -204,7 +208,7 @@ const Crossword = () => {
 
   // Handle keyboard input
   const handleKeyDown = useCallback((e) => {
-    if (!selectedCell) return;
+    if (!selectedCell || viewOnlyMode) return;
 
     const { row, col } = selectedCell;
 
@@ -419,14 +423,29 @@ const Crossword = () => {
       setIncorrectCells(new Set());
       setRevealedCells(new Set());
       setIsCompleted(false);
+      setShowCompletionModal(false);
+      setViewOnlyMode(false);
       setElapsedTime(0);
       setIsTimerRunning(true);
       clearCrosswordProgress();
     }
   };
 
+  // Handle New Game from completion modal
+  const handleNewGame = () => {
+    handleReset();
+  };
+
+  // Handle Show Puzzle from completion modal
+  const handleShowPuzzle = () => {
+    setShowCompletionModal(false);
+    setViewOnlyMode(true);
+    setSelectedCell(null);
+  };
+
   // Handle clue click
   const handleClueClick = (number, clueDirection) => {
+    if (viewOnlyMode) return; // Don't allow clue clicks in view-only mode
     const clueData = puzzleData.clues[clueDirection][number];
     if (clueData) {
       setSelectedCell({ row: clueData.row, col: clueData.col });
@@ -454,8 +473,8 @@ const Crossword = () => {
         </header>
 
         {/* Completion Modal */}
-        {isCompleted && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        {showCompletionModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 30 }}>
             <div className="bg-white rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full">
               <div className="text-center">
                 <div className="text-6xl mb-4">🎉</div>
@@ -467,12 +486,20 @@ const Crossword = () => {
                     {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
                   </div>
                 </div>
-                <button
-                  onClick={() => setIsCompleted(false)}
-                  className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-colors"
-                >
-                  Close
-                </button>
+                <div className="flex gap-3 justify-center">
+                  <button
+                    onClick={handleNewGame}
+                    className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-colors"
+                  >
+                    New Game
+                  </button>
+                  <button
+                    onClick={handleShowPuzzle}
+                    className="px-6 py-3 bg-white border-2 border-gray-300 text-gray-900 rounded-full font-semibold hover:bg-gray-50 transition-colors"
+                  >
+                    Show Puzzle
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -544,41 +571,52 @@ const Crossword = () => {
           </div>
 
           {/* Control buttons */}
-          <div className="flex flex-wrap gap-2 justify-center">
-            <button
-              onClick={handleCheck}
-              className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-50 transition-colors text-sm"
-              disabled={!selectedCell}
-            >
-              Check Word
-            </button>
-            <button
-              onClick={handleReveal}
-              className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-50 transition-colors text-sm"
-              disabled={!selectedCell}
-            >
-              Reveal Word
-            </button>
-            <button
-              onClick={handleClear}
-              className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-50 transition-colors text-sm"
-              disabled={!selectedCell}
-            >
-              Clear Word
-            </button>
-            <button
-              onClick={handleRevealAll}
-              className="px-4 py-2 bg-pink-100 border-2 border-pink-300 rounded-full font-semibold hover:bg-pink-200 transition-colors text-sm"
-            >
-              Reveal All
-            </button>
-            <button
-              onClick={handleReset}
-              className="px-4 py-2 bg-purple-100 border-2 border-purple-300 rounded-full font-semibold hover:bg-purple-200 transition-colors text-sm"
-            >
-              Reset Puzzle
-            </button>
-          </div>
+          {!viewOnlyMode ? (
+            <div className="flex flex-wrap gap-2 justify-center">
+              <button
+                onClick={handleCheck}
+                className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-50 transition-colors text-sm"
+                disabled={!selectedCell}
+              >
+                Check Word
+              </button>
+              <button
+                onClick={handleReveal}
+                className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-50 transition-colors text-sm"
+                disabled={!selectedCell}
+              >
+                Reveal Word
+              </button>
+              <button
+                onClick={handleClear}
+                className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-50 transition-colors text-sm"
+                disabled={!selectedCell}
+              >
+                Clear Word
+              </button>
+              <button
+                onClick={handleRevealAll}
+                className="px-4 py-2 bg-pink-100 border-2 border-pink-300 rounded-full font-semibold hover:bg-pink-200 transition-colors text-sm"
+              >
+                Reveal All
+              </button>
+              <button
+                onClick={handleReset}
+                className="px-4 py-2 bg-purple-100 border-2 border-purple-300 rounded-full font-semibold hover:bg-purple-200 transition-colors text-sm"
+              >
+                Reset Puzzle
+              </button>
+            </div>
+          ) : (
+            <div className="flex justify-center">
+              <button
+                onClick={handleNewGame}
+                className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-colors"
+              >
+                New Game
+              </button>
+            </div>
+          )}
 
           {/* Clues */}
           <div className="w-full">

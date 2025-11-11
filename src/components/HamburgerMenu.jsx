@@ -31,7 +31,7 @@ const HamburgerMenu = () => {
       {/* Menu overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="fixed inset-0 bg-black bg-opacity-20 z-40"
           onClick={closeMenu}
         />
       )}

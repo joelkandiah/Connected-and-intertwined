@@ -26,6 +26,8 @@ function ConnectionsGame() {
   const [mistakes, setMistakes] = useState(0);
   const [message, setMessage] = useState('');
   const [isGameOver, setIsGameOver] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [viewOnlyMode, setViewOnlyMode] = useState(false);
   
   const [rearranging, setRearranging] = useState(null); // Step 1
   const [solving, setSolving] = useState(null); // Step 2
@@ -59,7 +61,7 @@ function ConnectionsGame() {
   }, [words, selected, solved, mistakes, isGameOver]);
 
   const handleWordClick = (word) => {
-    if (isGameOver) return;
+    if (isGameOver || viewOnlyMode) return;
     if (selected.includes(word)) setSelected(selected.filter(w => w !== word));
     else if (selected.length < 4) setSelected([...selected, word]);
   };
@@ -108,6 +110,7 @@ function ConnectionsGame() {
 
           if (solved.length + 1 === PUZZLE.categories.length) {
             setIsGameOver(true);
+            setShowCompletionModal(true);
             setMessage('Congratulations! You solved the puzzle!');
           }
         }, 1200);
@@ -147,11 +150,45 @@ function ConnectionsGame() {
     setSolved([]);
     setMistakes(0);
     setIsGameOver(false);
+    setShowCompletionModal(false);
+    setViewOnlyMode(false);
     setMessage('');
+  };
+
+  const handleShowPuzzle = () => {
+    setShowCompletionModal(false);
+    setViewOnlyMode(true);
   };
 
   return (
     <div className="min-h-screen bg-gray-50 py-4 sm:py-8 px-3 sm:px-4">
+      {/* Completion Modal */}
+      {showCompletionModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 30 }}>
+          <div className="bg-white rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full">
+            <div className="text-center">
+              <div className="text-6xl mb-4">🎉</div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Congratulations!</h2>
+              <p className="text-lg text-gray-700 mb-6">You solved all the connections!</p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={handleNewGame}
+                  className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-green-500 text-white rounded-full font-semibold hover:from-yellow-500 hover:to-green-600 transition-colors"
+                >
+                  New Game
+                </button>
+                <button
+                  onClick={handleShowPuzzle}
+                  className="px-6 py-3 bg-white border-2 border-gray-300 text-gray-900 rounded-full font-semibold hover:bg-gray-50 transition-colors"
+                >
+                  Show Puzzle
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="w-full max-w-[min(96vw,650px)] mx-auto">
         <header className="text-center mb-6 sm:mb-8">
           <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)'}} className="font-bold mb-2">Connections</h1>
@@ -244,7 +281,7 @@ function ConnectionsGame() {
         )}
 
         {/* Mistakes */}
-        {!isGameOver && (
+        {!isGameOver && !viewOnlyMode && (
           <div className="flex justify-center mb-6">
             <div className="flex gap-2 items-center">
               <span style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} className="text-gray-600">Mistakes remaining:</span>
@@ -261,8 +298,21 @@ function ConnectionsGame() {
           </div>
         )}
 
+        {/* New Game button in view-only mode */}
+        {viewOnlyMode && (
+          <div className="flex justify-center mb-6">
+            <button
+              onClick={handleNewGame}
+              className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-green-500 text-white rounded-full font-semibold hover:from-yellow-500 hover:to-green-600 transition-colors"
+              style={{fontSize: 'clamp(0.875rem, 2vw, 1rem)'}}
+            >
+              New Game
+            </button>
+          </div>
+        )}
+
         {/* Controls */}
-        {!isGameOver && (words.length > 0 || rearranging || solving) && (
+        {!isGameOver && !viewOnlyMode && (words.length > 0 || rearranging || solving) && (
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
             <button onClick={handleShuffle} className="px-4 sm:px-6 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-100 transition-colors" style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}>Shuffle</button>
             <button onClick={handleDeselectAll} className="px-4 sm:px-6 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-100 transition-colors" style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} disabled={selected.length === 0}>Deselect All</button>
