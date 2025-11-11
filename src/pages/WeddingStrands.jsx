@@ -162,24 +162,6 @@ function WeddingStrands() {
     return rowDiff <= 1 && colDiff <= 1 && !(rowDiff === 0 && colDiff === 0);
   };
 
-  const handleCellClick = (row, col) => {
-    if (isComplete) return;
-    
-    const cellKey = getCellKey(row, col);
-    const isAlreadySelected = selectedCells.some(c => c.key === cellKey);
-    
-    if (isAlreadySelected) {
-      // Deselect from this point onwards
-      const index = selectedCells.findIndex(c => c.key === cellKey);
-      setSelectedCells(selectedCells.slice(0, index));
-    } else {
-      // Check if adjacent to last selected cell (or if this is first cell)
-      if (selectedCells.length === 0 || areAdjacent(selectedCells[selectedCells.length - 1], { row, col })) {
-        setSelectedCells([...selectedCells, { row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
-      }
-    }
-  };
-
   const handleCellMouseDown = (row, col) => {
     if (isComplete) return;
     setIsDragging(true);
@@ -196,7 +178,7 @@ function WeddingStrands() {
     if (!isAlreadySelected && selectedCells.length > 0) {
       const lastCell = selectedCells[selectedCells.length - 1];
       if (areAdjacent(lastCell, { row, col })) {
-        setSelectedCells([...selectedCells, { row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
+        setSelectedCells(prev => [...prev, { row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
       }
     }
   };
@@ -204,8 +186,9 @@ function WeddingStrands() {
   const handleMouseUp = () => {
     if (isDragging && selectedCells.length >= 3) {
       handleSubmit();
+    } else {
+      setIsDragging(false);
     }
-    setIsDragging(false);
   };
 
   useEffect(() => {
@@ -330,7 +313,7 @@ function WeddingStrands() {
           <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)'}} className="font-bold mb-2">Wedding Strands</h1>
           <p style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}} className="text-gray-600">Find the hidden words!</p>
           <p style={{fontSize: 'clamp(0.55rem, 2vw, 0.75rem)'}} className="text-gray-500 mt-2">
-            Theme: Wedding Day
+            Drag to select letters • Find the pangram!
           </p>
         </header>
 
@@ -358,7 +341,6 @@ function WeddingStrands() {
                       key={`${rowIndex}-${colIndex}`}
                       onMouseDown={() => handleCellMouseDown(rowIndex, colIndex)}
                       onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
-                      onClick={() => handleCellClick(rowIndex, colIndex)}
                       className={`
                         w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14
                         flex items-center justify-center
@@ -491,8 +473,8 @@ function WeddingStrands() {
             How to Play
           </h2>
           <ul style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} className="space-y-2 text-gray-700">
-            <li>• Click or drag to select adjacent letters in the grid</li>
-            <li>• Find hidden wedding-themed words</li>
+            <li>• Drag across adjacent letters to form words</li>
+            <li>• Find all the hidden wedding-themed words</li>
             <li>• Look for the special spangram word (marked with ⭐)</li>
             <li>• The spangram spans across the puzzle</li>
             <li>• Try to find all words as quickly as possible!</li>
