@@ -381,17 +381,39 @@ const Crossword = () => {
 
   // Reveal all
   const handleRevealAll = () => {
+    // This step correctly updates the grid contents to the solution
     const newGrid = grid.map(row => 
       row.map(cell => ({
         ...cell,
-        value: cell.isBlock ? '' : cell.solution
+        value: cell.isBlock ? '' : cell.solution // Set the cell value to the solution
       }))
     );
+  
+    // 1. Create a new Set to hold ONLY the newly revealed cell coordinates
+    const newlyRevealed = new Set();
+    
+    // 2. Iterate through the original grid to compare user input against the solution
+    grid.forEach((row, rowIndex) => {
+      row.forEach((cell, colIndex) => {
+        
+        // Check if it's a playable cell AND the current value is NOT the solution
+        if (!cell.isBlock && cell.value !== cell.solution) {
+          
+          // **Only add the cell to the set if the solution had to be revealed**
+          newlyRevealed.add(`${rowIndex}-${colIndex}`);
+        }
+      });
+    });
+  
+    // 3. Update the states
     setGrid(newGrid);
-    setIncorrectCells(new Set());
+    // Merge the existing revealed cells with the newly revealed ones
+    setRevealedCells(prevRevealed => {
+      return new Set([...prevRevealed, ...newlyRevealed]);
+    });
+    setIncorrectCells(new Set()); // Clear all incorrect cells
   };
-
-  // Clear current word
+      
   const handleClear = () => {
     const wordCells = getCurrentWordCells();
     const newGrid = [...grid];

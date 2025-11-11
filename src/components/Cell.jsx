@@ -14,20 +14,21 @@ const Cell = ({
 
   return (
     <div
-      onClick={isBlack ? undefined : onClick}
-      className={`
-        relative aspect-square border flex items-center justify-center
-        ${isBlack 
-          ? 'bg-gray-900 cursor-default' 
-          : isSelected 
-            ? 'bg-yellow-200 border-yellow-400 border-2 cursor-pointer' 
-            : isHighlighted 
-              ? 'bg-yellow-50 border-yellow-300 cursor-pointer'
-              : 'bg-white border-gray-300 cursor-pointer hover:bg-gray-50'
-        }
-        ${isIncorrect ? 'bg-red-100' : ''}
-        ${isRevealed ? 'bg-blue-50' : ''}
-      `}
+      onClick={isBlack ? undefined : onClick}
+      className={`
+        relative aspect-square border flex items-center justify-center
+        ${isBlack 
+          ? 'bg-gray-900 cursor-default' 
+          : isSelected 
+            ? 'bg-yellow-200 border-yellow-400 border-2 cursor-pointer' 
+            : isIncorrect   // <--- Check isIncorrect here!
+              ? 'bg-red-100 border-red-300 cursor-pointer' // Added border for style
+              : isHighlighted 
+                ? 'bg-yellow-50 border-yellow-300 cursor-pointer'
+                : 'bg-white border-gray-300 cursor-pointer hover:bg-gray-50'
+        }
+        ${isRevealed ? 'bg-blue-50' : ''}
+      `}
       role={isBlack ? 'presentation' : 'gridcell'}
       aria-label={isBlack ? undefined : `Cell ${number || ''}`}
       tabIndex={isBlack ? -1 : 0}
@@ -39,12 +40,12 @@ const Cell = ({
       )}
       {!isBlack && isRevealed && (
         <div 
-          className="absolute top-0 right-0 w-0 h-0 border-t-[12px] border-r-[12px]"
+          className="absolute top-0 left-0 w-0 h-0 border-t-[12px] border-r-[12px]"
           style={{
-            borderTopColor: '#3b82f6',
-            borderRightColor: '#3b82f6',
-            borderBottomColor: 'transparent',
-            borderLeftColor: 'transparent'
+            borderTop: '12px solid #3b82f6', // Visible color
+            borderLeft: '12px solid #3b82f6', // Visible color
+            borderRight: '12px solid transparent', // Invisible
+            borderBottom: '12px solid transparent', // Invisible
           }}
           title="Revealed cell"
         />

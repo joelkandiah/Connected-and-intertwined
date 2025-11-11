@@ -3,79 +3,67 @@
   "author": "Connected & Intertwined",
   "size": 5,
   "grid": [
-    "#JOEL",
+    "MRS##",
     "SOFIA",
-    "#Y#DO",
-    "##O#S",
-    "INKS#"
+    "#M#D#",
+    "#EROS",
+    "JOEL#"
   ],
   "clues": {
     "across": {
       "1": {
-        "clue": "Old Testament Prophet (4)",
-        "answer": "JOEL",
+        "clue": "Title after I do (3)",
+        "answer": "MRS",
         "row": 0,
-        "col": 1
+        "col": 0
       },
-      "5": {
+      "4": {
         "clue": "Capital of Bulgaria (5)",
         "answer": "SOFIA",
         "row": 1,
         "col": 0
       },
       "6": {
-        "clue": "Wedding vow words, I __ (2)",
-        "answer": "DO",
-        "row": 2,
-        "col": 3
+        "clue": "Greek god of love (2)",
+        "answer": "EROS",
+        "row": 3,
+        "col": 1
       },
       "8": {
-        "clue": "Bride's name last letter (1)",
-        "answer": "S",
-        "row": 4,
-        "col": 4
-      },
-      "8": {
-        "clue": "Sign their new names (4)",
-        "answer": "INKS",
+        "clue": "Old Testament Prophet (4)",
+        "answer": "JOEL",
         "row": 4,
         "col": 0
       }
     },
     "down": {
-      "2": {
-        "clue": "Preposition (2)",
-        "answer": "OF",
+      "1": {
+        "clue": "Title before I do (2)",
+        "answer": "MS",
         "row": 0,
-        "col": 2
-      },
-      "3": {
-        "clue": "Hindu Celebration (3)",
-        "answer": "E",
-        "row": 0,
-        "col": 3
-      },
-      "4": {
-        "clue": "Honeymoon Destination (4)",
-        "answer": "LAOS",
-        "row": 0,
-        "col": 4
-      },
-      "5": {
-        "clue": "Bride's first name (5)",
-        "answer": "SOFIA",
-        "row": 1,
         "col": 0
       },
-      "1": {
-        "clue": "Wedding affirmative (3)",
-        "answer": "IDO",
+      "2": {
+        "clue": "Another star-crossed lover (5)",
+        "answer": "ROMEO",
         "row": 0,
         "col": 1
       },
+      "3": {
+        "clue": "Someones initial initials! (2)",
+        "answer": "SF",
+        "row": 0,
+        "col": 2
+      },
+      "5": {
+        "clue": "???? (4)",
+        "answer": "IDOL",
+        "row": 1,
+        "col": 3
+    },
       "7": {
-        "clue": "Agreed (2)",
-        "answer": "OK",
+        "clue": "RSVP by Email (2)",
+        "answer": "RE",
         "row": 3,
         "col": 2
       }
