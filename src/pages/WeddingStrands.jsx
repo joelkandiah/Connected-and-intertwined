@@ -101,6 +101,8 @@ function WeddingStrands() {
   const [isDragging, setIsDragging] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const timerRef = useRef(null);
+  const gridRef = useRef(null);
+  const buttonRefs = useRef({});
 
   // Load saved state
   useEffect(() => {
@@ -215,14 +217,20 @@ function WeddingStrands() {
       const row = parseInt(element.dataset.row);
       const col = parseInt(element.dataset.col);
       const cellKey = getCellKey(row, col);
-      const isAlreadySelected = selectedCells.some(c => c.key === cellKey);
       
-      if (!isAlreadySelected && selectedCells.length > 0) {
-        const lastCell = selectedCells[selectedCells.length - 1];
-        if (areAdjacent(lastCell, { row, col })) {
-          setSelectedCells(prev => [...prev, { row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
+      setSelectedCells(prev => {
+        // Check if this cell is already in the selection
+        const isAlreadySelected = prev.some(c => c.key === cellKey);
+        
+        if (!isAlreadySelected && prev.length > 0) {
+          const lastCell = prev[prev.length - 1];
+          if (areAdjacent(lastCell, { row, col })) {
+            return [...prev, { row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }];
+          }
         }
-      }
+        
+        return prev;
+      });
     }
   };
 
@@ -379,7 +387,7 @@ function WeddingStrands() {
 
         {/* Letter Grid with SVG */}
         <div className="mb-6 flex justify-center">
-          <div className="relative inline-block">
+          <div className="relative inline-block" ref={gridRef}>
             <svg 
               className="absolute inset-0 pointer-events-none" 
               style={{ zIndex: 1 }}
@@ -391,14 +399,21 @@ function WeddingStrands() {
                 if (index === 0) return null;
                 const prevCell = selectedCells[index - 1];
                 
-                // Calculate center positions of circles
-                const cellSize = 56; // md size
-                const gap = 6; // gap between cells
+                // Get actual button elements to calculate positions
+                const prevButton = buttonRefs.current[prevCell.key];
+                const currButton = buttonRefs.current[cell.key];
                 
-                const x1 = prevCell.col * (cellSize + gap) + cellSize / 2;
-                const y1 = prevCell.row * (cellSize + gap) + cellSize / 2;
-                const x2 = cell.col * (cellSize + gap) + cellSize / 2;
-                const y2 = cell.row * (cellSize + gap) + cellSize / 2;
+                if (!prevButton || !currButton || !gridRef.current) return null;
+                
+                const gridRect = gridRef.current.getBoundingClientRect();
+                const prevRect = prevButton.getBoundingClientRect();
+                const currRect = currButton.getBoundingClientRect();
+                
+                // Calculate center positions relative to the grid
+                const x1 = prevRect.left - gridRect.left + prevRect.width / 2;
+                const y1 = prevRect.top - gridRect.top + prevRect.height / 2;
+                const x2 = currRect.left - gridRect.left + currRect.width / 2;
+                const y2 = currRect.top - gridRect.top + currRect.height / 2;
                 
                 return (
                   <line
@@ -427,9 +442,14 @@ function WeddingStrands() {
                     const isInSpangram = foundWords.includes(spangramWord?.word) && 
                       spangramWord?.positions.some(([r, c]) => r === rowIndex && c === colIndex);
                     
+                    const cellKey = getCellKey(rowIndex, colIndex);
+                    
                     return (
                       <button
                         key={`${rowIndex}-${colIndex}`}
+                        ref={(el) => {
+                          if (el) buttonRefs.current[cellKey] = el;
+                        }}
                         data-row={rowIndex}
                         data-col={colIndex}
                         onMouseDown={() => handleCellMouseDown(rowIndex, colIndex)}
