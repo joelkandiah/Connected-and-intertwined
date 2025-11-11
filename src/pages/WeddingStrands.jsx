@@ -5,80 +5,84 @@ import { useState, useEffect, useRef } from 'react';
 // Spangram: CEREMONY (spans across the grid)
 // Other words: BRIDE, GROOM, VOWS, RING, TOAST, DANCE, LOVE, ROSES, UNITY, MARRY
 
+// Rotated 90 degrees - now 8 rows x 6 columns (tall and thin)
 const PUZZLE_GRID = [
-  ['C', 'E', 'R', 'E', 'M', 'O', 'N', 'Y'],
-  ['B', 'R', 'I', 'D', 'E', 'G', 'R', 'O'],
-  ['V', 'O', 'W', 'S', 'T', 'O', 'A', 'S'],
-  ['R', 'I', 'N', 'G', 'D', 'A', 'N', 'C'],
-  ['L', 'O', 'V', 'E', 'M', 'A', 'R', 'R'],
-  ['U', 'N', 'I', 'T', 'Y', 'R', 'O', 'S'],
+  ['C', 'B', 'V', 'R', 'L', 'U'],
+  ['E', 'R', 'O', 'I', 'O', 'N'],
+  ['R', 'I', 'W', 'N', 'V', 'I'],
+  ['E', 'D', 'S', 'G', 'E', 'T'],
+  ['M', 'E', 'T', 'D', 'M', 'Y'],
+  ['O', 'G', 'O', 'A', 'A', 'R'],
+  ['N', 'R', 'A', 'N', 'R', 'O'],
+  ['Y', 'O', 'S', 'C', 'R', 'S'],
 ];
 
 // Define word positions in the grid (row, col pairs for each letter)
+// Grid is now rotated 90 degrees (8 rows x 6 columns)
 const WORD_DEFINITIONS = [
   { 
     word: 'CEREMONY', 
-    positions: [[0,0], [0,1], [0,2], [0,3], [0,4], [0,5], [0,6], [0,7]], 
+    positions: [[0,0], [1,0], [2,0], [3,0], [4,0], [5,0], [6,0], [7,0]], 
     isSpangram: true,
     hint: 'The main event (spans the grid)'
   },
   { 
     word: 'BRIDE', 
-    positions: [[1,0], [1,1], [1,2], [1,3], [1,4]], 
+    positions: [[0,1], [1,1], [2,1], [3,1], [4,1]], 
     isSpangram: false,
     hint: 'She walks down the aisle'
   },
   { 
     word: 'GROOM', 
-    positions: [[1,5], [1,6], [2,5], [2,6], [0,4]], 
+    positions: [[5,1], [1,1], [7,1], [5,0], [4,0]], 
     isSpangram: false,
     hint: 'He waits at the altar'
   },
   { 
     word: 'VOWS', 
-    positions: [[2,0], [2,1], [2,2], [2,3]], 
+    positions: [[0,2], [1,2], [2,2], [3,2]], 
     isSpangram: false,
     hint: 'Promises exchanged'
   },
   { 
     word: 'RING', 
-    positions: [[3,0], [3,1], [3,2], [3,3]], 
+    positions: [[0,3], [1,3], [2,3], [3,3]], 
     isSpangram: false,
     hint: 'Symbol of commitment'
   },
   { 
     word: 'TOAST', 
-    positions: [[2,4], [2,5], [2,6], [2,7], [2,3]], 
+    positions: [[4,2], [5,2], [6,2], [7,2], [3,2]], 
     isSpangram: false,
     hint: 'Cheers to the couple!'
   },
   { 
     word: 'DANCE', 
-    positions: [[3,4], [3,5], [3,6], [3,7], [0,1]], 
+    positions: [[3,3], [5,3], [6,3], [7,3], [1,0]], 
     isSpangram: false,
     hint: 'First ___ as husband and wife'
   },
   { 
     word: 'LOVE', 
-    positions: [[4,0], [4,1], [4,2], [4,3]], 
+    positions: [[0,4], [1,4], [2,4], [3,4]], 
     isSpangram: false,
     hint: 'The reason for the celebration'
   },
   { 
     word: 'ROSES', 
-    positions: [[4,6], [2,5], [2,7], [1,4], [2,3]], 
+    positions: [[6,4], [5,2], [7,2], [3,1], [3,2]], 
     isSpangram: false,
     hint: 'Popular wedding flowers'
   },
   { 
     word: 'UNITY', 
-    positions: [[5,0], [5,1], [5,2], [5,3], [5,4]], 
+    positions: [[0,5], [1,5], [2,5], [3,5], [4,5]], 
     isSpangram: false,
     hint: 'Togetherness'
   },
   { 
     word: 'MARRY', 
-    positions: [[4,4], [4,5], [4,6], [4,6], [5,4]], 
+    positions: [[4,4], [5,4], [6,4], [6,4], [4,5]], 
     isSpangram: false,
     hint: 'To wed'
   },
@@ -191,9 +195,55 @@ function WeddingStrands() {
     }
   };
 
+  // Touch event handlers for mobile
+  const handleCellTouchStart = (row, col, e) => {
+    e.preventDefault();
+    if (isComplete) return;
+    setIsDragging(true);
+    const cellKey = getCellKey(row, col);
+    setSelectedCells([{ row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging || isComplete) return;
+    e.preventDefault();
+    
+    const touch = e.touches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    
+    if (element && element.dataset.row !== undefined && element.dataset.col !== undefined) {
+      const row = parseInt(element.dataset.row);
+      const col = parseInt(element.dataset.col);
+      const cellKey = getCellKey(row, col);
+      const isAlreadySelected = selectedCells.some(c => c.key === cellKey);
+      
+      if (!isAlreadySelected && selectedCells.length > 0) {
+        const lastCell = selectedCells[selectedCells.length - 1];
+        if (areAdjacent(lastCell, { row, col })) {
+          setSelectedCells(prev => [...prev, { row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
+        }
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (isDragging && selectedCells.length >= 3) {
+      handleSubmit();
+    } else {
+      setIsDragging(false);
+    }
+  };
+
   useEffect(() => {
     document.addEventListener('mouseup', handleMouseUp);
-    return () => document.removeEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchend', handleTouchEnd);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    
+    return () => {
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener('touchmove', handleTouchMove);
+    };
   }, [isDragging, selectedCells]);
 
   const positionsMatch = (selected, wordDef) => {
@@ -327,40 +377,87 @@ function WeddingStrands() {
           </div>
         </div>
 
-        {/* Letter Grid */}
+        {/* Letter Grid with SVG */}
         <div className="mb-6 flex justify-center">
-          <div className="inline-block">
-            {PUZZLE_GRID.map((row, rowIndex) => (
-              <div key={rowIndex} className="flex gap-1 sm:gap-1.5 mb-1 sm:mb-1.5">
-                {row.map((letter, colIndex) => {
-                  const isSelected = isCellSelected(rowIndex, colIndex);
-                  const isInFound = isCellInFoundWord(rowIndex, colIndex);
-                  
-                  return (
-                    <button
-                      key={`${rowIndex}-${colIndex}`}
-                      onMouseDown={() => handleCellMouseDown(rowIndex, colIndex)}
-                      onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
-                      className={`
-                        w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14
-                        flex items-center justify-center
-                        rounded-lg font-bold text-base sm:text-xl
-                        transition-all duration-200
-                        ${isSelected
-                          ? 'bg-gradient-to-r from-yellow-400 to-green-500 text-white scale-95'
-                          : isInFound
-                          ? 'bg-nyt-blue text-gray-900'
-                          : 'color-nyt-beige-bg hover:bg-gray-300 text-gray-900'
-                        }
-                        cursor-pointer select-none
-                      `}
-                    >
-                      {letter}
-                    </button>
-                  );
-                })}
-              </div>
-            ))}
+          <div className="relative inline-block">
+            <svg 
+              className="absolute inset-0 pointer-events-none" 
+              style={{ zIndex: 1 }}
+              width="100%" 
+              height="100%"
+            >
+              {/* Draw paths between selected cells */}
+              {selectedCells.length > 1 && selectedCells.map((cell, index) => {
+                if (index === 0) return null;
+                const prevCell = selectedCells[index - 1];
+                
+                // Calculate center positions of circles
+                const cellSize = 56; // md size
+                const gap = 6; // gap between cells
+                
+                const x1 = prevCell.col * (cellSize + gap) + cellSize / 2;
+                const y1 = prevCell.row * (cellSize + gap) + cellSize / 2;
+                const x2 = cell.col * (cellSize + gap) + cellSize / 2;
+                const y2 = cell.row * (cellSize + gap) + cellSize / 2;
+                
+                return (
+                  <line
+                    key={`path-${index}`}
+                    x1={x1}
+                    y1={y1}
+                    x2={x2}
+                    y2={y2}
+                    stroke="#3b82f6"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                  />
+                );
+              })}
+            </svg>
+            
+            <div className="relative" style={{ zIndex: 2 }}>
+              {PUZZLE_GRID.map((row, rowIndex) => (
+                <div key={rowIndex} className="flex gap-1 sm:gap-1.5 mb-1 sm:mb-1.5">
+                  {row.map((letter, colIndex) => {
+                    const isSelected = isCellSelected(rowIndex, colIndex);
+                    const isInFound = isCellInFoundWord(rowIndex, colIndex);
+                    
+                    // Check if this cell is part of the spangram
+                    const spangramWord = WORD_DEFINITIONS.find(wd => wd.isSpangram);
+                    const isInSpangram = foundWords.includes(spangramWord?.word) && 
+                      spangramWord?.positions.some(([r, c]) => r === rowIndex && c === colIndex);
+                    
+                    return (
+                      <button
+                        key={`${rowIndex}-${colIndex}`}
+                        data-row={rowIndex}
+                        data-col={colIndex}
+                        onMouseDown={() => handleCellMouseDown(rowIndex, colIndex)}
+                        onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
+                        onTouchStart={(e) => handleCellTouchStart(rowIndex, colIndex, e)}
+                        className={`
+                          w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14
+                          flex items-center justify-center
+                          rounded-full font-bold text-base sm:text-xl
+                          transition-all duration-200
+                          ${isSelected
+                            ? 'bg-blue-500 text-white scale-95'
+                            : isInSpangram
+                            ? 'bg-nyt-yellow text-gray-900'
+                            : isInFound
+                            ? 'color-nyt-beige-bg-selected text-white'
+                            : 'color-nyt-beige-bg hover:bg-gray-300 text-gray-900'
+                          }
+                          cursor-pointer select-none
+                        `}
+                      >
+                        {letter}
+                      </button>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -440,7 +537,7 @@ function WeddingStrands() {
                   className={`
                     px-3 py-2 rounded-lg font-semibold
                     ${wordData?.isSpangram
-                      ? 'bg-gradient-to-r from-yellow-400 to-green-500 text-white'
+                      ? 'bg-nyt-yellow text-gray-900'
                       : 'bg-gray-200 text-gray-900'
                     }
                   `}
