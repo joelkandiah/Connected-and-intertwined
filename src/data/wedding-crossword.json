@@ -3,75 +3,81 @@
   "author": "Connected & Intertwined",
   "size": 5,
   "grid": [
-    "RINGS",
-    "AISLE",
-    "VOWED",
-    "ENTER",
-    "DRESS"
+    "#JOEL",
+    "SOFIA",
+    "#Y#DO",
+    "###O#S",
+    "INKS#"
   ],
   "clues": {
     "across": {
       "1": {
-        "clue": "Wedding bands",
-        "answer": "RINGS",
+        "clue": "Groom's name (4)",
+        "answer": "JOEL",
         "row": 0,
-        "col": 0
+        "col": 1
       },
-      "6": {
-        "clue": "Bride's walk",
-        "answer": "AISLE",
+      "5": {
+        "clue": "Bride's name (5)",
+        "answer": "SOFIA",
         "row": 1,
         "col": 0
       },
       "7": {
-        "clue": "Made promises",
-        "answer": "VOWED",
+        "clue": "Wedding vow words (2)",
+        "answer": "DO",
         "row": 2,
-        "col": 0
-      },
-      "8": {
-        "clue": "Go in",
-        "answer": "ENTER",
-        "row": 3,
-        "col": 0
+        "col": 3
       },
       "9": {
-        "clue": "Wedding gown",
-        "answer": "DRESS",
+        "clue": "Plural of self (1)",
+        "answer": "S",
+        "row": 3,
+        "col": 4
+      },
+      "10": {
+        "clue": "Writing fluids (4)",
+        "answer": "INKS",
         "row": 4,
         "col": 0
       }
     },
     "down": {
-      "1": {
-        "clue": "To be wed",
-        "answer": "RAVED",
-        "row": 0,
-        "col": 0
-      },
       "2": {
-        "clue": "Singular pronoun",
-        "answer": "I",
-        "row": 0,
-        "col": 1
-      },
-      "3": {
-        "clue": "Wedding cheer",
-        "answer": "NOWEL",
+        "clue": "Sphere shape (1)",
+        "answer": "O",
         "row": 0,
         "col": 2
       },
-      "4": {
-        "clue": "Bride and groom",
-        "answer": "GLIDE",
+      "3": {
+        "clue": "Bride's name first letter (1)",
+        "answer": "E",
         "row": 0,
         "col": 3
       },
-      "5": {
-        "clue": "Exchanged",
-        "answer": "SEEDS",
+      "4": {
+        "clue": "Not you (1)",
+        "answer": "L",
         "row": 0,
         "col": 4
+      },
+      "5": {
+        "clue": "Bride's first name (5)",
+        "answer": "SOFIA",
+        "row": 1,
+        "col": 0
+      },
+      "6": {
+        "clue": "Wedding affirmative (3)",
+        "answer": "IDO",
+        "row": 1,
+        "col": 1
+      },
+      "8": {
+        "clue": "Preposition (2)",
+        "answer": "OS",
+        "row": 3,
+        "col": 3
       }
     }
   }

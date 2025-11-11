@@ -404,8 +404,8 @@ const Crossword = () => {
               className="grid gap-0 bg-white p-2 sm:p-4 rounded-lg shadow-lg border-2 border-pink-100"
               style={{ 
                 gridTemplateColumns: `repeat(${puzzleData.size}, minmax(0, 1fr))`,
-                width: '100%',
-                maxWidth: 'min(100vw - 2rem, 500px)',
+                width: 'clamp(280px, 100%, 500px)',
+                maxWidth: '100vw',
                 aspectRatio: '1/1'
               }}
               role="grid"
