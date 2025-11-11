@@ -65,6 +65,15 @@ const HamburgerMenu = () => {
                The Mini 
               </Link>
             </li>
+            <li>
+              <Link
+                to="/wedding-strands"
+                onClick={closeMenu}
+                className="block py-3 px-4 text-lg font-semibold text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Wedding Strands
+              </Link>
+            </li>
           </ul>
         </nav>
       </div>
