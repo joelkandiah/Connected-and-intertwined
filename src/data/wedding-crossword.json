@@ -1,0 +1,84 @@
+{
+  "title": "Wedding Mini",
+  "author": "Connected & Intertwined",
+  "size": 5,
+  "grid": [
+    "#JOEL",
+    "SOFIA",
+    "#Y#DO",
+    "##O#S",
+    "INKS#"
+  ],
+  "clues": {
+    "across": {
+      "1": {
+        "clue": "Groom's name (4)",
+        "answer": "JOEL",
+        "row": 0,
+        "col": 1
+      },
+      "5": {
+        "clue": "Bride's name (5)",
+        "answer": "SOFIA",
+        "row": 1,
+        "col": 0
+      },
+      "7": {
+        "clue": "Wedding vow words (2)",
+        "answer": "DO",
+        "row": 2,
+        "col": 3
+      },
+      "8": {
+        "clue": "Bride's name last letter (1)",
+        "answer": "S",
+        "row": 4,
+        "col": 4
+      },
+      "9": {
+        "clue": "Writing fluids (4)",
+        "answer": "INKS",
+        "row": 4,
+        "col": 0
+      }
+    },
+    "down": {
+      "2": {
+        "clue": "Preposition (2)",
+        "answer": "OF",
+        "row": 0,
+        "col": 2
+      },
+      "3": {
+        "clue": "Bride's name last letter (1)",
+        "answer": "E",
+        "row": 0,
+        "col": 3
+      },
+      "4": {
+        "clue": "Groom's name last letter (1)",
+        "answer": "L",
+        "row": 0,
+        "col": 4
+      },
+      "5": {
+        "clue": "Bride's first name (5)",
+        "answer": "SOFIA",
+        "row": 1,
+        "col": 0
+      },
+      "6": {
+        "clue": "Wedding affirmative (3)",
+        "answer": "IDO",
+        "row": 1,
+        "col": 1
+      },
+      "8": {
+        "clue": "Preposition (2)",
+        "answer": "OS",
+        "row": 3,
+        "col": 2
+      }
+    }
+  }
+}
