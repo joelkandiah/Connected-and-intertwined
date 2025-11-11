@@ -168,12 +168,12 @@ function App() {
               className={`${DIFFICULTY_COLORS[category.difficulty]} rounded-lg animate-slideIn p-2 sm:p-3`}
               style={{ minHeight: 'calc(100% / 4)' }} // same height as one grid row
             >
-              <h3 className="font-bold text-center mb-2 uppercase">{category.name}</h3>
+              <h3 className="font-semibold text-center mb-2 uppercase">{category.name}</h3>
               <div className="grid grid-cols-4 gap-1 sm:gap-2">
                 {category.words.map(word => (
                   <div
                     key={word}
-                    className="aspect-square flex items-center justify-center font-semibold uppercase bg-gray-100 rounded-md"
+                    className="aspect-square flex items-center justify-center font-semibold uppercase color-nyt-beige-bg rounded-md"
                     style={{fontSize: 'clamp(0.7rem, 2.5vw, 1rem)'}}
                   >
                     {word}
@@ -198,7 +198,7 @@ function App() {
                     aspect-square flex items-center justify-center
                     p-1.5 sm:p-3 md:p-4 rounded-lg font-semibold uppercase
                     transition-all duration-400
-                    ${isSelected ? 'bg-gray-700 text-white scale-95' : 'bg-gray-200 hover:bg-gray-300 text-gray-900'}
+                    ${isSelected ? 'color-nyt-beige-bg-selected text-white scale-95' : 'color-nyt-beige-bg hover:bg-gray-300 text-gray-900'}
                     ${isRearranging ? 'transform translate-y-[-100%]' : ''}
                   `}
                   style={{
