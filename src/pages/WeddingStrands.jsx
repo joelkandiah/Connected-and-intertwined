@@ -7,9 +7,9 @@ import { useState, useEffect, useRef } from 'react';
 
 // Rotated 90 degrees - now 8 rows x 6 columns (tall and thin)
 const PUZZLE_GRID = [
-  ['E', 'C', 'B', 'G', 'I', 'Y'],
-  ['D', 'N', 'R', 'N', 'R', 'N'],
-  ['E', 'I', 'A', 'D', 'O', 'L'],
+  ['E', 'C', 'S', 'G', 'I', 'Y'],
+  ['I', 'N', 'O', 'N', 'R', 'N'],
+  ['A', 'F', 'A', 'D', 'O', 'L'],
   ['C', 'E', 'R', 'M', 'E', 'I'],
   ['R', 'U', 'E', 'I', 'V', 'T'],
   ['Y', 'E', 'N', 'A', 'O', 'S'],
@@ -69,7 +69,7 @@ const WORD_DEFINITIONS = [
     hint: 'The groom lifts to see her face!'
   },
   { 
-    word: 'BRIDE', 
+    word: 'SOFIA', 
     positions: [[0,2], [1,2], [2,1], [1,0], [2,0]], 
     isSpangram: false,
     hint: 'It\'s her special day!'
@@ -88,10 +88,12 @@ function WeddingStrands() {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [isTapMode, setIsTapMode] = useState(false);
   const timerRef = useRef(null);
   const gridRef = useRef(null);
   const buttonRefs = useRef({});
   const isInitialMount = useRef(true);
+  const touchStartTimeRef = useRef(null);
 
   // Load saved state
   useEffect(() => {
@@ -181,15 +183,45 @@ function WeddingStrands() {
     return rowDiff <= 1 && colDiff <= 1 && !(rowDiff === 0 && colDiff === 0);
   };
 
+  const handleCellClick = (row, col) => {
+    if (isComplete || !isTapMode) return;
+    
+    const cellKey = getCellKey(row, col);
+    const isAlreadySelected = selectedCells.some(c => c.key === cellKey);
+    
+    if (isAlreadySelected) {
+      // If clicking the last cell in the selection, remove it
+      if (selectedCells.length > 0 && selectedCells[selectedCells.length - 1].key === cellKey) {
+        setSelectedCells(prev => prev.slice(0, -1));
+      }
+      return;
+    }
+    
+    // If no cells selected, start new selection
+    if (selectedCells.length === 0) {
+      setSelectedCells([{ row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
+      return;
+    }
+    
+    // Check if adjacent to last cell
+    const lastCell = selectedCells[selectedCells.length - 1];
+    if (areAdjacent(lastCell, { row, col })) {
+      setSelectedCells(prev => [...prev, { row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
+    } else {
+      setMessage('Must select adjacent letters!');
+      setTimeout(() => setMessage(''), 1500);
+    }
+  };
+
   const handleCellMouseDown = (row, col) => {
-    if (isComplete) return;
+    if (isComplete || isTapMode) return;
     setIsDragging(true);
     const cellKey = getCellKey(row, col);
     setSelectedCells([{ row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
   };
 
   const handleCellMouseEnter = (row, col) => {
-    if (!isDragging || isComplete) return;
+    if (!isDragging || isComplete || isTapMode) return;
     
     const cellKey = getCellKey(row, col);
     const isAlreadySelected = selectedCells.some(c => c.key === cellKey);
@@ -212,18 +244,31 @@ function WeddingStrands() {
 
   // Touch event handlers for mobile
   const handleCellTouchStart = (row, col, e) => {
-    e.preventDefault();
     if (isComplete) return;
+    
+    // In tap mode, let the touch convert to a click event naturally
+    // Don't prevent default so onClick handler will fire
+    if (isTapMode) {
+      return;
+    }
+    
+    // In drag mode, start dragging
+    touchStartTimeRef.current = Date.now();
     setIsDragging(true);
     const cellKey = getCellKey(row, col);
     setSelectedCells([{ row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
   };
 
   const handleTouchMove = (e) => {
-    if (!isDragging || isComplete) return;
+    if (!isDragging || isComplete || isTapMode) return;
+    
+    // Prevent scrolling and other default behaviors during drag
     e.preventDefault();
+    e.stopPropagation();
     
     const touch = e.touches[0];
+    if (!touch) return;
+    
     const element = document.elementFromPoint(touch.clientX, touch.clientY);
     
     if (element && element.dataset.row !== undefined && element.dataset.col !== undefined) {
@@ -247,25 +292,47 @@ function WeddingStrands() {
     }
   };
 
-  const handleTouchEnd = () => {
-    if (isDragging && selectedCells.length >= 3) {
-      handleSubmit();
-    } else {
+  const handleTouchEnd = (e) => {
+    if (isTapMode) return; // Tap mode handles selection differently
+    
+    if (isDragging) {
+      // Small delay to ensure last cell is captured
+      const touchDuration = touchStartTimeRef.current ? Date.now() - touchStartTimeRef.current : 0;
+      
+      // Only submit if drag was intentional (not a quick tap)
+      if (touchDuration > 150 && selectedCells.length >= 3) {
+        // Small delay to capture any final touches
+        setTimeout(() => {
+          handleSubmit();
+        }, 50);
+      }
       setIsDragging(false);
+      touchStartTimeRef.current = null;
+    }
+  };
+
+  const handleTouchCancel = (e) => {
+    // Handle touch cancel to prevent stuck drag state
+    if (isDragging) {
+      setIsDragging(false);
+      setSelectedCells([]);
+      touchStartTimeRef.current = null;
     }
   };
 
   useEffect(() => {
     document.addEventListener('mouseup', handleMouseUp);
-    document.addEventListener('touchend', handleTouchEnd);
+    document.addEventListener('touchend', handleTouchEnd, { passive: true });
+    document.addEventListener('touchcancel', handleTouchCancel, { passive: true });
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
     
     return () => {
       document.removeEventListener('mouseup', handleMouseUp);
       document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener('touchcancel', handleTouchCancel);
       document.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [isDragging, selectedCells]);
+  }, [isDragging, selectedCells, isTapMode]);
 
   const positionsMatch = (selected, wordDef) => {
     if (selected.length !== wordDef.positions.length) return false;
@@ -398,9 +465,39 @@ function WeddingStrands() {
           </div>
         </div>
 
+        {/* Input Mode Toggle */}
+        {!isComplete && (
+          <div className="flex justify-center mb-4">
+            <div className="bg-white border-2 border-gray-300 rounded-full p-1 inline-flex">
+              <button
+                onClick={() => setIsTapMode(false)}
+                className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors ${
+                  !isTapMode
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+                style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}
+              >
+                Drag Mode
+              </button>
+              <button
+                onClick={() => setIsTapMode(true)}
+                className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors ${
+                  isTapMode
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+                style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}
+              >
+                Tap Mode
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Letter Grid with SVG */}
         <div className="mb-6 flex justify-center">
-          <div className="relative inline-block" ref={gridRef}>
+          <div className="relative inline-block" ref={gridRef} style={{ touchAction: isTapMode ? 'auto' : 'none' }}>
             <svg 
               className="absolute inset-0 pointer-events-none" 
               style={{ zIndex: 1 }}
@@ -445,7 +542,7 @@ function WeddingStrands() {
             
             <div className="relative" style={{ zIndex: 2 }}>
               {PUZZLE_GRID.map((row, rowIndex) => (
-                <div key={rowIndex} className="flex gap-1 sm:gap-1.5 mb-1 sm:mb-1.5">
+                <div key={rowIndex} className="flex gap-2.5 sm:gap-3 mb-2.5 sm:mb-3">
                   {row.map((letter, colIndex) => {
                     const isSelected = isCellSelected(rowIndex, colIndex);
                     const isInFound = isCellInFoundWord(rowIndex, colIndex);
@@ -465,13 +562,14 @@ function WeddingStrands() {
                         }}
                         data-row={rowIndex}
                         data-col={colIndex}
+                        onClick={() => handleCellClick(rowIndex, colIndex)}
                         onMouseDown={() => handleCellMouseDown(rowIndex, colIndex)}
                         onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
                         onTouchStart={(e) => handleCellTouchStart(rowIndex, colIndex, e)}
                         className={`
-                          w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14
+                          w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16
                           flex items-center justify-center
-                          rounded-full font-bold text-base sm:text-xl
+                          rounded-full font-bold text-lg sm:text-xl md:text-2xl
                           transition-all duration-200
                           ${isSelected
                             ? 'bg-blue-500 text-white scale-95'
@@ -483,6 +581,7 @@ function WeddingStrands() {
                           }
                           cursor-pointer select-none
                         `}
+                        style={{ touchAction: isTapMode ? 'auto' : 'none' }}
                       >
                         {letter}
                       </button>
