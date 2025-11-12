@@ -212,9 +212,8 @@ function WeddingStrands() {
 
   // Touch event handlers for mobile
   const handleCellTouchStart = (row, col, e) => {
-    e.preventDefault();
-    e.stopPropagation();
     if (isComplete) return;
+    e.preventDefault(); // Prevent default to avoid double-tap zoom and text selection
     setIsDragging(true);
     const cellKey = getCellKey(row, col);
     setSelectedCells([{ row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
@@ -222,8 +221,7 @@ function WeddingStrands() {
 
   const handleTouchMove = (e) => {
     if (!isDragging || isComplete) return;
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); // Only prevent when dragging
     
     const touch = e.touches[0];
     const element = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -250,12 +248,13 @@ function WeddingStrands() {
   };
 
   const handleTouchEnd = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (isDragging && selectedCells.length >= 3) {
-      handleSubmit();
-    } else {
-      setIsDragging(false);
+    if (isDragging) {
+      e.preventDefault(); // Only prevent when we were dragging
+      if (selectedCells.length >= 3) {
+        handleSubmit();
+      } else {
+        setIsDragging(false);
+      }
     }
   };
 
@@ -487,7 +486,6 @@ function WeddingStrands() {
                           }
                           cursor-pointer select-none
                         `}
-                        style={{ touchAction: 'none' }}
                       >
                         {letter}
                       </button>
