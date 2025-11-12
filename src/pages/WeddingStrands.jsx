@@ -91,6 +91,7 @@ function WeddingStrands() {
   const timerRef = useRef(null);
   const gridRef = useRef(null);
   const buttonRefs = useRef({});
+  const isInitialMount = useRef(true);
 
   // Load saved state
   useEffect(() => {
@@ -109,6 +110,12 @@ function WeddingStrands() {
 
   // Save state
   useEffect(() => {
+    // Skip saving on initial mount to avoid overwriting loaded state
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       foundWords,
       elapsedTime,
