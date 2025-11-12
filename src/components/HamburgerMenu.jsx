@@ -21,8 +21,8 @@ const HamburgerMenu = () => {
         aria-label="Menu"
         aria-expanded={isOpen}
       >
-        <div className="w-6 h-5 flex flex-col justify-between">
-          <span className={`block h-0.5 bg-gray-900 transition-all ${isOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
+        <div className="w-6 h-6 flex flex-col justify-between">
+          <span className={`block h-0.5 bg-gray-900 transition-all ${isOpen ? 'rotate-45 translate-y-3' : ''}`}></span>
           <span className={`block h-0.5 bg-gray-900 transition-all ${isOpen ? 'opacity-0' : ''}`}></span>
           <span className={`block h-0.5 bg-gray-900 transition-all ${isOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
         </div>

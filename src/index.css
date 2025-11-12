@@ -13,13 +13,14 @@ body {
 }
 
 /* For headers similar to Connections category headers */
-h1, h2 .nyt-conn-heading {
+h1, h2, .nyt-conn-heading {
   font-family:
-    "Impact",
-    "Haettenschweiler",
-    "Arial Narrow Bold",
-    sans-serif;
+    "Merriweather",      /* elegant serif, slightly condensed */
+    "Libre Baskerville",  /* good backup, readable */
+    "Georgia",
+    serif;
 }
+
 
 h3 .nyt-conn-subheading {
   font-family:

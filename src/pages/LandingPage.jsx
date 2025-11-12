@@ -71,31 +71,33 @@ const LandingPage = () => {
       {/* Main content */}
       <div className="relative z-10 max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 animate-fadeIn">
-            Welcome to our wedding! 💕
+          <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)', paddingTop: '60px'}} className="font-bold mb-2 animate-fadeIn">
+                Welcome to our wedding! 💕
           </h1>
-          <p className="text-2xl md:text-3xl text-gray-700 animate-fadeIn" style={{ animationDelay: '0.3s' }}>
-            Sofia and Joel invite you to try some of our favourite puzzles with a marriage twist
+          <p className="text-2xl md:text-3xl text-gray-600 animate-fadeIn" style={{ animationDelay: '0.3s' }}>
+            Sofia and Joel invite you to try some of our favourite puzzles with a wedding day twist!
           </p>
         </div>
 
         {/* Puzzle buttons */}
-        <div className="grid md:grid-cols-3 gap-6 mt-16">
+        <div className="grid md:grid-cols-3 gap-6 sm:gap-3 sm:scale-90 mt-16 sm:mt-8">
           {puzzles.map((puzzle, index) => (
             <Link
               key={puzzle.path}
               to={puzzle.path}
-              className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 text-center transform hover:-translate-y-2 animate-fadeIn"
+              className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 
+                         p-6 sm:p-4 text-center transform hover:-translate-y-2 animate-fadeIn"
               style={{ animationDelay: `${0.5 + index * 0.2}s` }}
             >
-              <h2 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-pink-600 transition-colors">
+              <h2 className="text-2xl sm:text-xl font-bold text-gray-900 mb-3 group-hover:text-pink-600 transition-colors">
                 {puzzle.name}
               </h2>
-              <p className="text-gray-600">{puzzle.description}</p>
+              <p className="text-gray-600 text-base sm:text-sm">{puzzle.description}</p>
               <div className="mt-4 text-pink-500 group-hover:translate-x-2 transition-transform inline-block">
                 →
               </div>
             </Link>
+            
           ))}
         </div>
 

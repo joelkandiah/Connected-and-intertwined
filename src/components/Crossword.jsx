@@ -552,7 +552,7 @@ const Crossword = () => {
           {/* Crossword grid */}
           <div className="w-full flex justify-center">
             <div 
-              className="grid gap-0 bg-white p-2 sm:p-4 rounded-lg shadow-lg border-2 border-pink-100"
+              className="grid gap-0 bg-white p-2 sm:p-4 rounded-lg shadow-lg" 
               style={{ 
                 gridTemplateColumns: `repeat(${puzzleData.size}, minmax(0, 1fr))`,
                 width: 'clamp(280px, 100%, 500px)',
@@ -639,7 +639,7 @@ const Crossword = () => {
 
           {/* Clues */}
           <div className="w-full">
-            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg border-2 border-pink-100 max-w-2xl mx-auto">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg max-w-2xl mx-auto">
               <ClueList
                 title="Across"
                 clues={puzzleData.clues.across}
@@ -657,7 +657,7 @@ const Crossword = () => {
         </div>
 
         {/* Instructions */}
-        <div className="mt-8 p-4 sm:p-6 bg-white rounded-lg shadow-sm border-2 border-pink-100">
+        <div className="mt-8 p-4 sm:p-6 bg-white rounded-lg shadow-sm"> 
           <h2 className="text-lg sm:text-xl font-bold mb-3">How to Play</h2>
           <ul className="space-y-2 text-sm sm:text-base text-gray-700">
             <li>• Click on a cell to select it, then type to fill in letters</li>
