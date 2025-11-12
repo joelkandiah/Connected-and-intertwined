@@ -7,14 +7,14 @@ import { useState, useEffect, useRef } from 'react';
 
 // Rotated 90 degrees - now 8 rows x 6 columns (tall and thin)
 const PUZZLE_GRID = [
-  ['C', 'B', 'V', 'R', 'L', 'U'],
-  ['E', 'R', 'O', 'I', 'O', 'N'],
-  ['R', 'I', 'W', 'N', 'V', 'I'],
-  ['E', 'D', 'S', 'G', 'E', 'T'],
-  ['M', 'E', 'T', 'D', 'M', 'Y'],
-  ['O', 'G', 'O', 'A', 'A', 'R'],
-  ['N', 'R', 'A', 'N', 'R', 'O'],
-  ['Y', 'O', 'S', 'C', 'R', 'S'],
+  ['E', 'C', 'B', 'G', 'I', 'Y'],
+  ['E', 'N', 'R', 'N', 'R', 'N'],
+  ['D', 'I', 'A', 'D', 'O', 'L'],
+  ['C', 'E', 'R', 'M', 'E', 'I'],
+  ['R', 'U', 'E', 'I', 'V', 'T'],
+  ['Y', 'E', 'N', 'A', 'O', 'S'],
+  ['N', 'W', 'O', 'D', 'N', 'A'],
+  ['S', 'O', 'L', 'V', 'T', 'O'],
 ];
 
 // Define word positions in the grid (row, col pairs for each letter)
@@ -22,69 +22,57 @@ const PUZZLE_GRID = [
 const WORD_DEFINITIONS = [
   { 
     word: 'CEREMONY', 
-    positions: [[0,0], [1,0], [2,0], [3,0], [4,0], [5,0], [6,0], [7,0]], 
+    positions: [[3,0], [3,1], [3,2], [4,2], [3,3], [2,4], [1,5], [0,5]], 
     isSpangram: true,
-    hint: 'The main event (spans the grid)'
+    hint: 'The main event!'
   },
   { 
-    word: 'BRIDE', 
-    positions: [[0,1], [1,1], [2,1], [3,1], [4,1]], 
+    word: 'REYNOLDA', 
+    positions: [[4,0], [5,1], [5,0], [6,0], [7,1], [7,2], [6,3], [5,3]], 
     isSpangram: false,
-    hint: 'She walks down the aisle'
-  },
-  { 
-    word: 'GROOM', 
-    positions: [[5,1], [1,1], [7,1], [5,0], [4,0]], 
-    isSpangram: false,
-    hint: 'He waits at the altar'
+    hint: 'The grand barn'
   },
   { 
     word: 'VOWS', 
-    positions: [[0,2], [1,2], [2,2], [3,2]], 
+    positions: [[7,3], [6,2], [6,1], [7,0]], 
     isSpangram: false,
-    hint: 'Promises exchanged'
+    hint: 'Exchanged Promises'
+  },
+  { 
+    word: 'UNION', 
+    positions: [[4,1], [5,2], [4,3], [5,4], [6,4]], 
+    isSpangram: false,
+    hint: 'As One'
   },
   { 
     word: 'RING', 
-    positions: [[0,3], [1,3], [2,3], [3,3]], 
+    positions: [[1,4], [0,4], [1,3], [0,3]], 
     isSpangram: false,
     hint: 'Symbol of commitment'
   },
   { 
     word: 'TOAST', 
-    positions: [[4,2], [5,2], [6,2], [7,2], [3,2]], 
+    positions: [[7,4], [7,5], [6,5], [5,5], [4,5]], 
     isSpangram: false,
     hint: 'Cheers to the couple!'
   },
   { 
     word: 'DANCE', 
-    positions: [[3,3], [5,3], [6,3], [7,3], [1,0]], 
+    positions: [[2,3], [2,2], [1,1], [0,1], [0,0]], 
     isSpangram: false,
     hint: 'First ___ as husband and wife'
   },
   { 
     word: 'LOVE', 
-    positions: [[0,4], [1,4], [2,4], [3,4]], 
+    positions: [[4,4], [3,4], [3,5], [2,5]], 
     isSpangram: false,
-    hint: 'The reason for the celebration'
+    hint: 'The groom lifts to see her face!'
   },
   { 
-    word: 'ROSES', 
-    positions: [[6,4], [5,2], [7,2], [3,1], [3,2]], 
+    word: 'BRIDE', 
+    positions: [[0,2], [1,2], [2,1], [2,0], [1,0]], 
     isSpangram: false,
-    hint: 'Popular wedding flowers'
-  },
-  { 
-    word: 'UNITY', 
-    positions: [[0,5], [1,5], [2,5], [3,5], [4,5]], 
-    isSpangram: false,
-    hint: 'Togetherness'
-  },
-  { 
-    word: 'MARRY', 
-    positions: [[4,4], [5,4], [6,4], [6,4], [4,5]], 
-    isSpangram: false,
-    hint: 'To wed'
+    hint: 'It\'s her special day!'
   },
 ];
 
@@ -350,7 +338,7 @@ function WeddingStrands() {
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={handleNewGame}
-                  className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-green-500 text-white rounded-full font-semibold hover:from-yellow-500 hover:to-green-600 transition-colors"
+                  className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-blue-500 text-white rounded-full font-semibold hover:from-yellow-500 hover:to-green-600 transition-colors"
                 >
                   New Game
                 </button>
@@ -368,10 +356,10 @@ function WeddingStrands() {
 
       <div className="w-full max-w-[min(96vw,650px)] mx-auto">
         <header className="text-center mb-6 sm:mb-8">
-          <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)'}} className="font-bold mb-2">Wedding Strands</h1>
-          <p style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}} className="text-gray-600">Find the hidden words!</p>
+          <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)'}} className="font-bold mb-2">Strands</h1>
+          <p style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}} className="text-gray-600"> Wedding Edition</p>
           <p style={{fontSize: 'clamp(0.55rem, 2vw, 0.75rem)'}} className="text-gray-500 mt-2">
-            Drag to select letters • Find the pangram!
+            Find the hidden words! • Drag to select letters • Find the pangram!
           </p>
         </header>
 
@@ -535,7 +523,7 @@ function WeddingStrands() {
           <div className="flex justify-center mb-6">
             <button
               onClick={handleNewGame}
-              className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-green-500 text-white rounded-full font-semibold hover:from-yellow-500 hover:to-green-600 transition-colors"
+              className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-blue-500 text-white rounded-full font-semibold hover:from-yellow-500 hover:to-green-600 transition-colors"
               style={{fontSize: 'clamp(0.875rem, 2vw, 1rem)'}}
             >
               New Game
