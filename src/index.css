@@ -1,27 +1,5 @@
 @import "tailwindcss";
 
-body {
-  margin: 0;
-  font-family:
-    "Franklin Gothic Medium",
-    "Arial Narrow",
-    Arial,
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #f7f7f7;
-}
-
-/* Dark mode body background */
-.dark body {
-  background-color: #1a1a1a;
-}
-
-/* Fix landing page gradient in dark mode */
-.dark .landing-bg {
-  background-image: linear-gradient(to bottom right, rgb(17, 24, 39), rgb(31, 41, 55), rgb(17, 24, 39)) !important;
-}
-
 /* For headers similar to Connections category headers */
 h1, h2, .nyt-conn-heading {
   font-family:
@@ -31,48 +9,11 @@ h1, h2, .nyt-conn-heading {
     serif;
 }
 
-
 h3 .nyt-conn-subheading {
   font-family:
     "Franklin Gothic Medium",
     "Arial Narrow",
     Arial,
     sans-serif;
-}
-
-.color-nyt-beige-bg {
-  background-color: var(--connections-light-beige);
-}
-
-.color-nyt-beige-bg-selected {
-  background-color: var(--connections-dark-beige);
-  color: #fff;
-}
-
-/* Keep text readable in dark mode on beige backgrounds */
-.dark .color-nyt-beige-bg-selected {
-  color: #fff;
-}
-
-@theme {
-  --color-nyt-yellow: #f9df6d;
-  --color-nyt-green: #a0c35a;
-  --color-nyt-blue: #b0c4ef;
-  --color-nyt-purple: #ba81c5;
-  --connections-light-beige: #efefe6;
-  --connections-dark-beige: #5a594e;
-
-  --animate-slideIn: slideIn 0.6s ease-out;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
 }
 

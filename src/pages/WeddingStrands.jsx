@@ -576,8 +576,8 @@ function WeddingStrands() {
                             : isInSpangram
                             ? 'bg-nyt-yellow text-gray-900'
                             : isInFound
-                            ? 'color-nyt-beige-bg-selected text-white'
-                            : 'color-nyt-beige-bg hover:bg-gray-300 text-gray-900'
+                            ? 'bg-nyt-beige-dark text-white'
+                            : 'bg-nyt-beige-light hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900'
                           }
                           cursor-pointer select-none
                         `}

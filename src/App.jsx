@@ -34,15 +34,17 @@ function App() {
   };
 
   return (
-    <Router basename="/Connected-and-intertwined">
-      <HamburgerMenu darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/connections" element={<ConnectionsGame />} />
-        <Route path="/wedding-crossword" element={<WeddingCrossword />} />
-        <Route path="/wedding-strands" element={<WeddingStrands />} />
-      </Routes>
-    </Router>
+    <div className="bg-gray-100 dark:bg-gray-950 min-h-screen">
+      <Router basename="/Connected-and-intertwined">
+        <HamburgerMenu darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/connections" element={<ConnectionsGame />} />
+          <Route path="/wedding-crossword" element={<WeddingCrossword />} />
+          <Route path="/wedding-strands" element={<WeddingStrands />} />
+        </Routes>
+      </Router>
+    </div>
   );
 }
 

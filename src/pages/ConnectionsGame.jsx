@@ -264,7 +264,7 @@ useEffect(() => {
                 {category.words.map(word => (
                   <div
                     key={word}
-                    className="aspect-square flex items-center justify-center font-semibold uppercase color-nyt-beige-bg rounded-md"
+                    className="aspect-square flex items-center justify-center font-semibold uppercase bg-nyt-beige-light text-gray-900 rounded-md"
                     style={{fontSize: 'clamp(0.7rem, 2.5vw, 1rem)'}}
                   >
                     {word}
@@ -289,7 +289,7 @@ useEffect(() => {
                     aspect-square flex items-center justify-center
                     p-1.5 sm:p-3 md:p-4 rounded-lg font-semibold uppercase
                     transition-all duration-400
-                    ${isSelected ? 'color-nyt-beige-bg-selected text-white scale-95' : 'color-nyt-beige-bg hover:bg-gray-300 text-gray-900'}
+                    ${isSelected ? 'bg-nyt-beige-dark text-white scale-95' : 'bg-nyt-beige-light hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900'}
                     ${isRearranging ? 'transform translate-y-[-100%]' : ''}
                   `}
                   style={{
