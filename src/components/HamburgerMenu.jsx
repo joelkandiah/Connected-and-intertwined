@@ -53,6 +53,15 @@ const HamburgerMenu = () => {
                 onClick={closeMenu}
                 className="block py-3 px-4 text-lg font-semibold text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
               >
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/connections"
+                onClick={closeMenu}
+                className="block py-3 px-4 text-lg font-semibold text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              >
                 Connections
               </Link>
             </li>
