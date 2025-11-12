@@ -7,9 +7,9 @@ import { useState, useEffect, useRef } from 'react';
 
 // Rotated 90 degrees - now 8 rows x 6 columns (tall and thin)
 const PUZZLE_GRID = [
-  ['E', 'C', 'B', 'G', 'I', 'Y'],
-  ['D', 'N', 'R', 'N', 'R', 'N'],
-  ['E', 'I', 'A', 'D', 'O', 'L'],
+  ['E', 'C', 'S', 'G', 'I', 'Y'],
+  ['I', 'N', 'O', 'N', 'R', 'N'],
+  ['A', 'F', 'A', 'D', 'O', 'L'],
   ['C', 'E', 'R', 'M', 'E', 'I'],
   ['R', 'U', 'E', 'I', 'V', 'T'],
   ['Y', 'E', 'N', 'A', 'O', 'S'],
@@ -69,7 +69,7 @@ const WORD_DEFINITIONS = [
     hint: 'The groom lifts to see her face!'
   },
   { 
-    word: 'BRIDE', 
+    word: 'SOFIA', 
     positions: [[0,2], [1,2], [2,1], [1,0], [2,0]], 
     isSpangram: false,
     hint: 'It\'s her special day!'
@@ -448,7 +448,7 @@ function WeddingStrands() {
             
             <div className="relative" style={{ zIndex: 2 }}>
               {PUZZLE_GRID.map((row, rowIndex) => (
-                <div key={rowIndex} className="flex gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                <div key={rowIndex} className="flex gap-2.5 sm:gap-3 mb-2.5 sm:mb-3">
                   {row.map((letter, colIndex) => {
                     const isSelected = isCellSelected(rowIndex, colIndex);
                     const isInFound = isCellInFoundWord(rowIndex, colIndex);
