@@ -17,6 +17,7 @@ const Crossword = () => {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const inputRef = useRef(null);
   const timerIntervalRef = useRef(null);
+  const lastKeyEventRef = useRef(0);
 
   // Initialize grid from puzzle data
   useEffect(() => {
@@ -215,6 +216,7 @@ const Crossword = () => {
     // Handle letter input
     if (/^[a-zA-Z]$/.test(e.key)) {
       e.preventDefault();
+      lastKeyEventRef.current = Date.now(); // Mark that we handled a key event
       const newGrid = [...grid];
       
       // If cell already has a value, replace it and move to next cell
@@ -288,14 +290,22 @@ const Crossword = () => {
     }
   }, [selectedCell, grid, direction]);
 
-  // Handle input from mobile keyboard
+  // Handle input from mobile keyboard (for devices without proper keydown events)
   const handleInputChange = useCallback((e) => {
     if (!selectedCell || viewOnlyMode) return;
     
+    // If a keydown event was handled within the last 100ms, skip this to avoid duplicates
+    if (Date.now() - lastKeyEventRef.current < 100) {
+      e.target.value = '';
+      return;
+    }
+    
     const value = e.target.value;
-    if (value && /^[a-zA-Z]$/.test(value)) {
+    // Only handle single character input
+    if (value && value.length === 1 && /^[a-zA-Z]$/.test(value)) {
       const { row, col } = selectedCell;
       const newGrid = [...grid];
+      
       newGrid[row][col].value = value.toUpperCase();
       setGrid(newGrid);
       
@@ -311,10 +321,12 @@ const Crossword = () => {
         return newSet;
       });
       
-      // Clear input and move to next cell
-      e.target.value = '';
+      // Move to next cell
       moveToNextCell();
     }
+    
+    // Always clear input
+    e.target.value = '';
   }, [selectedCell, grid, viewOnlyMode]);
 
   useEffect(() => {
@@ -560,8 +572,7 @@ const Crossword = () => {
           inputMode="text"
           autoComplete="off"
           autoCapitalize="characters"
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
+          onInput={handleInputChange}
           className="absolute opacity-0 pointer-events-none"
           style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px' }}
           aria-hidden="true"
