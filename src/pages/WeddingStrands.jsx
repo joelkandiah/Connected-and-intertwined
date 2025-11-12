@@ -213,7 +213,7 @@ function WeddingStrands() {
   // Touch event handlers for mobile
   const handleCellTouchStart = (row, col, e) => {
     if (isComplete) return;
-    e.preventDefault(); // Prevent default to avoid double-tap zoom and text selection
+    // Don't preventDefault here - let it bubble for normal touch behavior
     setIsDragging(true);
     const cellKey = getCellKey(row, col);
     setSelectedCells([{ row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
@@ -221,7 +221,8 @@ function WeddingStrands() {
 
   const handleTouchMove = (e) => {
     if (!isDragging || isComplete) return;
-    e.preventDefault(); // Only prevent when dragging
+    // Only preventDefault when actively dragging to prevent scrolling
+    e.preventDefault();
     
     const touch = e.touches[0];
     const element = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -249,12 +250,11 @@ function WeddingStrands() {
 
   const handleTouchEnd = (e) => {
     if (isDragging) {
-      e.preventDefault(); // Only prevent when we were dragging
+      // Don't preventDefault on touchend to allow clicks on other elements
       if (selectedCells.length >= 3) {
         handleSubmit();
-      } else {
-        setIsDragging(false);
       }
+      setIsDragging(false);
     }
   };
 
@@ -403,7 +403,7 @@ function WeddingStrands() {
 
         {/* Letter Grid with SVG */}
         <div className="mb-6 flex justify-center">
-          <div className="relative inline-block" ref={gridRef}>
+          <div className="relative inline-block" ref={gridRef} style={{ touchAction: 'pan-y' }}>
             <svg 
               className="absolute inset-0 pointer-events-none" 
               style={{ zIndex: 1 }}
@@ -486,6 +486,7 @@ function WeddingStrands() {
                           }
                           cursor-pointer select-none
                         `}
+                        style={{ touchAction: 'pan-y' }}
                       >
                         {letter}
                       </button>
