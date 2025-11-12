@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 const PUZZLE = {
   categories: [
     { name: "The Couple", difficulty: 1, words: ["SOFIA", "JOEL", "BRIDE", "GROOM"] },
-    { name: "Places of Love", difficulty: 2, words: ["CAMBRIDGE", "WINSTON-SALEM", "HENLEY", "RANDLEMAN"] },
-    { name: "Journey Together", difficulty: 3, words: ["TRANSATLANTIC", "HONEYMOON", "ADVENTURE", "MEMORIES"] },
-    { name: "Symbols of Love", difficulty: 4, words: ["VOWS", "RING", "FOREVER", "PASSION"] }
+    { name: "As One", difficulty: 2, words: ["UNION", "TIED", "WED", "YOKED"] },
+    { name: "Synonyms for Ceremony/Ritual", difficulty: 3, words: ["CEREMONY", "RITUAL", "TRADITION", "RITE"] },
+    { name: "French Loan Words", difficulty: 4, words: ["BOUTONNIÉRE", "NUPTIAL", "BOUQUET", "FIANCÉE"] }
   ]
 };
 
