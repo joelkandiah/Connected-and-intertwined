@@ -8,9 +8,7 @@
   "scripts": {
     "dev": "vite",
     "predeploy": "vite build",
-    "deploy": "gh-pages -d build",
-    "start": "react-scripts start",
-    "build": "vite build",
+    "deploy": "gh-pages -d dist",
     "preview": "vite preview"
   },
   "keywords": [],
@@ -28,6 +26,7 @@
   "dependencies": {
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router-dom": "^7.9.5"
+    "react-router-dom": "^7.9.5",
+    "react-scripts": "^0.0.0"
   }
 }
