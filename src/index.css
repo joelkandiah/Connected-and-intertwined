@@ -43,6 +43,16 @@ h3 .nyt-conn-subheading {
   background-color: var(--connections-dark-beige);
 }
 
+/* Swap beige colors in dark mode */
+.dark .color-nyt-beige-bg {
+  background-color: var(--connections-dark-beige);
+}
+
+.dark .color-nyt-beige-bg-selected {
+  background-color: var(--connections-light-beige);
+  color: #000;
+}
+
 @theme {
   --color-nyt-yellow: #f9df6d;
   --color-nyt-green: #a0c35a;
