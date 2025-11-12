@@ -404,7 +404,7 @@ function WeddingStrands() {
 
         {/* Letter Grid with SVG */}
         <div className="mb-6 flex justify-center">
-          <div className="relative inline-block" ref={gridRef} style={{ touchAction: 'none' }}>
+          <div className="relative inline-block" ref={gridRef}>
             <svg 
               className="absolute inset-0 pointer-events-none" 
               style={{ zIndex: 1 }}
