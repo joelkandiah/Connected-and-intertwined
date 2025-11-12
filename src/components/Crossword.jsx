@@ -55,15 +55,24 @@ const Crossword = () => {
       });
     }
 
+    // Restore revealed cells
+    if (savedProgress && savedProgress.revealedCells) {
+      setRevealedCells(new Set(savedProgress.revealedCells));
+    }
+
     setGrid(initialGrid);
   }, []);
 
-  // Save progress whenever grid changes
+  // Save progress whenever grid or revealed cells change
   useEffect(() => {
     if (grid.length > 0) {
-      saveCrosswordProgress({ grid, elapsedTime });
+      saveCrosswordProgress({ 
+        grid, 
+        elapsedTime,
+        revealedCells: Array.from(revealedCells)
+      });
     }
-  }, [grid, elapsedTime]);
+  }, [grid, elapsedTime, revealedCells]);
 
   // Load saved time on initial load
   useEffect(() => {
