@@ -8,8 +8,8 @@ import { useState, useEffect, useRef } from 'react';
 // Rotated 90 degrees - now 8 rows x 6 columns (tall and thin)
 const PUZZLE_GRID = [
   ['E', 'C', 'B', 'G', 'I', 'Y'],
-  ['E', 'N', 'R', 'N', 'R', 'N'],
-  ['D', 'I', 'A', 'D', 'O', 'L'],
+  ['D', 'N', 'R', 'N', 'R', 'N'],
+  ['E', 'I', 'A', 'D', 'O', 'L'],
   ['C', 'E', 'R', 'M', 'E', 'I'],
   ['R', 'U', 'E', 'I', 'V', 'T'],
   ['Y', 'E', 'N', 'A', 'O', 'S'],
@@ -70,7 +70,7 @@ const WORD_DEFINITIONS = [
   },
   { 
     word: 'BRIDE', 
-    positions: [[0,2], [1,2], [2,1], [2,0], [1,0]], 
+    positions: [[0,2], [1,2], [2,1], [1,0], [2,0]], 
     isSpangram: false,
     hint: 'It\'s her special day!'
   },
