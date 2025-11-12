@@ -246,10 +246,9 @@ function WeddingStrands() {
   const handleCellTouchStart = (row, col, e) => {
     if (isComplete) return;
     
-    // In tap mode, treat touch as a tap/click
+    // In tap mode, let the touch convert to a click event naturally
+    // Don't prevent default so onClick handler will fire
     if (isTapMode) {
-      e.preventDefault();
-      handleCellClick(row, col);
       return;
     }
     
