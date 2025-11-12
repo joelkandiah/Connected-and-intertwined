@@ -216,15 +216,15 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 sm:py-8 px-3 sm:px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8 px-3 sm:px-4">
       {/* Completion Modal */}
       {showCompletionModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 30 }}>
-          <div className="bg-white rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full">
+        <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center p-4" style={{ zIndex: 30 }}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full">
             <div className="text-center">
               <div className="text-6xl mb-4">🎉</div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Congratulations!</h2>
-              <p className="text-lg text-gray-700 mb-6">You solved all the connections!</p>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Congratulations!</h2>
+              <p className="text-lg text-gray-700 dark:text-gray-300 mb-6">You solved all the connections!</p>
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={handleNewGame}
@@ -234,7 +234,7 @@ useEffect(() => {
                 </button>
                 <button
                   onClick={handleShowPuzzle}
-                  className="px-6 py-3 bg-white border-2 border-gray-300 text-gray-900 rounded-full font-semibold hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                 >
                   Show Puzzle
                 </button>
@@ -246,9 +246,9 @@ useEffect(() => {
       
       <div className="w-full max-w-[min(96vw,650px)] mx-auto">
         <header className="text-center mb-6 sm:mb-8">
-          <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)'}} className="font-bold mb-2">Connections</h1>
-          <p style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}} className="text-gray-600">Wedding Edition</p>
-          <p style={{fontSize: 'clamp(0.55rem, 2vw, 0.75rem)'}} className="text-gray-500 mt-2">Create four groups of four!</p>
+          <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)'}} className="font-bold mb-2 text-gray-900 dark:text-gray-100">Connections</h1>
+          <p style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}} className="text-gray-600 dark:text-gray-300">Wedding Edition</p>
+          <p style={{fontSize: 'clamp(0.55rem, 2vw, 0.75rem)'}} className="text-gray-500 dark:text-gray-400 mt-2">Create four groups of four!</p>
         </header>
 
         {/* Solved categories */}
@@ -339,13 +339,13 @@ useEffect(() => {
         {!isGameOver && !viewOnlyMode && (
           <div className="flex justify-center mb-6">
             <div className="flex gap-2 items-center">
-              <span style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} className="text-gray-600">Mistakes remaining:</span>
+              <span style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} className="text-gray-600 dark:text-gray-300">Mistakes remaining:</span>
               <div className="flex gap-1">
                 {[...Array(4)].map((_, idx) => (
                   <div
                     key={idx}
                     style={{width: 'clamp(10px, 2vw, 12px)', height: 'clamp(10px, 2vw, 12px)'}}
-                    className={`rounded-full ${idx < (4 - mistakes) ? 'bg-gray-700' : 'bg-gray-300'}`}
+                    className={`rounded-full ${idx < (4 - mistakes) ? 'bg-gray-700 dark:bg-gray-300' : 'bg-gray-300 dark:bg-gray-600'}`}
                   />
                 ))}
               </div>
@@ -369,23 +369,23 @@ useEffect(() => {
         {/* Controls */}
         {!isGameOver && !viewOnlyMode && (words.length > 0 || rearranging || solving) && (
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
-            <button onClick={handleShuffle} className="px-4 sm:px-6 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-100 transition-colors" style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}>Shuffle</button>
-            <button onClick={handleDeselectAll} className="px-4 sm:px-6 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-100 transition-colors" style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} disabled={selected.length === 0}>Deselect All</button>
-            <button onClick={handleSubmit} className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors ${selected.length === 4 ? 'bg-gray-900 text-white hover:bg-gray-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`} disabled={selected.length !== 4} style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}>Submit</button>
+            <button onClick={handleShuffle} className="px-4 sm:px-6 py-2 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}>Shuffle</button>
+            <button onClick={handleDeselectAll} className="px-4 sm:px-6 py-2 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} disabled={selected.length === 0}>Deselect All</button>
+            <button onClick={handleSubmit} className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors ${selected.length === 4 ? 'bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-100' : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'}`} disabled={selected.length !== 4} style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}>Submit</button>
           </div>
         )}
 
         {/* New Game */}
         {isGameOver && !viewOnlyMode && (
           <div className="flex justify-center">
-            <button onClick={handleNewGame} className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gray-900 text-white rounded-full font-semibold hover:bg-gray-700 transition-colors" style={{fontSize: 'clamp(0.875rem, 2.5vw, 1rem)'}}>New Game</button>
+            <button onClick={handleNewGame} className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 rounded-full font-semibold hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors" style={{fontSize: 'clamp(0.875rem, 2.5vw, 1rem)'}}>New Game</button>
           </div>
         )}
 
        {/* How to Play */}
-        <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-white rounded-lg shadow-sm">
-          <h2 style={{fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)'}} className="font-bold mb-3">How to Play</h2>
-          <ul style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} className="space-y-2 text-gray-700">
+        <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <h2 style={{fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)'}} className="font-bold mb-3 text-gray-900 dark:text-gray-100">How to Play</h2>
+          <ul style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} className="space-y-2 text-gray-700 dark:text-gray-300">
             <li>• Find groups of four items that share something in common.</li>
             <li>• Select four items and tap 'Submit' to check if your guess is correct.</li>
             <li>• Find the groups without making 4 mistakes!</li>

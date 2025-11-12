@@ -12,6 +12,11 @@ body {
   background-color: #f7f7f7;
 }
 
+/* Dark mode body background */
+.dark body {
+  background-color: #1a1a1a;
+}
+
 /* For headers similar to Connections category headers */
 h1, h2, .nyt-conn-heading {
   font-family:
