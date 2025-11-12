@@ -9,7 +9,7 @@ import './App.css';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/Connected-and-intertwined">
       <HamburgerMenu />
       <Routes>
         <Route path="/" element={<LandingPage />} />
