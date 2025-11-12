@@ -84,8 +84,8 @@ function WeddingStrands() {
   const [message, setMessage] = useState('');
   const [isComplete, setIsComplete] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
-  const [startTime, setStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const timerRef = useRef(null);
@@ -98,54 +98,72 @@ function WeddingStrands() {
     if (savedState) {
       const state = JSON.parse(savedState);
       setFoundWords(state.foundWords || []);
-      setStartTime(state.startTime || null);
       setElapsedTime(state.elapsedTime || 0);
       setIsComplete(state.isComplete || false);
       
       if (state.foundWords && state.foundWords.length === WORD_DEFINITIONS.length) {
         setIsComplete(true);
       }
-    } else {
-      // Start timer on new game
-      setStartTime(Date.now());
     }
   }, []);
 
   // Save state
   useEffect(() => {
-    if (startTime) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        foundWords,
-        startTime,
-        elapsedTime,
-        isComplete
-      }));
-    }
-  }, [foundWords, startTime, elapsedTime, isComplete]);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      foundWords,
+      elapsedTime,
+      isComplete
+    }));
+  }, [foundWords, elapsedTime, isComplete]);
 
-  // Timer
+  // Timer logic - only runs when page is visible
   useEffect(() => {
-    if (startTime && !isComplete) {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setIsTimerRunning(false);
+      } else if (!isComplete) {
+        setIsTimerRunning(true);
+      }
+    };
+
+    // Start timer when component mounts (if not completed)
+    if (!isComplete) {
+      setIsTimerRunning(true);
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isComplete]);
+
+  // Timer interval
+  useEffect(() => {
+    if (isTimerRunning && !isComplete) {
       timerRef.current = setInterval(() => {
-        setElapsedTime(Date.now() - startTime);
-      }, 100);
+        setElapsedTime(prev => prev + 1);
+      }, 1000);
     } else {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
     }
+
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
     };
-  }, [startTime, isComplete]);
+  }, [isTimerRunning, isComplete]);
 
-  const formatTime = (ms) => {
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
   };
 
   const getCellKey = (row, col) => `${row}-${col}`;
@@ -300,8 +318,8 @@ function WeddingStrands() {
     setMessage('');
     setIsComplete(false);
     setShowCompletionModal(false);
-    setStartTime(Date.now());
     setElapsedTime(0);
+    setIsTimerRunning(true);
   };
 
   const handleShowPuzzle = () => {
