@@ -288,6 +288,35 @@ const Crossword = () => {
     }
   }, [selectedCell, grid, direction]);
 
+  // Handle input from mobile keyboard
+  const handleInputChange = useCallback((e) => {
+    if (!selectedCell || viewOnlyMode) return;
+    
+    const value = e.target.value;
+    if (value && /^[a-zA-Z]$/.test(value)) {
+      const { row, col } = selectedCell;
+      const newGrid = [...grid];
+      newGrid[row][col].value = value.toUpperCase();
+      setGrid(newGrid);
+      
+      // Clear incorrect/revealed state for this cell
+      setIncorrectCells(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(`${row}-${col}`);
+        return newSet;
+      });
+      setRevealedCells(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(`${row}-${col}`);
+        return newSet;
+      });
+      
+      // Clear input and move to next cell
+      e.target.value = '';
+      moveToNextCell();
+    }
+  }, [selectedCell, grid, viewOnlyMode]);
+
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -531,8 +560,10 @@ const Crossword = () => {
           inputMode="text"
           autoComplete="off"
           autoCapitalize="characters"
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
           className="absolute opacity-0 pointer-events-none"
-          style={{ position: 'absolute', left: '-9999px' }}
+          style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px' }}
           aria-hidden="true"
         />
 

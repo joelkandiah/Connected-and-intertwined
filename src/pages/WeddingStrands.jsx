@@ -213,6 +213,7 @@ function WeddingStrands() {
   // Touch event handlers for mobile
   const handleCellTouchStart = (row, col, e) => {
     e.preventDefault();
+    e.stopPropagation();
     if (isComplete) return;
     setIsDragging(true);
     const cellKey = getCellKey(row, col);
@@ -222,6 +223,7 @@ function WeddingStrands() {
   const handleTouchMove = (e) => {
     if (!isDragging || isComplete) return;
     e.preventDefault();
+    e.stopPropagation();
     
     const touch = e.touches[0];
     const element = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -247,7 +249,9 @@ function WeddingStrands() {
     }
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (isDragging && selectedCells.length >= 3) {
       handleSubmit();
     } else {
@@ -400,7 +404,7 @@ function WeddingStrands() {
 
         {/* Letter Grid with SVG */}
         <div className="mb-6 flex justify-center">
-          <div className="relative inline-block" ref={gridRef}>
+          <div className="relative inline-block" ref={gridRef} style={{ touchAction: 'none' }}>
             <svg 
               className="absolute inset-0 pointer-events-none" 
               style={{ zIndex: 1 }}
@@ -445,7 +449,7 @@ function WeddingStrands() {
             
             <div className="relative" style={{ zIndex: 2 }}>
               {PUZZLE_GRID.map((row, rowIndex) => (
-                <div key={rowIndex} className="flex gap-1 sm:gap-1.5 mb-1 sm:mb-1.5">
+                <div key={rowIndex} className="flex gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
                   {row.map((letter, colIndex) => {
                     const isSelected = isCellSelected(rowIndex, colIndex);
                     const isInFound = isCellInFoundWord(rowIndex, colIndex);
@@ -469,9 +473,9 @@ function WeddingStrands() {
                         onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
                         onTouchStart={(e) => handleCellTouchStart(rowIndex, colIndex, e)}
                         className={`
-                          w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14
+                          w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16
                           flex items-center justify-center
-                          rounded-full font-bold text-base sm:text-xl
+                          rounded-full font-bold text-lg sm:text-xl md:text-2xl
                           transition-all duration-200
                           ${isSelected
                             ? 'bg-blue-500 text-white scale-95'
@@ -483,6 +487,7 @@ function WeddingStrands() {
                           }
                           cursor-pointer select-none
                         `}
+                        style={{ touchAction: 'none' }}
                       >
                         {letter}
                       </button>
