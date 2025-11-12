@@ -1,0 +1,150 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
+const LandingPage = () => {
+  const [emojis, setEmojis] = useState([]);
+
+  // Wedding emoji that will fall
+  const weddingEmojis = ['💒', '💍', '💐', '❤️', '💑', '🎉', '🥂', '💕'];
+
+  useEffect(() => {
+    // Create initial emoji
+    const initialEmojis = [];
+    for (let i = 0; i < 15; i++) {
+      initialEmojis.push({
+        id: Date.now() + i,
+        emoji: weddingEmojis[Math.floor(Math.random() * weddingEmojis.length)],
+        left: Math.random() * 100,
+        delay: Math.random() * 5,
+        duration: 3 + Math.random() * 4
+      });
+    }
+    setEmojis(initialEmojis);
+
+    // Add new emoji periodically
+    const interval = setInterval(() => {
+      setEmojis(prev => {
+        // Keep only the last 20 emoji
+        const filtered = prev.slice(-19);
+        return [
+          ...filtered,
+          {
+            id: Date.now(),
+            emoji: weddingEmojis[Math.floor(Math.random() * weddingEmojis.length)],
+            left: Math.random() * 100,
+            delay: 0,
+            duration: 3 + Math.random() * 4
+          }
+        ];
+      });
+    }, 800);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const puzzles = [
+    { name: 'Connections', path: '/connections', description: 'Find groups of four!' },
+    { name: 'The Mini', path: '/wedding-crossword', description: 'Wedding crossword puzzle' },
+    { name: 'Wedding Strands', path: '/wedding-strands', description: 'Find the hidden words' }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 py-8 px-4 relative overflow-hidden">
+      {/* Falling emoji animation */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 1 }}>
+        {emojis.map((item) => (
+          <div
+            key={item.id}
+            className="absolute text-4xl animate-fall"
+            style={{
+              left: `${item.left}%`,
+              animationDelay: `${item.delay}s`,
+              animationDuration: `${item.duration}s`,
+              top: '-60px'
+            }}
+          >
+            {item.emoji}
+          </div>
+        ))}
+      </div>
+
+      {/* Main content */}
+      <div className="relative z-10 max-w-4xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 animate-fadeIn">
+            Welcome to our wedding! 💕
+          </h1>
+          <p className="text-2xl md:text-3xl text-gray-700 animate-fadeIn" style={{ animationDelay: '0.3s' }}>
+            Sofia and Joel invite you to try some of our favourite puzzles with a marriage twist
+          </p>
+        </div>
+
+        {/* Puzzle buttons */}
+        <div className="grid md:grid-cols-3 gap-6 mt-16">
+          {puzzles.map((puzzle, index) => (
+            <Link
+              key={puzzle.path}
+              to={puzzle.path}
+              className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 text-center transform hover:-translate-y-2 animate-fadeIn"
+              style={{ animationDelay: `${0.5 + index * 0.2}s` }}
+            >
+              <h2 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-pink-600 transition-colors">
+                {puzzle.name}
+              </h2>
+              <p className="text-gray-600">{puzzle.description}</p>
+              <div className="mt-4 text-pink-500 group-hover:translate-x-2 transition-transform inline-block">
+                →
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Decorative hearts at bottom */}
+        <div className="text-center mt-16 text-6xl animate-fadeIn" style={{ animationDelay: '1.1s' }}>
+          ❤️ 💍 ❤️
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes fall {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100vh) rotate(360deg);
+            opacity: 0;
+          }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fall {
+          animation: fall linear infinite;
+        }
+
+        .animate-fadeIn {
+          animation: fadeIn 0.8s ease-out forwards;
+          opacity: 0;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default LandingPage;
