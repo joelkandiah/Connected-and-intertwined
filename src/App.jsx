@@ -45,9 +45,6 @@ function App() {
           <Route path="/wedding-strands" element={<WeddingStrands />} />
         </Routes>
       </Router>
-      <div className="bg-red-500 dark:bg-blue-500 p-4 text-white">
-  Test: Should be RED in light mode, BLUE in dark mode
-</div>
     </div>
   );
 }
