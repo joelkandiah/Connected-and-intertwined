@@ -1,52 +1,16 @@
 @import "tailwindcss";
 
-body {
-  margin: 0;
-  font-family:
-    "Franklin Gothic Medium",
-    "Arial Narrow",
-    Arial,
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #f7f7f7;
-}
-
-/* For headers similar to Connections category headers */
-h1, h2, .nyt-conn-heading {
-  font-family:
-    "Merriweather",      /* elegant serif, slightly condensed */
-    "Libre Baskerville",  /* good backup, readable */
-    "Georgia",
-    serif;
-}
-
-
-h3 .nyt-conn-subheading {
-  font-family:
-    "Franklin Gothic Medium",
-    "Arial Narrow",
-    Arial,
-    sans-serif;
-}
-
-.color-nyt-beige-bg {
-  background-color: var(--connections-light-beige);
-}
-
-.color-nyt-beige-bg-selected {
-  background-color: var(--connections-dark-beige);
-}
+@variant dark (.dark &);
 
 @theme {
   --color-nyt-yellow: #f9df6d;
   --color-nyt-green: #a0c35a;
   --color-nyt-blue: #b0c4ef;
   --color-nyt-purple: #ba81c5;
-  --connections-light-beige: #efefe6;
-  --connections-dark-beige: #5a594e;
-
-  --animate-slideIn: slideIn 0.6s ease-out;
+  --color-nyt-beige-light: #efefe6;
+  --color-nyt-beige-dark: #5a594e;
+  
+  --animate-slide-in: slideIn 0.6s ease-out;
 }
 
 @keyframes slideIn {
@@ -60,3 +24,19 @@ h3 .nyt-conn-subheading {
   }
 }
 
+/* For headers similar to Connections category headers */
+h1, h2, .nyt-conn-heading {
+  font-family:
+    "Merriweather",
+    "Libre Baskerville",
+    "Georgia",
+    serif;
+}
+
+h3, .nyt-conn-subheading {
+  font-family:
+    "Franklin Gothic Medium",
+    "Arial Narrow",
+    Arial,
+    sans-serif;
+}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const HamburgerMenu = () => {
+const HamburgerMenu = ({ darkMode, toggleDarkMode }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -17,22 +17,21 @@ const HamburgerMenu = () => {
       {/* Hamburger button */}
       <button
         onClick={toggleMenu}
-        className="fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg hover:bg-gray-50 transition-colors"
+        className="fixed top-4 left-4 z-50 p-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         aria-label="Menu"
         aria-expanded={isOpen}
       >
         <div className="w-6 h-6 flex flex-col justify-between">
-          <span className={`block h-0.5 bg-gray-900 transition-all ${isOpen ? 'rotate-45 translate-y-3' : ''}`}></span>
-          <span className={`block h-0.5 bg-gray-900 transition-all ${isOpen ? 'opacity-0' : ''}`}></span>
-          <span className={`block h-0.5 bg-gray-900 transition-all ${isOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
+          <span className={`block h-0.5 bg-gray-900 dark:bg-gray-100 transition-all ${isOpen ? 'rotate-45 translate-y-3' : ''}`}></span>
+          <span className={`block h-0.5 bg-gray-900 dark:bg-gray-100 transition-all ${isOpen ? 'opacity-0' : ''}`}></span>
+          <span className={`block h-0.5 bg-gray-900 dark:bg-gray-100 transition-all ${isOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
         </div>
       </button>
 
       {/* Menu overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}
+          className="fixed inset-0 z-40 bg-black/20 dark:bg-black/40"
           onClick={closeMenu}
         />
       )}
@@ -40,7 +39,7 @@ const HamburgerMenu = () => {
       {/* Menu panel */}
       <div
         className={`
-          fixed top-0 left-0 h-full w-64 bg-white shadow-2xl z-40
+          fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-2xl z-40
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
@@ -51,7 +50,7 @@ const HamburgerMenu = () => {
               <Link
                 to="/"
                 onClick={closeMenu}
-                className="block py-3 px-4 text-lg font-semibold text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                className="block py-3 px-4 text-lg font-semibold text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
                 Home
               </Link>
@@ -60,7 +59,7 @@ const HamburgerMenu = () => {
               <Link
                 to="/connections"
                 onClick={closeMenu}
-                className="block py-3 px-4 text-lg font-semibold text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                className="block py-3 px-4 text-lg font-semibold text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
                 Connections
               </Link>
@@ -69,7 +68,7 @@ const HamburgerMenu = () => {
               <Link
                 to="/wedding-crossword"
                 onClick={closeMenu}
-                className="block py-3 px-4 text-lg font-semibold text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                className="block py-3 px-4 text-lg font-semibold text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
                The Mini 
               </Link>
@@ -78,10 +77,23 @@ const HamburgerMenu = () => {
               <Link
                 to="/wedding-strands"
                 onClick={closeMenu}
-                className="block py-3 px-4 text-lg font-semibold text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                className="block py-3 px-4 text-lg font-semibold text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
                 Strands
               </Link>
+            </li>
+            
+            {/* Dark mode toggle */}
+            <li className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={toggleDarkMode}
+                className="w-full flex items-center justify-between py-3 px-4 text-lg font-semibold text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <span>Dark Mode</span>
+                <div className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${darkMode ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${darkMode ? 'translate-x-6' : 'translate-x-1'}`} />
+                </div>
+              </button>
             </li>
           </ul>
         </nav>

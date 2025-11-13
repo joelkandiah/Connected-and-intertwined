@@ -49,7 +49,7 @@ const LandingPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 py-8 px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 px-4 relative overflow-hidden">
       {/* Falling emoji animation */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 1 }}>
         {emojis.map((item) => (
@@ -71,10 +71,10 @@ const LandingPage = () => {
       {/* Main content */}
       <div className="relative z-10 max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)', paddingTop: '60px'}} className="font-bold mb-2 animate-fadeIn">
+          <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)', paddingTop: '60px'}} className="font-bold mb-2 animate-fadeIn text-gray-900 dark:text-gray-100">
                 Welcome to our wedding! 💕
           </h1>
-          <p className="text-2xl md:text-3xl text-gray-600 animate-fadeIn" style={{ animationDelay: '0.3s' }}>
+          <p className="text-2xl md:text-3xl text-gray-600 dark:text-gray-300 animate-fadeIn" style={{ animationDelay: '0.3s' }}>
             Sofia and Joel invite you to try some of our favourite puzzles with a wedding day twist!
           </p>
         </div>
@@ -85,15 +85,15 @@ const LandingPage = () => {
             <Link
               key={puzzle.path}
               to={puzzle.path}
-              className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 
+              className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 
                          p-6 sm:p-4 text-center transform hover:-translate-y-2 animate-fadeIn"
               style={{ animationDelay: `${0.5 + index * 0.2}s` }}
             >
-              <h2 className="text-2xl sm:text-xl font-bold text-gray-900 mb-3 group-hover:text-pink-600 transition-colors">
+              <h2 className="text-2xl sm:text-xl font-bold text-gray-900 dark:text-gray-100 mb-3 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
                 {puzzle.name}
               </h2>
-              <p className="text-gray-600 text-base sm:text-sm">{puzzle.description}</p>
-              <div className="mt-4 text-pink-500 group-hover:translate-x-2 transition-transform inline-block">
+              <p className="text-gray-600 dark:text-gray-300 text-base sm:text-sm">{puzzle.description}</p>
+              <div className="mt-4 text-pink-500 dark:text-pink-400 group-hover:translate-x-2 transition-transform inline-block">
                 →
               </div>
             </Link>

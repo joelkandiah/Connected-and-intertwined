@@ -417,16 +417,16 @@ function WeddingStrands() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 sm:py-8 px-3 sm:px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8 px-3 sm:px-4">
       {/* Completion Modal */}
       {showCompletionModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 30 }}>
-          <div className="bg-white rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full">
+        <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center p-4" style={{ zIndex: 30 }}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full">
             <div className="text-center">
               <div className="text-6xl mb-4">💍</div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Congratulations!</h2>
-              <p className="text-lg text-gray-700 mb-2">You found all the words!</p>
-              <p className="text-2xl font-bold text-gray-900 mb-6">Time: {formatTime(elapsedTime)}</p>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Congratulations!</h2>
+              <p className="text-lg text-gray-700 dark:text-gray-300 mb-2">You found all the words!</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Time: {formatTime(elapsedTime)}</p>
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={handleNewGame}
@@ -436,7 +436,7 @@ function WeddingStrands() {
                 </button>
                 <button
                   onClick={handleShowPuzzle}
-                  className="px-6 py-3 bg-white border-2 border-gray-300 text-gray-900 rounded-full font-semibold hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                 >
                   Show Puzzle
                 </button>
@@ -448,19 +448,19 @@ function WeddingStrands() {
 
       <div className="w-full max-w-[min(96vw,650px)] mx-auto">
         <header className="text-center mb-6 sm:mb-8">
-          <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)'}} className="font-bold mb-2">Strands</h1>
-          <p style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}} className="text-gray-600"> Wedding Edition</p>
-          <p style={{fontSize: 'clamp(0.55rem, 2vw, 0.75rem)'}} className="text-gray-500 mt-2">
-            Find the hidden words! • Drag or tap to select letters • Find the spangram!
+          <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)'}} className="font-bold mb-2 text-gray-900 dark:text-gray-100">Strands</h1>
+          <p style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}} className="text-gray-600 dark:text-gray-300"> Wedding Edition</p>
+          <p style={{fontSize: 'clamp(0.55rem, 2vw, 0.75rem)'}} className="text-gray-500 dark:text-gray-400 mt-2">
+            Find the hidden words! • Drag to select letters • Find the pangram!
           </p>
         </header>
 
         {/* Timer and Progress */}
         <div className="flex justify-between items-center mb-4 px-2">
-          <div className="text-xl sm:text-2xl font-bold text-gray-900">
+          <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
             {formatTime(elapsedTime)}
           </div>
-          <div className="text-base sm:text-lg font-semibold text-gray-700">
+          <div className="text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-300">
             {foundWords.length} / {WORD_DEFINITIONS.length}
           </div>
         </div>
@@ -576,8 +576,8 @@ function WeddingStrands() {
                             : isInSpangram
                             ? 'bg-nyt-yellow text-gray-900'
                             : isInFound
-                            ? 'color-nyt-beige-bg-selected text-white'
-                            : 'color-nyt-beige-bg hover:bg-gray-300 text-gray-900'
+                            ? 'bg-nyt-beige-dark text-white'
+                            : 'bg-nyt-beige-light hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900'
                           }
                           cursor-pointer select-none
                         `}
@@ -596,7 +596,7 @@ function WeddingStrands() {
         {/* Current Selection */}
         {selectedCells.length > 0 && (
           <div className="text-center mb-4">
-            <div className="text-lg sm:text-xl font-bold text-gray-900">
+            <div className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">
               {selectedCells.map(c => c.letter).join('')}
             </div>
           </div>
@@ -604,7 +604,7 @@ function WeddingStrands() {
 
         {/* Message */}
         {message && (
-          <div className="text-center mb-4 font-semibold text-base sm:text-lg text-gray-900">
+          <div className="text-center mb-4 font-semibold text-base sm:text-lg text-gray-900 dark:text-gray-100">
             {message}
           </div>
         )}
@@ -614,7 +614,7 @@ function WeddingStrands() {
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
             <button
               onClick={handleClear}
-              className="px-4 sm:px-6 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+              className="px-4 sm:px-6 py-2 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
               style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}
               disabled={selectedCells.length === 0}
             >
@@ -624,8 +624,8 @@ function WeddingStrands() {
               onClick={handleSubmit}
               className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors ${
                 selectedCells.length >= 3
-                  ? 'bg-gray-900 text-white hover:bg-gray-700'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  ? 'bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-100'
+                  : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
               }`}
               disabled={selectedCells.length < 3}
               style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}
@@ -634,7 +634,7 @@ function WeddingStrands() {
             </button>
             <button
               onClick={() => setShowHint(!showHint)}
-              className="px-4 sm:px-6 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+              className="px-4 sm:px-6 py-2 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
               style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}
             >
               {showHint ? 'Hide' : 'Show'} Hints
@@ -656,8 +656,8 @@ function WeddingStrands() {
         )}
 
         {/* Found Words List */}
-        <div className="mt-8 p-4 sm:p-6 bg-white rounded-lg shadow-sm">
-          <h2 style={{fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)'}} className="font-bold mb-3">
+        <div className="mt-8 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <h2 style={{fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)'}} className="font-bold mb-3 text-gray-900 dark:text-gray-100">
             Found Words
           </h2>
           <div className="space-y-2">
@@ -670,7 +670,7 @@ function WeddingStrands() {
                     px-3 py-2 rounded-lg font-semibold
                     ${wordData?.isSpangram
                       ? 'bg-nyt-yellow text-gray-900'
-                      : 'bg-gray-200 text-gray-900'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
                     }
                   `}
                   style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}
@@ -683,11 +683,11 @@ function WeddingStrands() {
           
           {/* Hints */}
           {showHint && getRemainingWords().length > 0 && (
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <h3 className="font-semibold mb-2" style={{fontSize: 'clamp(0.875rem, 2vw, 1rem)'}}>
+            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <h3 className="font-semibold mb-2 text-gray-900 dark:text-gray-100" style={{fontSize: 'clamp(0.875rem, 2vw, 1rem)'}}>
                 Remaining Word Hints:
               </h3>
-              <ul className="space-y-1 text-gray-600" style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}>
+              <ul className="space-y-1 text-gray-600 dark:text-gray-300" style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}>
                 {getRemainingWords().map((wd, index) => (
                   <li key={index}>• {wd.hint} {wd.isSpangram && '(Spangram)'}</li>
                 ))}
@@ -697,13 +697,12 @@ function WeddingStrands() {
         </div>
 
         {/* How to Play */}
-        <div className="mt-8 p-4 sm:p-6 bg-white rounded-lg shadow-sm">
-          <h2 style={{fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)'}} className="font-bold mb-3">
+        <div className="mt-8 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <h2 style={{fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)'}} className="font-bold mb-3 text-gray-900 dark:text-gray-100">
             How to Play
           </h2>
-          <ul style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} className="space-y-2 text-gray-700">
-            <li>• <strong>Drag Mode:</strong> Drag across adjacent letters to form words</li>
-            <li>• <strong>Tap Mode:</strong> Tap letters one by one to build words</li>
+          <ul style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} className="space-y-2 text-gray-700 dark:text-gray-300">
+            <li>• Drag across adjacent letters to form words</li>
             <li>• Find all the hidden wedding-themed words</li>
             <li>• Look for the special spangram word (marked with ⭐)</li>
             <li>• The spangram spans across the puzzle</li>

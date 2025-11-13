@@ -529,29 +529,29 @@ const Crossword = () => {
   const wordCells = getCurrentWordCells();
 
   return (
-    <div className="min-h-screen py-4 sm:py-8 px-3 sm:px-4">
+    <div className="min-h-screen py-4 sm:py-8 px-3 sm:px-4 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto">
         <header className="text-center mb-6 sm:mb-8">
-          <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)'}} className="font-bold mb-2">The Mini</h1>
-          <p style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}} className="text-gray-600">Wedding Edition</p>
-          <p style={{fontSize: 'clamp(0.55rem, 2vw, 0.75rem)'}} className="text-gray-500 mt-2">Piece together all the clues!</p>
+          <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)'}} className="font-bold mb-2 text-gray-900 dark:text-gray-100">The Mini</h1>
+          <p style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}} className="text-gray-600 dark:text-gray-300">Wedding Edition</p>
+          <p style={{fontSize: 'clamp(0.55rem, 2vw, 0.75rem)'}} className="text-gray-500 dark:text-gray-400 mt-2">Piece together all the clues!</p>
           {/* Timer display */}
-          <div className="mt-3 text-lg font-semibold text-gray-700">
+          <div className="mt-3 text-lg font-semibold text-gray-700 dark:text-gray-300">
             Time: {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
           </div>
         </header>
 
         {/* Completion Modal */}
         {showCompletionModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 30 }}>
-            <div className="bg-white rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full">
+          <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center p-4" style={{ zIndex: 30 }}>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full">
               <div className="text-center">
                 <div className="text-6xl mb-4">🎉</div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Congratulations!</h2>
-                <p className="text-lg text-gray-700 mb-4">You completed the puzzle!</p>
-                <div className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg p-4 mb-6">
-                  <div className="text-sm text-gray-600 mb-1">Your Time</div>
-                  <div className="text-4xl font-bold text-gray-900">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Congratulations!</h2>
+                <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">You completed the puzzle!</p>
+                <div className="bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 rounded-lg p-4 mb-6">
+                  <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">Your Time</div>
+                  <div className="text-4xl font-bold text-gray-900 dark:text-gray-100">
                     {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
                   </div>
                 </div>
@@ -564,7 +564,7 @@ const Crossword = () => {
                   </button>
                   <button
                     onClick={handleShowPuzzle}
-                    className="px-6 py-3 bg-white border-2 border-gray-300 text-gray-900 rounded-full font-semibold hover:bg-gray-50 transition-colors"
+                    className="px-6 py-3 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                   >
                     Show Puzzle
                   </button>
@@ -589,11 +589,11 @@ const Crossword = () => {
 
         {/* Current clue display */}
         {currentClue && (
-          <div className="mb-6 p-4 bg-white rounded-lg shadow-sm border-2 border-pink-200">
-            <div className="text-sm text-gray-600 uppercase tracking-wide mb-1">
+          <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border-2 border-pink-200 dark:border-pink-700">
+            <div className="text-sm text-gray-600 dark:text-gray-300 uppercase tracking-wide mb-1">
               {currentClue.number} {currentClue.direction}
             </div>
-            <div className="text-base sm:text-lg font-medium text-gray-900">
+            <div className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100">
               {currentClue.clue}
             </div>
           </div>
@@ -603,7 +603,7 @@ const Crossword = () => {
           {/* Crossword grid */}
           <div className="w-full flex justify-center">
             <div 
-              className="grid gap-0 bg-white p-2 sm:p-4 rounded-lg shadow-lg" 
+              className="grid gap-0 bg-white dark:bg-gray-800 p-2 sm:p-4 rounded-lg shadow-lg" 
               style={{ 
                 gridTemplateColumns: `repeat(${puzzleData.size}, minmax(0, 1fr))`,
                 width: 'clamp(280px, 100%, 500px)',
@@ -645,34 +645,34 @@ const Crossword = () => {
             <div className="flex flex-wrap gap-2 justify-center">
               <button
                 onClick={handleCheck}
-                className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-50 transition-colors text-sm"
+                className="px-4 py-2 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors text-sm"
                 disabled={!selectedCell}
               >
                 Check Word
               </button>
               <button
                 onClick={handleReveal}
-                className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-50 transition-colors text-sm"
+                className="px-4 py-2 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors text-sm"
                 disabled={!selectedCell}
               >
                 Reveal Word
               </button>
               <button
                 onClick={handleClear}
-                className="px-4 py-2 bg-white border-2 border-gray-300 rounded-full font-semibold hover:bg-gray-50 transition-colors text-sm"
+                className="px-4 py-2 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors text-sm"
                 disabled={!selectedCell}
               >
                 Clear Word
               </button>
               <button
                 onClick={handleRevealAll}
-                className="px-4 py-2 bg-pink-100 border-2 border-pink-300 rounded-full font-semibold hover:bg-pink-200 transition-colors text-sm"
+                className="px-4 py-2 bg-pink-100 dark:bg-pink-900/50 border-2 border-pink-300 dark:border-pink-700 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-pink-200 dark:hover:bg-pink-900/70 transition-colors text-sm"
               >
                 Reveal All
               </button>
               <button
                 onClick={handleReset}
-                className="px-4 py-2 bg-purple-100 border-2 border-purple-300 rounded-full font-semibold hover:bg-purple-200 transition-colors text-sm"
+                className="px-4 py-2 bg-purple-100 dark:bg-purple-900/50 border-2 border-purple-300 dark:border-purple-700 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-purple-200 dark:hover:bg-purple-900/70 transition-colors text-sm"
               >
                 Reset Puzzle
               </button>
@@ -690,7 +690,7 @@ const Crossword = () => {
 
           {/* Clues */}
           <div className="w-full">
-            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg max-w-2xl mx-auto">
+            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-lg max-w-2xl mx-auto">
               <ClueList
                 title="Across"
                 clues={puzzleData.clues.across}
@@ -708,9 +708,9 @@ const Crossword = () => {
         </div>
 
         {/* Instructions */}
-        <div className="mt-8 p-4 sm:p-6 bg-white rounded-lg shadow-sm"> 
-          <h2 className="text-lg sm:text-xl font-bold mb-3">How to Play</h2>
-          <ul className="space-y-2 text-sm sm:text-base text-gray-700">
+        <div className="mt-8 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm"> 
+          <h2 className="text-lg sm:text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">How to Play</h2>
+          <ul className="space-y-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">
             <li>• Click on a cell to select it, then type to fill in letters</li>
             <li>• Click the same cell again or press Enter to toggle between Across and Down</li>
             <li>• Use arrow keys to navigate between cells</li>
