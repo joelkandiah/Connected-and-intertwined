@@ -256,7 +256,7 @@ useEffect(() => {
           {solved.sort((a, b) => a.difficulty - b.difficulty).map((category, idx) => (
             <div
               key={idx}
-              className={`${DIFFICULTY_COLORS[category.difficulty]} rounded-lg animate-slideIn p-2 sm:p-3`}
+              className={`${DIFFICULTY_COLORS[category.difficulty]} rounded-lg animate-slide-in p-2 sm:p-3`}
               style={{ minHeight: 'calc(100% / 4)' }} // same height as one grid row
             >
               <h3 className="font-semibold text-center mb-2 uppercase">{category.name}</h3>

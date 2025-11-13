@@ -6,6 +6,7 @@ import ConnectionsGame from './pages/ConnectionsGame';
 import WeddingCrossword from './pages/WeddingCrossword';
 import WeddingStrands from './pages/WeddingStrands';
 import './App.css';
+import './index.css';
 
 function App() {
   const [darkMode, setDarkMode] = useState(() => {
@@ -44,6 +45,9 @@ function App() {
           <Route path="/wedding-strands" element={<WeddingStrands />} />
         </Routes>
       </Router>
+      <div className="bg-red-500 dark:bg-blue-500 p-4 text-white">
+  Test: Should be RED in light mode, BLUE in dark mode
+</div>
     </div>
   );
 }

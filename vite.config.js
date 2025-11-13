@@ -6,5 +6,8 @@ export default defineConfig({
   base: '/Connected-and-intertwined/',
   build: {
     outDir: 'dist',
-  }
+  },
+   css: {
+    postcss: './postcss.config.js',
+    }
 })
