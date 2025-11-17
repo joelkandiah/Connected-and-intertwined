@@ -330,7 +330,7 @@ useEffect(() => {
 
         {/* Message */}
         {message && (
-          <div className="text-center mb-4 font-semibold" style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}}>
+          <div className="text-center mb-4 font-semibold dark:text-gray-100" style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}}>
             {message}
           </div>
         )}
