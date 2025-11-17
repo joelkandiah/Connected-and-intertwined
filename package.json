@@ -2,7 +2,7 @@
   "name": "connected-and-intertwined",
   "version": "1.0.0",
   "description": "Connections for my wedding",
-  "homeppage": "https://joelkandiah.github.io/Connected-and-intertwined/",
+  "homepage": "https://joelkandiah.github.io/Connected-and-intertwined/",
   "private": true,
   "type": "module",
   "scripts": {
