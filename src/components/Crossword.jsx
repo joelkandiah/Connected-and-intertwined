@@ -516,14 +516,14 @@ const Crossword = () => {
   };
 
   // Handle clue click
-  const handleClueClick = (number, clueDirection) => {
+  const handleClueClick = useCallback((number, clueDirection) => {
     if (viewOnlyMode) return; // Don't allow clue clicks in view-only mode
     const clueData = puzzleData.clues[clueDirection][number];
     if (clueData) {
       setSelectedCell({ row: clueData.row, col: clueData.col });
       setDirection(clueDirection);
     }
-  };
+  }, [viewOnlyMode]);
 
   const currentClue = getCurrentClue();
   const wordCells = getCurrentWordCells();

@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
   const [emojis, setEmojis] = useState([]);
 
   // Wedding emoji that will fall
-  const weddingEmojis = ['💒', '💍', '💐', '❤️', '💑', '🎉', '🥂', '💕'];
+  const weddingEmojis = useMemo(() => ['💒', '💍', '💐', '❤️', '💑', '🎉', '🥂', '💕'], []);
 
   useEffect(() => {
     // Create initial emoji
@@ -40,13 +40,13 @@ const LandingPage = () => {
     }, 800);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [weddingEmojis]);
 
-  const puzzles = [
+  const puzzles = useMemo(() => [
     { name: 'Connections', path: '/connections', description: 'Find groups of four!' },
     { name: 'The Mini', path: '/wedding-crossword', description: 'Wedding crossword puzzle' },
     { name: 'Wedding Strands', path: '/wedding-strands', description: 'Find the hidden words' }
-  ];
+  ], []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 px-4 relative overflow-hidden">

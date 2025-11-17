@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { memo } from 'react';
 
-const ClueList = ({ title, clues, currentClue, onClueClick }) => {
+const ClueList = memo(({ title, clues, currentClue, onClueClick }) => {
   return (
     <div className="mb-6">
       <h3 className="text-lg sm:text-xl font-bold mb-3 uppercase text-gray-900 dark:text-gray-100">{title}</h3>
@@ -30,6 +30,8 @@ const ClueList = ({ title, clues, currentClue, onClueClick }) => {
       </div>
     </div>
   );
-};
+});
+
+ClueList.displayName = 'ClueList';
 
 export default ClueList;

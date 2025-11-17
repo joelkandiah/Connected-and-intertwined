@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { Link } from 'react-router-dom';
 
-const HamburgerMenu = ({ darkMode, toggleDarkMode }) => {
+const HamburgerMenu = memo(({ darkMode, toggleDarkMode }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -100,6 +100,8 @@ const HamburgerMenu = ({ darkMode, toggleDarkMode }) => {
       </div>
     </>
   );
-};
+});
+
+HamburgerMenu.displayName = 'HamburgerMenu';
 
 export default HamburgerMenu;
