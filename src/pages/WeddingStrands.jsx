@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import puzzleData from '../data/strands-puzzle.json';
 
 // Wedding-themed Strands puzzle
 // Theme: Wedding Day
@@ -6,75 +7,11 @@ import { useState, useEffect, useRef } from 'react';
 // Other words: BRIDE, GROOM, VOWS, RING, TOAST, DANCE, LOVE, ROSES, UNITY, MARRY
 
 // Rotated 90 degrees - now 8 rows x 6 columns (tall and thin)
-const PUZZLE_GRID = [
-  ['E', 'C', 'S', 'G', 'I', 'Y'],
-  ['I', 'N', 'O', 'N', 'R', 'N'],
-  ['A', 'F', 'A', 'D', 'O', 'L'],
-  ['C', 'E', 'R', 'M', 'E', 'I'],
-  ['R', 'U', 'E', 'I', 'V', 'T'],
-  ['Y', 'E', 'N', 'A', 'O', 'S'],
-  ['N', 'W', 'O', 'D', 'N', 'A'],
-  ['S', 'O', 'L', 'V', 'T', 'O'],
-];
+const PUZZLE_GRID = puzzleData.grid;
 
 // Define word positions in the grid (row, col pairs for each letter)
 // Grid is now rotated 90 degrees (8 rows x 6 columns)
-const WORD_DEFINITIONS = [
-  { 
-    word: 'CEREMONY', 
-    positions: [[3,0], [3,1], [3,2], [4,2], [3,3], [2,4], [1,5], [0,5]], 
-    isSpangram: true,
-    hint: 'The main event!'
-  },
-  { 
-    word: 'REYNOLDA', 
-    positions: [[4,0], [5,1], [5,0], [6,0], [7,1], [7,2], [6,3], [5,3]], 
-    isSpangram: false,
-    hint: 'The grand barn'
-  },
-  { 
-    word: 'VOWS', 
-    positions: [[7,3], [6,2], [6,1], [7,0]], 
-    isSpangram: false,
-    hint: 'Exchanged Promises'
-  },
-  { 
-    word: 'UNION', 
-    positions: [[4,1], [5,2], [4,3], [5,4], [6,4]], 
-    isSpangram: false,
-    hint: 'As One'
-  },
-  { 
-    word: 'RING', 
-    positions: [[1,4], [0,4], [1,3], [0,3]], 
-    isSpangram: false,
-    hint: 'Symbol of commitment'
-  },
-  { 
-    word: 'TOAST', 
-    positions: [[7,4], [7,5], [6,5], [5,5], [4,5]], 
-    isSpangram: false,
-    hint: 'Cheers to the couple!'
-  },
-  { 
-    word: 'DANCE', 
-    positions: [[2,3], [2,2], [1,1], [0,1], [0,0]], 
-    isSpangram: false,
-    hint: 'First ___ as husband and wife'
-  },
-  { 
-    word: 'LOVE', 
-    positions: [[4,4], [3,4], [3,5], [2,5]], 
-    isSpangram: false,
-    hint: 'The groom lifts to see her face!'
-  },
-  { 
-    word: 'SOFIA', 
-    positions: [[0,2], [1,2], [2,1], [1,0], [2,0]], 
-    isSpangram: false,
-    hint: 'It\'s her special day!'
-  },
-];
+const WORD_DEFINITIONS = puzzleData.words;
 
 const STORAGE_KEY = 'wedding-strands-progress';
 
