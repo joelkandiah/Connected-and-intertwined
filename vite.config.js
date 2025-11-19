@@ -33,5 +33,12 @@ export default defineConfig({
   base: '/Connected-and-intertwined/',
   build: {
     outDir: 'dist',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+        },
+      },
+    },
   },
 })

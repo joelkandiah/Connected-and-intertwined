@@ -14,6 +14,8 @@ const ClueList = memo(({ title, clues, currentClue, onClueClick }) => {
             <div
               key={number}
               onClick={() => onClueClick(number, title.toLowerCase())}
+              onMouseDown={(e) => e.preventDefault()}
+              onTouchStart={(e) => e.preventDefault()}
               className={`
                 p-2 rounded cursor-pointer transition-colors text-gray-900 dark:text-gray-100
                 ${isCurrent

@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import puzzleData from '../data/strands-puzzle.json';
+import StrandsCell from '../components/StrandsCell';
 
 // Wedding-themed Strands puzzle
 // Theme: Wedding Day
@@ -32,6 +33,20 @@ function WeddingStrands() {
   const isInitialMount = useRef(true);
   const touchStartTimeRef = useRef(null);
   const layoutCacheRef = useRef({ centers: {}, rects: {} });
+
+  // Refs for event handlers to avoid re-renders
+  const selectedCellsRef = useRef(selectedCells);
+  const isDraggingRef = useRef(isDragging);
+  const isTapModeRef = useRef(isTapMode);
+  const isCompleteRef = useRef(isComplete);
+
+  const foundWordsRef = useRef(foundWords);
+
+  useEffect(() => { selectedCellsRef.current = selectedCells; }, [selectedCells]);
+  useEffect(() => { isDraggingRef.current = isDragging; }, [isDragging]);
+  useEffect(() => { isTapModeRef.current = isTapMode; }, [isTapMode]);
+  useEffect(() => { isCompleteRef.current = isComplete; }, [isComplete]);
+  useEffect(() => { foundWordsRef.current = foundWords; }, [foundWords]);
 
   const measureLayout = () => {
     if (!gridRef.current) return;
@@ -156,72 +171,124 @@ function WeddingStrands() {
     return rowDiff <= 1 && colDiff <= 1 && !(rowDiff === 0 && colDiff === 0);
   };
 
-  const handleCellClick = (row, col) => {
-    if (isComplete || !isTapMode) return;
+  const positionsMatch = (selected, wordDef) => {
+    if (selected.length !== wordDef.positions.length) return false;
+
+    // Check if selected positions match word positions exactly
+    return selected.every((cell, index) => {
+      const [row, col] = wordDef.positions[index];
+      return cell.row === row && cell.col === col;
+    });
+  };
+
+  const handleSubmit = useCallback(() => {
+    const currentSelected = selectedCellsRef.current;
+    if (currentSelected.length < 3) {
+      setMessage('Word too short!');
+      setTimeout(() => setMessage(''), 2000);
+      setSelectedCells([]);
+      return;
+    }
+
+    const word = currentSelected.map(c => c.letter).join('');
+
+    // Check if this word matches any defined word by positions
+    const foundWordDef = WORD_DEFINITIONS.find(wd =>
+      wd.word === word || positionsMatch(currentSelected, wd)
+    );
+
+    const currentFoundWords = foundWordsRef.current;
+
+    if (foundWordDef && !currentFoundWords.includes(foundWordDef.word)) {
+      const newFoundWords = [...currentFoundWords, foundWordDef.word];
+      setFoundWords(newFoundWords);
+      setMessage(foundWordDef.isSpangram ? '🎉 Spangram found!' : 'Great job!');
+
+      if (newFoundWords.length === WORD_DEFINITIONS.length) {
+        setIsComplete(true);
+        setShowCompletionModal(true);
+      }
+
+      setTimeout(() => setMessage(''), 2000);
+    } else if (currentFoundWords.includes(word)) {
+      setMessage('Already found!');
+      setTimeout(() => setMessage(''), 2000);
+    } else {
+      setMessage('Not in word list or Invalid word!');
+      setTimeout(() => setMessage(''), 2000);
+    }
+
+    setSelectedCells([]);
+  }, []);
+
+  const handleCellClick = useCallback((row, col) => {
+    if (isCompleteRef.current || !isTapModeRef.current) return;
 
     const cellKey = getCellKey(row, col);
-    const isAlreadySelected = selectedCells.some(c => c.key === cellKey);
+    const currentSelected = selectedCellsRef.current;
+    const isAlreadySelected = currentSelected.some(c => c.key === cellKey);
 
     if (isAlreadySelected) {
       // If clicking the last cell in the selection, remove it
-      if (selectedCells.length > 0 && selectedCells[selectedCells.length - 1].key === cellKey) {
+      if (currentSelected.length > 0 && currentSelected[currentSelected.length - 1].key === cellKey) {
         setSelectedCells(prev => prev.slice(0, -1));
       }
       return;
     }
 
     // If no cells selected, start new selection
-    if (selectedCells.length === 0) {
+    if (currentSelected.length === 0) {
       setSelectedCells([{ row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
       return;
     }
 
     // Check if adjacent to last cell
-    const lastCell = selectedCells[selectedCells.length - 1];
+    const lastCell = currentSelected[currentSelected.length - 1];
     if (areAdjacent(lastCell, { row, col })) {
       setSelectedCells(prev => [...prev, { row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
     } else {
       setMessage('Must select adjacent letters!');
       setTimeout(() => setMessage(''), 1500);
     }
-  };
+  }, []);
 
-  const handleCellMouseDown = (row, col) => {
-    if (isComplete || isTapMode) return;
+  const handleCellMouseDown = useCallback((row, col) => {
+    if (isCompleteRef.current || isTapModeRef.current) return;
     setIsDragging(true);
     const cellKey = getCellKey(row, col);
     setSelectedCells([{ row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
-  };
+  }, []);
 
-  const handleCellMouseEnter = (row, col) => {
-    if (!isDragging || isComplete || isTapMode) return;
+  const handleCellMouseEnter = useCallback((row, col) => {
+    if (!isDraggingRef.current || isCompleteRef.current || isTapModeRef.current) return;
 
     const cellKey = getCellKey(row, col);
-    const isAlreadySelected = selectedCells.some(c => c.key === cellKey);
+    const currentSelected = selectedCellsRef.current;
+    const isAlreadySelected = currentSelected.some(c => c.key === cellKey);
 
-    if (!isAlreadySelected && selectedCells.length > 0) {
-      const lastCell = selectedCells[selectedCells.length - 1];
+    if (!isAlreadySelected && currentSelected.length > 0) {
+      const lastCell = currentSelected[currentSelected.length - 1];
       if (areAdjacent(lastCell, { row, col })) {
         setSelectedCells(prev => [...prev, { row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
       }
     }
-  };
+  }, []);
 
-  const handleMouseUp = () => {
-    if (isDragging && selectedCells.length >= 3) {
+  const handleMouseUp = useCallback(() => {
+    if (isDraggingRef.current && selectedCellsRef.current.length >= 3) {
       handleSubmit();
     } else {
       setIsDragging(false);
     }
-  };
+  }, [handleSubmit]);
 
   // Touch event handlers for mobile
-  const handleCellTouchStart = (row, col, e) => {
-    if (isComplete) return;
+  const handleCellTouchStart = useCallback((row, col, e) => {
+    if (isCompleteRef.current) return;
 
     // In tap mode, let the touch convert to a click event naturally
     // Don't prevent default so onClick handler will fire
-    if (isTapMode) {
+    if (isTapModeRef.current) {
       return;
     }
 
@@ -234,10 +301,14 @@ function WeddingStrands() {
 
     const cellKey = getCellKey(row, col);
     setSelectedCells([{ row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
-  };
+  }, []);
 
-  const handleTouchMove = (e) => {
-    if (!isDragging || isComplete || isTapMode) return;
+  const handleSetButtonRef = useCallback((r, c, el) => {
+    if (el) buttonRefs.current[getCellKey(r, c)] = el;
+  }, []);
+
+  const handleTouchMove = useCallback((e) => {
+    if (!isDraggingRef.current || isCompleteRef.current || isTapModeRef.current) return;
 
     // Prevent scrolling and other default behaviors during drag
     e.preventDefault();
@@ -290,17 +361,17 @@ function WeddingStrands() {
         return prev;
       });
     }
-  };
+  }, []);
 
-  const handleTouchEnd = (e) => {
-    if (isTapMode) return; // Tap mode handles selection differently
+  const handleTouchEnd = useCallback((e) => {
+    if (isTapModeRef.current) return; // Tap mode handles selection differently
 
-    if (isDragging) {
+    if (isDraggingRef.current) {
       // Small delay to ensure last cell is captured
       const touchDuration = touchStartTimeRef.current ? Date.now() - touchStartTimeRef.current : 0;
 
       // Only submit if drag was intentional (not a quick tap)
-      if (touchDuration > 150 && selectedCells.length >= 3) {
+      if (touchDuration > 150 && selectedCellsRef.current.length >= 3) {
         // Small delay to capture any final touches
         setTimeout(() => {
           handleSubmit();
@@ -309,16 +380,16 @@ function WeddingStrands() {
       setIsDragging(false);
       touchStartTimeRef.current = null;
     }
-  };
+  }, []); // handleSubmit is now stable (defined below)
 
-  const handleTouchCancel = (e) => {
+  const handleTouchCancel = useCallback((e) => {
     // Handle touch cancel to prevent stuck drag state
-    if (isDragging) {
+    if (isDraggingRef.current) {
       setIsDragging(false);
       setSelectedCells([]);
       touchStartTimeRef.current = null;
     }
-  };
+  }, []);
 
   useEffect(() => {
     document.addEventListener('mouseup', handleMouseUp);
@@ -332,54 +403,9 @@ function WeddingStrands() {
       document.removeEventListener('touchcancel', handleTouchCancel);
       document.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [isDragging, selectedCells, isTapMode]);
+  }, [handleMouseUp, handleTouchEnd, handleTouchCancel, handleTouchMove]);
 
-  const positionsMatch = (selected, wordDef) => {
-    if (selected.length !== wordDef.positions.length) return false;
 
-    // Check if selected positions match word positions exactly
-    return selected.every((cell, index) => {
-      const [row, col] = wordDef.positions[index];
-      return cell.row === row && cell.col === col;
-    });
-  };
-
-  const handleSubmit = () => {
-    if (selectedCells.length < 3) {
-      setMessage('Word too short!');
-      setTimeout(() => setMessage(''), 2000);
-      setSelectedCells([]);
-      return;
-    }
-
-    const word = selectedCells.map(c => c.letter).join('');
-
-    // Check if this word matches any defined word by positions
-    const foundWordDef = WORD_DEFINITIONS.find(wd =>
-      wd.word === word || positionsMatch(selectedCells, wd)
-    );
-
-    if (foundWordDef && !foundWords.includes(foundWordDef.word)) {
-      const newFoundWords = [...foundWords, foundWordDef.word];
-      setFoundWords(newFoundWords);
-      setMessage(foundWordDef.isSpangram ? '🎉 Spangram found!' : 'Great job!');
-
-      if (newFoundWords.length === WORD_DEFINITIONS.length) {
-        setIsComplete(true);
-        setShowCompletionModal(true);
-      }
-
-      setTimeout(() => setMessage(''), 2000);
-    } else if (foundWords.includes(word)) {
-      setMessage('Already found!');
-      setTimeout(() => setMessage(''), 2000);
-    } else {
-      setMessage('Not in word list or Invalid word!');
-      setTimeout(() => setMessage(''), 2000);
-    }
-
-    setSelectedCells([]);
-  };
 
   const handleClear = () => {
     setSelectedCells([]);
@@ -543,36 +569,21 @@ function WeddingStrands() {
                     const cellKey = getCellKey(rowIndex, colIndex);
 
                     return (
-                      <button
+                      <StrandsCell
                         key={`${rowIndex}-${colIndex}`}
-                        ref={(el) => {
-                          if (el) buttonRefs.current[cellKey] = el;
-                        }}
-                        data-row={rowIndex}
-                        data-col={colIndex}
-                        onClick={() => handleCellClick(rowIndex, colIndex)}
-                        onMouseDown={() => handleCellMouseDown(rowIndex, colIndex)}
-                        onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
-                        onTouchStart={(e) => handleCellTouchStart(rowIndex, colIndex, e)}
-                        className={`
-                          w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16
-                          flex items-center justify-center
-                          rounded-full font-bold text-lg sm:text-xl md:text-2xl
-                          transition-all duration-200
-                          ${isSelected
-                            ? 'bg-blue-500 text-white scale-95'
-                            : isInSpangram
-                              ? 'bg-nyt-yellow text-gray-900'
-                              : isInFound
-                                ? 'bg-nyt-beige-dark text-white'
-                                : 'bg-nyt-beige-light hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900'
-                          }
-                          cursor-pointer select-none
-                        `}
-                        style={{ touchAction: isTapMode ? 'auto' : 'none' }}
-                      >
-                        {letter}
-                      </button>
+                        letter={letter}
+                        row={rowIndex}
+                        col={colIndex}
+                        isSelected={isSelected}
+                        isInFound={isInFound}
+                        isInSpangram={isInSpangram}
+                        isTapMode={isTapMode}
+                        onCellClick={handleCellClick}
+                        onCellMouseDown={handleCellMouseDown}
+                        onCellMouseEnter={handleCellMouseEnter}
+                        onCellTouchStart={handleCellTouchStart}
+                        setButtonRef={handleSetButtonRef}
+                      />
                     );
                   })}
                 </div>

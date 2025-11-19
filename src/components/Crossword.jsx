@@ -211,8 +211,13 @@ const Crossword = () => {
     }
 
     // Focus the hidden input to trigger mobile keyboard
+    // Save scroll position to prevent unwanted scrolling
     if (inputRef.current) {
+      const scrollX = window.scrollX;
+      const scrollY = window.scrollY;
       inputRef.current.focus({ preventScroll: true });
+      // Restore scroll position in case it changed
+      window.scrollTo(scrollX, scrollY);
     }
   };
 
@@ -583,7 +588,15 @@ const Crossword = () => {
           autoCapitalize="characters"
           onInput={handleInputChange}
           className="fixed opacity-0 pointer-events-none"
-          style={{ top: 0, left: 0, width: '1px', height: '1px' }}
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            width: '1px',
+            height: '1px',
+            transform: 'translate(-50%, -50%)',
+            zIndex: -1
+          }}
           aria-hidden="true"
         />
 
