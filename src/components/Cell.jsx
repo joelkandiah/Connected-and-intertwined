@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { memo } from 'react';
 
-const Cell = ({ 
+const Cell = memo(({ 
   cell, 
   isSelected, 
   isHighlighted, 
@@ -57,6 +57,8 @@ const Cell = ({
       )}
     </div>
   );
-};
+});
+
+Cell.displayName = 'Cell';
 
 export default Cell;

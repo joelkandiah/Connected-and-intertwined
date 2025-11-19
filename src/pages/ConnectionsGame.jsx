@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import PUZZLE from '../data/connections-puzzle.json';
 
 const DIFFICULTY_COLORS = {
