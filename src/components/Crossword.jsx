@@ -22,7 +22,7 @@ const Crossword = () => {
   // Initialize grid from puzzle data
   useEffect(() => {
     const savedProgress = loadCrosswordProgress();
-    const initialGrid = puzzleData.grid.map((row, rowIndex) => 
+    const initialGrid = puzzleData.grid.map((row, rowIndex) =>
       row.split('').map((char, colIndex) => ({
         isBlock: char === '#',
         solution: char === '#' ? null : char,
@@ -66,8 +66,8 @@ const Crossword = () => {
   // Save progress whenever grid or revealed cells change
   useEffect(() => {
     if (grid.length > 0) {
-      saveCrosswordProgress({ 
-        grid, 
+      saveCrosswordProgress({
+        grid,
         elapsedTime,
         revealedCells: Array.from(revealedCells)
       });
@@ -147,7 +147,7 @@ const Crossword = () => {
   // Get current word cells based on selected cell and direction
   const getCurrentWordCells = useCallback(() => {
     if (!selectedCell) return [];
-    
+
     const { row, col } = selectedCell;
     const cells = [];
 
@@ -179,7 +179,7 @@ const Crossword = () => {
   // Get current clue
   const getCurrentClue = useCallback(() => {
     if (!selectedCell) return null;
-    
+
     const wordCells = getCurrentWordCells();
     if (wordCells.length === 0) return null;
 
@@ -209,10 +209,10 @@ const Crossword = () => {
     } else {
       setSelectedCell({ row, col });
     }
-    
+
     // Focus the hidden input to trigger mobile keyboard
     if (inputRef.current) {
-      inputRef.current.focus();
+      inputRef.current.focus({ preventScroll: true });
     }
   };
 
@@ -227,7 +227,7 @@ const Crossword = () => {
       e.preventDefault();
       lastKeyEventRef.current = Date.now(); // Mark that we handled a key event
       const newGrid = [...grid];
-      
+
       // If cell already has a value, replace it and move to next cell
       const hadValue = newGrid[row][col].value !== '';
       newGrid[row][col].value = e.key.toUpperCase();
@@ -302,22 +302,22 @@ const Crossword = () => {
   // Handle input from mobile keyboard (for devices without proper keydown events)
   const handleInputChange = useCallback((e) => {
     if (!selectedCell || viewOnlyMode) return;
-    
+
     // If a keydown event was handled within the last 100ms, skip this to avoid duplicates
     if (Date.now() - lastKeyEventRef.current < 100) {
       e.target.value = '';
       return;
     }
-    
+
     const value = e.target.value;
     // Only handle single character input
     if (value && value.length === 1 && /^[a-zA-Z]$/.test(value)) {
       const { row, col } = selectedCell;
       const newGrid = [...grid];
-      
+
       newGrid[row][col].value = value.toUpperCase();
       setGrid(newGrid);
-      
+
       // Clear incorrect/revealed state for this cell
       setIncorrectCells(prev => {
         const newSet = new Set(prev);
@@ -329,11 +329,11 @@ const Crossword = () => {
         newSet.delete(`${row}-${col}`);
         return newSet;
       });
-      
+
       // Move to next cell
       moveToNextCell();
     }
-    
+
     // Always clear input
     e.target.value = '';
   }, [selectedCell, grid, viewOnlyMode]);
@@ -345,7 +345,7 @@ const Crossword = () => {
 
   const moveInDirection = (rowDelta, colDelta) => {
     if (!selectedCell) return;
-    
+
     let newRow = selectedCell.row + rowDelta;
     let newCol = selectedCell.col + colDelta;
 
@@ -432,29 +432,29 @@ const Crossword = () => {
   // Reveal all
   const handleRevealAll = () => {
     // This step correctly updates the grid contents to the solution
-    const newGrid = grid.map(row => 
+    const newGrid = grid.map(row =>
       row.map(cell => ({
         ...cell,
         value: cell.isBlock ? '' : cell.solution // Set the cell value to the solution
       }))
     );
-  
+
     // 1. Create a new Set to hold ONLY the newly revealed cell coordinates
     const newlyRevealed = new Set();
-    
+
     // 2. Iterate through the original grid to compare user input against the solution
     grid.forEach((row, rowIndex) => {
       row.forEach((cell, colIndex) => {
-        
+
         // Check if it's a playable cell AND the current value is NOT the solution
         if (!cell.isBlock && cell.value !== cell.solution) {
-          
+
           // **Only add the cell to the set if the solution had to be revealed**
           newlyRevealed.add(`${rowIndex}-${colIndex}`);
         }
       });
     });
-  
+
     // 3. Update the states
     setGrid(newGrid);
     // Merge the existing revealed cells with the newly revealed ones
@@ -463,7 +463,7 @@ const Crossword = () => {
     });
     setIncorrectCells(new Set()); // Clear all incorrect cells
   };
-      
+
   const handleClear = () => {
     const wordCells = getCurrentWordCells();
     const newGrid = [...grid];
@@ -485,7 +485,7 @@ const Crossword = () => {
   // Reset puzzle
   const handleReset = () => {
     if (confirm('Are you sure you want to reset the puzzle? All progress will be lost.')) {
-      const newGrid = grid.map(row => 
+      const newGrid = grid.map(row =>
         row.map(cell => ({
           ...cell,
           value: ''
@@ -532,9 +532,9 @@ const Crossword = () => {
     <div className="min-h-screen py-4 sm:py-8 px-3 sm:px-4 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto">
         <header className="text-center mb-6 sm:mb-8">
-          <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)'}} className="font-bold mb-2 text-gray-900 dark:text-gray-100">The Mini</h1>
-          <p style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}} className="text-gray-600 dark:text-gray-300">Wedding Edition</p>
-          <p style={{fontSize: 'clamp(0.55rem, 2vw, 0.75rem)'}} className="text-gray-500 dark:text-gray-400 mt-2">Piece together all the clues!</p>
+          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }} className="font-bold mb-2 text-gray-900 dark:text-gray-100">The Mini</h1>
+          <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.25rem)' }} className="text-gray-600 dark:text-gray-300">Wedding Edition</p>
+          <p style={{ fontSize: 'clamp(0.55rem, 2vw, 0.75rem)' }} className="text-gray-500 dark:text-gray-400 mt-2">Piece together all the clues!</p>
           {/* Timer display */}
           <div className="mt-3 text-lg font-semibold text-gray-700 dark:text-gray-300">
             Time: {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
@@ -582,8 +582,8 @@ const Crossword = () => {
           autoComplete="off"
           autoCapitalize="characters"
           onInput={handleInputChange}
-          className="absolute opacity-0 pointer-events-none"
-          style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px' }}
+          className="fixed opacity-0 pointer-events-none"
+          style={{ top: 0, left: 0, width: '1px', height: '1px' }}
           aria-hidden="true"
         />
 
@@ -602,9 +602,9 @@ const Crossword = () => {
         <div className="flex flex-col gap-6">
           {/* Crossword grid */}
           <div className="w-full flex justify-center">
-            <div 
-              className="grid gap-0 bg-white dark:bg-gray-800 p-2 sm:p-4 rounded-lg shadow-lg" 
-              style={{ 
+            <div
+              className="grid gap-0 bg-white dark:bg-gray-800 p-2 sm:p-4 rounded-lg shadow-lg"
+              style={{
                 gridTemplateColumns: `repeat(${puzzleData.size}, minmax(0, 1fr))`,
                 width: 'clamp(280px, 100%, 500px)',
                 maxWidth: '100vw',
@@ -613,32 +613,46 @@ const Crossword = () => {
               role="grid"
               aria-label="Crossword puzzle grid"
             >
-              {grid.map((row, rowIndex) => 
-                row.map((cell, colIndex) => {
-                  const isSelected = selectedCell && 
-                    selectedCell.row === rowIndex && 
-                    selectedCell.col === colIndex;
-                  const isHighlighted = wordCells.some(
-                    c => c.row === rowIndex && c.col === colIndex
-                  ) && !isSelected;
-                  const isIncorrect = incorrectCells.has(`${rowIndex}-${colIndex}`);
-                  const isRevealed = revealedCells.has(`${rowIndex}-${colIndex}`);
+              {grid.map((row, rowIndex) => (
+                <div key={`row-${rowIndex}`} role="row" style={{ display: 'contents' }}>
+                  {row.map((cell, colIndex) => {
+                    const isSelected = selectedCell &&
+                      selectedCell.row === rowIndex &&
+                      selectedCell.col === colIndex;
+                    const isHighlighted = wordCells.some(
+                      c => c.row === rowIndex && c.col === colIndex
+                    ) && !isSelected;
+                    const isIncorrect = incorrectCells.has(`${rowIndex}-${colIndex}`);
+                    const isRevealed = revealedCells.has(`${rowIndex}-${colIndex}`);
 
-                  return (
-                    <Cell
-                      key={`${rowIndex}-${colIndex}`}
-                      cell={cell}
-                      isSelected={isSelected}
-                      isHighlighted={isHighlighted}
-                      isIncorrect={isIncorrect}
-                      isRevealed={isRevealed}
-                      onClick={() => handleCellClick(rowIndex, colIndex)}
-                    />
-                  );
-                })
-              )}
+                    return (
+                      <Cell
+                        key={`${rowIndex}-${colIndex}`}
+                        cell={cell}
+                        isSelected={isSelected}
+                        isHighlighted={isHighlighted}
+                        isIncorrect={isIncorrect}
+                        isRevealed={isRevealed}
+                        onClick={() => handleCellClick(rowIndex, colIndex)}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
             </div>
           </div>
+
+          {/* Current clue display */}
+          {currentClue && (
+            <div className="sm:hidden mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border-2 border-pink-200 dark:border-pink-700">
+              <div className="text-sm text-gray-600 dark:text-gray-300 uppercase tracking-wide mb-1">
+                {currentClue.number} {currentClue.direction}
+              </div>
+              <div className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100">
+                {currentClue.clue}
+              </div>
+            </div>
+          )}
 
           {/* Control buttons */}
           {!viewOnlyMode ? (
@@ -708,7 +722,7 @@ const Crossword = () => {
         </div>
 
         {/* Instructions */}
-        <div className="mt-8 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm"> 
+        <div className="mt-8 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
           <h2 className="text-lg sm:text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">How to Play</h2>
           <ul className="space-y-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">
             <li>• Click on a cell to select it, then type to fill in letters</li>
