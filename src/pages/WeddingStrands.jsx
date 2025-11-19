@@ -31,6 +31,42 @@ function WeddingStrands() {
   const buttonRefs = useRef({});
   const isInitialMount = useRef(true);
   const touchStartTimeRef = useRef(null);
+  const layoutCacheRef = useRef({ centers: {}, rects: {} });
+
+  const measureLayout = () => {
+    if (!gridRef.current) return;
+
+    const gridRect = gridRef.current.getBoundingClientRect();
+    const centers = {};
+    const rects = {}; // For hit testing (viewport relative)
+
+    // We need to iterate over all possible cells
+    PUZZLE_GRID.forEach((row, rowIndex) => {
+      row.forEach((_, colIndex) => {
+        const key = getCellKey(rowIndex, colIndex);
+        const button = buttonRefs.current[key];
+        if (button) {
+          const rect = button.getBoundingClientRect();
+          rects[key] = rect;
+
+          // Calculate center relative to grid
+          centers[key] = {
+            x: rect.left - gridRect.left + rect.width / 2,
+            y: rect.top - gridRect.top + rect.height / 2
+          };
+        }
+      });
+    });
+
+    layoutCacheRef.current = { centers, rects };
+  };
+
+  // Measure layout on mount and resize
+  useEffect(() => {
+    measureLayout();
+    window.addEventListener('resize', measureLayout);
+    return () => window.removeEventListener('resize', measureLayout);
+  }, []);
 
   // Load saved state
   useEffect(() => {
@@ -40,7 +76,7 @@ function WeddingStrands() {
       setFoundWords(state.foundWords || []);
       setElapsedTime(state.elapsedTime || 0);
       setIsComplete(state.isComplete || false);
-      
+
       if (state.foundWords && state.foundWords.length === WORD_DEFINITIONS.length) {
         setIsComplete(true);
       }
@@ -54,7 +90,7 @@ function WeddingStrands() {
       isInitialMount.current = false;
       return;
     }
-    
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       foundWords,
       elapsedTime,
@@ -122,10 +158,10 @@ function WeddingStrands() {
 
   const handleCellClick = (row, col) => {
     if (isComplete || !isTapMode) return;
-    
+
     const cellKey = getCellKey(row, col);
     const isAlreadySelected = selectedCells.some(c => c.key === cellKey);
-    
+
     if (isAlreadySelected) {
       // If clicking the last cell in the selection, remove it
       if (selectedCells.length > 0 && selectedCells[selectedCells.length - 1].key === cellKey) {
@@ -133,13 +169,13 @@ function WeddingStrands() {
       }
       return;
     }
-    
+
     // If no cells selected, start new selection
     if (selectedCells.length === 0) {
       setSelectedCells([{ row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
       return;
     }
-    
+
     // Check if adjacent to last cell
     const lastCell = selectedCells[selectedCells.length - 1];
     if (areAdjacent(lastCell, { row, col })) {
@@ -159,10 +195,10 @@ function WeddingStrands() {
 
   const handleCellMouseEnter = (row, col) => {
     if (!isDragging || isComplete || isTapMode) return;
-    
+
     const cellKey = getCellKey(row, col);
     const isAlreadySelected = selectedCells.some(c => c.key === cellKey);
-    
+
     if (!isAlreadySelected && selectedCells.length > 0) {
       const lastCell = selectedCells[selectedCells.length - 1];
       if (areAdjacent(lastCell, { row, col })) {
@@ -182,48 +218,75 @@ function WeddingStrands() {
   // Touch event handlers for mobile
   const handleCellTouchStart = (row, col, e) => {
     if (isComplete) return;
-    
+
     // In tap mode, let the touch convert to a click event naturally
     // Don't prevent default so onClick handler will fire
     if (isTapMode) {
       return;
     }
-    
+
     // In drag mode, start dragging
     touchStartTimeRef.current = Date.now();
     setIsDragging(true);
+
+    // Measure layout immediately on interaction start to ensure accuracy
+    measureLayout();
+
     const cellKey = getCellKey(row, col);
     setSelectedCells([{ row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
   };
 
   const handleTouchMove = (e) => {
     if (!isDragging || isComplete || isTapMode) return;
-    
+
     // Prevent scrolling and other default behaviors during drag
     e.preventDefault();
     e.stopPropagation();
-    
+
     const touch = e.touches[0];
     if (!touch) return;
-    
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    
-    if (element && element.dataset.row !== undefined && element.dataset.col !== undefined) {
-      const row = parseInt(element.dataset.row);
-      const col = parseInt(element.dataset.col);
-      const cellKey = getCellKey(row, col);
-      
+
+    // Use cached rects for hit testing
+    const { rects } = layoutCacheRef.current;
+    const clientX = touch.clientX;
+    const clientY = touch.clientY;
+
+    // Find the cell under the finger
+    let targetCell = null;
+
+    // Optimization: Check if we are still over the last added cell first
+    // (Common case)
+
+    // Iterate through all cells to find which one contains the touch point
+    // This is faster than elementFromPoint which causes reflow
+    for (const key in rects) {
+      const rect = rects[key];
+      if (
+        clientX >= rect.left &&
+        clientX <= rect.right &&
+        clientY >= rect.top &&
+        clientY <= rect.bottom
+      ) {
+        const [r, c] = key.split('-').map(Number);
+        targetCell = { row: r, col: c, key };
+        break;
+      }
+    }
+
+    if (targetCell) {
+      const { row, col, key: cellKey } = targetCell;
+
       setSelectedCells(prev => {
         // Check if this cell is already in the selection
         const isAlreadySelected = prev.some(c => c.key === cellKey);
-        
+
         if (!isAlreadySelected && prev.length > 0) {
           const lastCell = prev[prev.length - 1];
           if (areAdjacent(lastCell, { row, col })) {
             return [...prev, { row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }];
           }
         }
-        
+
         return prev;
       });
     }
@@ -231,11 +294,11 @@ function WeddingStrands() {
 
   const handleTouchEnd = (e) => {
     if (isTapMode) return; // Tap mode handles selection differently
-    
+
     if (isDragging) {
       // Small delay to ensure last cell is captured
       const touchDuration = touchStartTimeRef.current ? Date.now() - touchStartTimeRef.current : 0;
-      
+
       // Only submit if drag was intentional (not a quick tap)
       if (touchDuration > 150 && selectedCells.length >= 3) {
         // Small delay to capture any final touches
@@ -262,7 +325,7 @@ function WeddingStrands() {
     document.addEventListener('touchend', handleTouchEnd, { passive: true });
     document.addEventListener('touchcancel', handleTouchCancel, { passive: true });
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    
+
     return () => {
       document.removeEventListener('mouseup', handleMouseUp);
       document.removeEventListener('touchend', handleTouchEnd);
@@ -273,7 +336,7 @@ function WeddingStrands() {
 
   const positionsMatch = (selected, wordDef) => {
     if (selected.length !== wordDef.positions.length) return false;
-    
+
     // Check if selected positions match word positions exactly
     return selected.every((cell, index) => {
       const [row, col] = wordDef.positions[index];
@@ -290,9 +353,9 @@ function WeddingStrands() {
     }
 
     const word = selectedCells.map(c => c.letter).join('');
-    
+
     // Check if this word matches any defined word by positions
-    const foundWordDef = WORD_DEFINITIONS.find(wd => 
+    const foundWordDef = WORD_DEFINITIONS.find(wd =>
       wd.word === word || positionsMatch(selectedCells, wd)
     );
 
@@ -311,10 +374,10 @@ function WeddingStrands() {
       setMessage('Already found!');
       setTimeout(() => setMessage(''), 2000);
     } else {
-      setMessage('Not a valid word');
+      setMessage('Not in word list or Invalid word!');
       setTimeout(() => setMessage(''), 2000);
     }
-    
+
     setSelectedCells([]);
   };
 
@@ -385,9 +448,9 @@ function WeddingStrands() {
 
       <div className="w-full max-w-[min(96vw,650px)] mx-auto">
         <header className="text-center mb-6 sm:mb-8">
-          <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)'}} className="font-bold mb-2 text-gray-900 dark:text-gray-100">Strands</h1>
-          <p style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}} className="text-gray-600 dark:text-gray-300"> Wedding Edition</p>
-          <p style={{fontSize: 'clamp(0.55rem, 2vw, 0.75rem)'}} className="text-gray-500 dark:text-gray-400 mt-2">
+          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }} className="font-bold mb-2 text-gray-900 dark:text-gray-100">Strands</h1>
+          <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.25rem)' }} className="text-gray-600 dark:text-gray-300"> Wedding Edition</p>
+          <p style={{ fontSize: 'clamp(0.55rem, 2vw, 0.75rem)' }} className="text-gray-500 dark:text-gray-400 mt-2">
             Find the hidden words! • Drag to select letters • Find the pangram!
           </p>
         </header>
@@ -408,23 +471,21 @@ function WeddingStrands() {
             <div className="bg-white border-2 border-gray-300 rounded-full p-1 inline-flex">
               <button
                 onClick={() => setIsTapMode(false)}
-                className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors ${
-                  !isTapMode
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
-                }`}
-                style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}
+                className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors ${!isTapMode
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+                  }`}
+                style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}
               >
                 Drag Mode
               </button>
               <button
                 onClick={() => setIsTapMode(true)}
-                className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors ${
-                  isTapMode
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
-                }`}
-                style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}
+                className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors ${isTapMode
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+                  }`}
+                style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}
               >
                 Tap Mode
               </button>
@@ -435,40 +496,30 @@ function WeddingStrands() {
         {/* Letter Grid with SVG */}
         <div className="mb-6 flex justify-center">
           <div className="relative inline-block" ref={gridRef} style={{ touchAction: isTapMode ? 'auto' : 'none' }}>
-            <svg 
-              className="absolute inset-0 pointer-events-none" 
+            <svg
+              className="absolute inset-0 pointer-events-none"
               style={{ zIndex: 1 }}
-              width="100%" 
+              width="100%"
               height="100%"
             >
               {/* Draw paths between selected cells */}
               {selectedCells.length > 1 && selectedCells.map((cell, index) => {
                 if (index === 0) return null;
                 const prevCell = selectedCells[index - 1];
-                
-                // Get actual button elements to calculate positions
-                const prevButton = buttonRefs.current[prevCell.key];
-                const currButton = buttonRefs.current[cell.key];
-                
-                if (!prevButton || !currButton || !gridRef.current) return null;
-                
-                const gridRect = gridRef.current.getBoundingClientRect();
-                const prevRect = prevButton.getBoundingClientRect();
-                const currRect = currButton.getBoundingClientRect();
-                
-                // Calculate center positions relative to the grid
-                const x1 = prevRect.left - gridRect.left + prevRect.width / 2;
-                const y1 = prevRect.top - gridRect.top + prevRect.height / 2;
-                const x2 = currRect.left - gridRect.left + currRect.width / 2;
-                const y2 = currRect.top - gridRect.top + currRect.height / 2;
-                
+
+                // Use cached centers
+                const prevCenter = layoutCacheRef.current.centers[prevCell.key];
+                const currCenter = layoutCacheRef.current.centers[cell.key];
+
+                if (!prevCenter || !currCenter) return null;
+
                 return (
                   <line
                     key={`path-${index}`}
-                    x1={x1}
-                    y1={y1}
-                    x2={x2}
-                    y2={y2}
+                    x1={prevCenter.x}
+                    y1={prevCenter.y}
+                    x2={currCenter.x}
+                    y2={currCenter.y}
                     stroke="#3b82f6"
                     strokeWidth="4"
                     strokeLinecap="round"
@@ -476,21 +527,21 @@ function WeddingStrands() {
                 );
               })}
             </svg>
-            
+
             <div className="relative" style={{ zIndex: 2 }}>
               {PUZZLE_GRID.map((row, rowIndex) => (
                 <div key={rowIndex} className="flex gap-2.5 sm:gap-3 mb-2.5 sm:mb-3">
                   {row.map((letter, colIndex) => {
                     const isSelected = isCellSelected(rowIndex, colIndex);
                     const isInFound = isCellInFoundWord(rowIndex, colIndex);
-                    
+
                     // Check if this cell is part of the spangram
                     const spangramWord = WORD_DEFINITIONS.find(wd => wd.isSpangram);
-                    const isInSpangram = foundWords.includes(spangramWord?.word) && 
+                    const isInSpangram = foundWords.includes(spangramWord?.word) &&
                       spangramWord?.positions.some(([r, c]) => r === rowIndex && c === colIndex);
-                    
+
                     const cellKey = getCellKey(rowIndex, colIndex);
-                    
+
                     return (
                       <button
                         key={`${rowIndex}-${colIndex}`}
@@ -511,10 +562,10 @@ function WeddingStrands() {
                           ${isSelected
                             ? 'bg-blue-500 text-white scale-95'
                             : isInSpangram
-                            ? 'bg-nyt-yellow text-gray-900'
-                            : isInFound
-                            ? 'bg-nyt-beige-dark text-white'
-                            : 'bg-nyt-beige-light hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900'
+                              ? 'bg-nyt-yellow text-gray-900'
+                              : isInFound
+                                ? 'bg-nyt-beige-dark text-white'
+                                : 'bg-nyt-beige-light hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900'
                           }
                           cursor-pointer select-none
                         `}
@@ -552,27 +603,26 @@ function WeddingStrands() {
             <button
               onClick={handleClear}
               className="px-4 sm:px-6 py-2 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-              style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}
+              style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}
               disabled={selectedCells.length === 0}
             >
               Clear
             </button>
             <button
               onClick={handleSubmit}
-              className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors ${
-                selectedCells.length >= 3
-                  ? 'bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-100'
-                  : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-              }`}
+              className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors ${selectedCells.length >= 3
+                ? 'bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-100'
+                : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                }`}
               disabled={selectedCells.length < 3}
-              style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}
+              style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}
             >
               Submit
             </button>
             <button
               onClick={() => setShowHint(!showHint)}
               className="px-4 sm:px-6 py-2 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-              style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}
+              style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}
             >
               {showHint ? 'Hide' : 'Show'} Hints
             </button>
@@ -585,7 +635,7 @@ function WeddingStrands() {
             <button
               onClick={handleNewGame}
               className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-blue-500 text-white rounded-full font-semibold hover:from-yellow-500 hover:to-green-600 transition-colors"
-              style={{fontSize: 'clamp(0.875rem, 2vw, 1rem)'}}
+              style={{ fontSize: 'clamp(0.875rem, 2vw, 1rem)' }}
             >
               New Game
             </button>
@@ -594,7 +644,7 @@ function WeddingStrands() {
 
         {/* Found Words List */}
         <div className="mt-8 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-          <h2 style={{fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)'}} className="font-bold mb-3 text-gray-900 dark:text-gray-100">
+          <h2 style={{ fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)' }} className="font-bold mb-3 text-gray-900 dark:text-gray-100">
             Found Words
           </h2>
           <div className="space-y-2">
@@ -610,21 +660,21 @@ function WeddingStrands() {
                       : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
                     }
                   `}
-                  style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}
+                  style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}
                 >
                   {word} {wordData?.isSpangram && '⭐ Spangram'}
                 </div>
               );
             })}
           </div>
-          
+
           {/* Hints */}
           {showHint && getRemainingWords().length > 0 && (
             <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <h3 className="font-semibold mb-2 text-gray-900 dark:text-gray-100" style={{fontSize: 'clamp(0.875rem, 2vw, 1rem)'}}>
+              <h3 className="font-semibold mb-2 text-gray-900 dark:text-gray-100" style={{ fontSize: 'clamp(0.875rem, 2vw, 1rem)' }}>
                 Remaining Word Hints:
               </h3>
-              <ul className="space-y-1 text-gray-600 dark:text-gray-300" style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}}>
+              <ul className="space-y-1 text-gray-600 dark:text-gray-300" style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}>
                 {getRemainingWords().map((wd, index) => (
                   <li key={index}>• {wd.hint} {wd.isSpangram && '(Spangram)'}</li>
                 ))}
@@ -635,10 +685,10 @@ function WeddingStrands() {
 
         {/* How to Play */}
         <div className="mt-8 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-          <h2 style={{fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)'}} className="font-bold mb-3 text-gray-900 dark:text-gray-100">
+          <h2 style={{ fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)' }} className="font-bold mb-3 text-gray-900 dark:text-gray-100">
             How to Play
           </h2>
-          <ul style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} className="space-y-2 text-gray-700 dark:text-gray-300">
+          <ul style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }} className="space-y-2 text-gray-700 dark:text-gray-300">
             <li>• Drag across adjacent letters to form words</li>
             <li>• Find all the hidden wedding-themed words</li>
             <li>• Look for the special spangram word (marked with ⭐)</li>
