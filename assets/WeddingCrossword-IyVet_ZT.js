@@ -1,4 +1,4 @@
-import{r as i,j as l}from"./index-D0Hizqyn.js";const J=i.memo(({cell:o,isSelected:g,isHighlighted:n,isRevealed:p,isIncorrect:d,onClick:x})=>{const m=o.isBlock,f=o.value||"",h=o.number;return l.jsxs("div",{onClick:m?void 0:x,className:`
+import{r as i,j as l}from"./index-XG9QTEK8.js";const J=i.memo(({cell:o,isSelected:g,isHighlighted:n,isRevealed:p,isIncorrect:d,onClick:x})=>{const m=o.isBlock,f=o.value||"",h=o.number;return l.jsxs("div",{onClick:m?void 0:x,className:`
         relative aspect-square border flex items-center justify-center
         ${m?"bg-gray-900 dark:bg-black cursor-default":g?"bg-yellow-200 dark:bg-yellow-700 border-yellow-400 dark:border-yellow-500 border-2 cursor-pointer":d?"bg-red-100 dark:bg-red-900/50 border-red-300 dark:border-red-700 cursor-pointer":n?"bg-yellow-50 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700 cursor-pointer":"bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600"}
         ${p?"bg-blue-50 dark:bg-blue-900/30":""}

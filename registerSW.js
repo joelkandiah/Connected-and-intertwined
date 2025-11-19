@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/Connected-and-intertwined/sw.js', { scope: '/Connected-and-intertwined/' })})}
