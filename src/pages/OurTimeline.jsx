@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import flashbackData from '../data/flashback.json';
 
+// Storage key for persisting game state
 const STORAGE_KEY = 'our-timeline-progress';
 
 function OurTimeline() {
