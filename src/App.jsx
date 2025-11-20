@@ -9,6 +9,7 @@ const LandingPage = lazy(() => import('./pages/LandingPage'));
 const ConnectionsGame = lazy(() => import('./pages/ConnectionsGame'));
 const WeddingCrossword = lazy(() => import('./pages/WeddingCrossword'));
 const WeddingStrands = lazy(() => import('./pages/WeddingStrands'));
+const OurTimeline = lazy(() => import('./pages/OurTimeline'));
 
 function App() {
   const [darkMode, setDarkMode] = useState(() => {
@@ -53,6 +54,7 @@ function App() {
             <Route path="/connections" element={<ConnectionsGame />} />
             <Route path="/wedding-crossword" element={<WeddingCrossword />} />
             <Route path="/wedding-strands" element={<WeddingStrands />} />
+            <Route path="/our-timeline" element={<OurTimeline />} />
           </Routes>
         </Suspense>
       </Router>
