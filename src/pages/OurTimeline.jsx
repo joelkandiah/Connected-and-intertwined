@@ -226,48 +226,66 @@ function OurTimeline() {
 
   // Touch events for mobile
   const touchStartPos = useRef(null);
+  const touchMoveThreshold = 10; // pixels to determine if it's a drag vs scroll
 
   const handleTouchStart = (e) => {
     if (isComplete || feedback !== null) return;
-    e.preventDefault(); // Prevent scrolling
     const touch = e.touches[0];
     touchStartPos.current = { x: touch.clientX, y: touch.clientY };
-    setIsDragging(true);
+    // Don't prevent default - allow scrolling to work
   };
 
   const handleTouchMove = (e) => {
-    if (isComplete || feedback !== null) return;
-    e.preventDefault(); // Prevent scrolling
+    if (isComplete || feedback !== null || !touchStartPos.current) return;
     
     const touch = e.touches[0];
-    const placedCardsContainer = document.getElementById('placed-cards-container');
-    if (!placedCardsContainer) return;
+    const deltaX = Math.abs(touch.clientX - touchStartPos.current.x);
+    const deltaY = Math.abs(touch.clientY - touchStartPos.current.y);
     
-    const cards = Array.from(placedCardsContainer.children);
-    
-    // Find which position we're hovering over
-    for (let i = 0; i < cards.length; i++) {
-      const rect = cards[i].getBoundingClientRect();
-      if (touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-        setDragOverIndex(i);
-        setTempPlacementIndex(i);
-        break;
+    // Only treat as drag if moved more than threshold
+    if (deltaX > touchMoveThreshold || deltaY > touchMoveThreshold) {
+      setIsDragging(true);
+      e.preventDefault(); // Only prevent scroll once we're sure it's a drag
+      
+      const placedCardsContainer = document.getElementById('placed-cards-container');
+      if (!placedCardsContainer) return;
+      
+      const cards = Array.from(placedCardsContainer.children);
+      
+      // Auto-scroll when near edges
+      const viewportHeight = window.innerHeight;
+      const scrollThreshold = 100; // pixels from edge to trigger scroll
+      
+      if (touch.clientY < scrollThreshold) {
+        window.scrollBy(0, -5);
+      } else if (touch.clientY > viewportHeight - scrollThreshold) {
+        window.scrollBy(0, 5);
       }
-    }
-    
-    // Check if we're below all cards
-    if (cards.length > 0) {
-      const lastRect = cards[cards.length - 1].getBoundingClientRect();
-      if (touch.clientY > lastRect.bottom) {
-        setDragOverIndex(cards.length);
-        setTempPlacementIndex(cards.length);
+      
+      // Find which position we're hovering over
+      for (let i = 0; i < cards.length; i++) {
+        const rect = cards[i].getBoundingClientRect();
+        if (touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+          setDragOverIndex(i);
+          setTempPlacementIndex(i);
+          break;
+        }
+      }
+      
+      // Check if we're below all cards
+      if (cards.length > 0) {
+        const lastRect = cards[cards.length - 1].getBoundingClientRect();
+        if (touch.clientY > lastRect.bottom) {
+          setDragOverIndex(cards.length);
+          setTempPlacementIndex(cards.length);
+        }
       }
     }
   };
 
   const handleTouchEnd = (e) => {
     if (isComplete || feedback !== null) return;
-    e.preventDefault(); // Prevent scrolling
+    touchStartPos.current = null;
     touchStartPos.current = null;
     setIsDragging(false);
   };
@@ -346,13 +364,11 @@ function OurTimeline() {
                 ${feedback === null ? 'cursor-move' : ''}
                 ${isDragging ? 'opacity-50' : 'opacity-100'}
                 transition-all duration-200
-                touch-none
                 relative
               `}
               style={{
                 userSelect: 'none',
-                WebkitUserSelect: 'none',
-                touchAction: 'none'
+                WebkitUserSelect: 'none'
               }}
             >
               <h3 className="font-bold text-lg sm:text-xl text-white mb-2">
@@ -370,9 +386,19 @@ function OurTimeline() {
           </div>
         )}
 
-        {/* Confirm Button - Top position */}
+        {/* Confirm Button - Top position with Cancel option */}
         {tempPlacementIndex !== null && feedback === null && !isComplete && (
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center gap-3 mb-4">
+            <button
+              onClick={() => {
+                setTempPlacementIndex(null);
+                setDragOverIndex(null);
+                setIsDragging(false);
+              }}
+              className="px-6 py-3 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+            >
+              Cancel
+            </button>
             <button
               onClick={handleConfirm}
               className="px-6 py-3 bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 rounded-full font-semibold hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors shadow-lg"
@@ -386,7 +412,7 @@ function OurTimeline() {
         <div className="mb-6" id="placed-cards-container">
           {placedCards.map((card, index) => (
             <div key={`placed-${card.id}`}>
-              {/* Drop zone BEFORE this card - only show when hovering over this specific zone */}
+              {/* Drop zone BEFORE this card - only show when hovering, no text since preview shows placement */}
               {dragOverIndex === index && currentCard && (
                 <div
                   onDragOver={(e) => handleDragOver(e, index)}
@@ -394,16 +420,9 @@ function OurTimeline() {
                   onDrop={(e) => handleDrop(e, index)}
                   className={`
                     transition-all duration-200 rounded-lg mb-3
-                    min-h-32 border-4 border-dashed border-nyt-blue bg-nyt-blue bg-opacity-10
-                    flex items-center justify-center p-4 text-center
+                    h-4 border-2 border-dashed border-nyt-blue bg-nyt-blue bg-opacity-10
                   `}
-                >
-                  <div className="text-center">
-                    <div className="text-gray-600 dark:text-gray-400 text-sm font-semibold">
-                      Drop to place before "{card.title}"
-                    </div>
-                  </div>
-                </div>
+                />
               )}
               
               {/* Invisible drop zone trigger - always present during drag to detect hover */}
@@ -460,7 +479,7 @@ function OurTimeline() {
             </div>
           ))}
           
-          {/* Drop zone at the END - only show when hovering over end zone */}
+          {/* Drop zone at the END - only show when hovering, minimal design */}
           {dragOverIndex === placedCards.length && currentCard && (
             <div
               onDragOver={(e) => handleDragOver(e, placedCards.length)}
@@ -468,14 +487,9 @@ function OurTimeline() {
               onDrop={(e) => handleDrop(e, placedCards.length)}
               className={`
                 transition-all duration-200 rounded-lg
-                min-h-32 border-4 border-dashed border-nyt-blue bg-nyt-blue bg-opacity-10
-                flex items-center justify-center text-center p-4 mb-3
+                h-4 border-2 border-dashed border-nyt-blue bg-nyt-blue bg-opacity-10 mb-3
               `}
-            >
-              <span className="text-gray-600 dark:text-gray-400 text-sm font-semibold">
-                Drop to place at end
-              </span>
-            </div>
+            />
           )}
           
           {/* Invisible drop zone trigger for end - always present during drag */}
@@ -513,9 +527,19 @@ function OurTimeline() {
           )}
         </div>
 
-        {/* Confirm Button - Bottom position */}
+        {/* Confirm Button - Bottom position with Cancel option */}
         {tempPlacementIndex !== null && feedback === null && !isComplete && (
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center gap-3 mb-6">
+            <button
+              onClick={() => {
+                setTempPlacementIndex(null);
+                setDragOverIndex(null);
+                setIsDragging(false);
+              }}
+              className="px-6 py-3 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+            >
+              Cancel
+            </button>
             <button
               onClick={handleConfirm}
               className="px-6 py-3 bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 rounded-full font-semibold hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors shadow-lg"
