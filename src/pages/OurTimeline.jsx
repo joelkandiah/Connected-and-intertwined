@@ -17,6 +17,7 @@ function OurTimeline() {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [feedback, setFeedback] = useState(null); // 'correct' or 'incorrect'
   const [tempPlacementIndex, setTempPlacementIndex] = useState(null); // Where user is trying to place
+  const [isDragging, setIsDragging] = useState(false); // Track if user is actively dragging
   const timerRef = useRef(null);
   const isInitialMount = useRef(true);
 
@@ -154,6 +155,7 @@ function OurTimeline() {
     if (isComplete || feedback !== null) return;
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', 'dragging');
+    setIsDragging(true);
   };
 
   const handleDragOver = (e, index) => {
@@ -175,10 +177,12 @@ function OurTimeline() {
     e.preventDefault();
     setDragOverIndex(null);
     setTempPlacementIndex(dropIndex);
+    setIsDragging(false);
   };
 
   const handleDragEnd = () => {
     setDragOverIndex(null);
+    setIsDragging(false);
   };
 
   const handleConfirm = () => {
@@ -228,6 +232,7 @@ function OurTimeline() {
     e.preventDefault(); // Prevent scrolling
     const touch = e.touches[0];
     touchStartPos.current = { x: touch.clientX, y: touch.clientY };
+    setIsDragging(true);
   };
 
   const handleTouchMove = (e) => {
@@ -264,6 +269,7 @@ function OurTimeline() {
     if (isComplete || feedback !== null) return;
     e.preventDefault(); // Prevent scrolling
     touchStartPos.current = null;
+    setIsDragging(false);
   };
 
   const handleNewGame = () => {
@@ -322,8 +328,8 @@ function OurTimeline() {
           </div>
         </header>
 
-        {/* Current Card to Place */}
-        {currentCard && !isComplete && (
+        {/* Current Card to Place - Only show when NOT dragging */}
+        {currentCard && !isComplete && !isDragging && tempPlacementIndex === null && (
           <div className="mb-6">
             <h3 className="text-center text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">
               Place this event:
@@ -360,67 +366,69 @@ function OurTimeline() {
                 </div>
               )}
             </div>
-            
-            {/* Confirm Button */}
-            {tempPlacementIndex !== null && feedback === null && (
-              <div className="flex justify-center mt-4">
-                <button
-                  onClick={handleConfirm}
-                  className="px-6 py-3 bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 rounded-full font-semibold hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors"
-                >
-                  Confirm Placement
-                </button>
-              </div>
-            )}
+          </div>
+        )}
+
+        {/* Confirm Button - Top position */}
+        {tempPlacementIndex !== null && feedback === null && !isComplete && (
+          <div className="flex justify-center mb-4">
+            <button
+              onClick={handleConfirm}
+              className="px-6 py-3 bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 rounded-full font-semibold hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors shadow-lg"
+            >
+              Confirm Placement
+            </button>
           </div>
         )}
 
         {/* Placed Cards Timeline */}
         <div className="mb-6" id="placed-cards-container">
-          {placedCards.length === 0 && currentCard && (
-            <div
-              onDragOver={(e) => handleDragOver(e, 0)}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, 0)}
-              className={`
-                min-h-32 border-2 border-dashed rounded-lg
-                flex items-center justify-center text-center p-4
-                transition-all duration-200
-                ${dragOverIndex === 0 ? 'border-nyt-blue bg-nyt-blue bg-opacity-10 border-4' : 'border-gray-300 dark:border-gray-600'}
-              `}
-            >
-              <span className="text-gray-500 dark:text-gray-400 font-semibold">
-                Drop here to start your timeline
-              </span>
-            </div>
-          )}
-          
           {placedCards.map((card, index) => (
             <div key={`placed-${card.id}`}>
-              {/* Large drop zone BEFORE this card */}
-              <div
-                onDragOver={(e) => handleDragOver(e, index)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, index)}
-                className={`
-                  transition-all duration-200 rounded-lg mb-3
-                  ${dragOverIndex === index && currentCard && tempPlacementIndex === index 
-                    ? 'min-h-40 border-4 border-dashed border-nyt-blue bg-nyt-blue bg-opacity-10' 
-                    : 'min-h-16 border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-nyt-blue hover:bg-nyt-blue hover:bg-opacity-5'}
-                  flex items-center justify-center p-4 text-center
-                `}
-              >
-                {dragOverIndex === index && currentCard && tempPlacementIndex === index ? (
+              {/* Drop zone BEFORE this card - only show when dragging */}
+              {isDragging && currentCard && (
+                <div
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, index)}
+                  className={`
+                    transition-all duration-200 rounded-lg mb-3
+                    ${dragOverIndex === index 
+                      ? 'min-h-32 border-4 border-dashed border-nyt-blue bg-nyt-blue bg-opacity-10' 
+                      : 'min-h-20 border-2 border-dashed border-gray-400 dark:border-gray-500'}
+                    flex items-center justify-center p-4 text-center
+                  `}
+                >
                   <div className="text-center">
-                    <div className="text-nyt-blue font-bold text-lg mb-1">{currentCard.title}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">Release to place before "{card.title}"</div>
+                    <div className="text-gray-600 dark:text-gray-400 text-sm">
+                      Drop to place before "{card.title}"
+                    </div>
                   </div>
-                ) : (
-                  <div className="text-gray-400 dark:text-gray-500 text-sm">
-                    Drop here to place before "{card.title}"
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
+              
+              {/* Show current card in this position if placed here temporarily */}
+              {tempPlacementIndex === index && currentCard && (
+                <div
+                  className={`
+                    bg-nyt-blue rounded-lg shadow-lg p-4 sm:p-5 mb-3
+                    transition-all duration-200
+                    relative
+                  `}
+                >
+                  <h3 className="font-bold text-lg sm:text-xl text-white mb-2">
+                    {currentCard.title}
+                  </h3>
+                  <p className="text-sm sm:text-base text-gray-100">
+                    {currentCard.description}
+                  </p>
+                  {feedback !== null && (
+                    <div className={`absolute top-2 right-2 text-3xl text-white`}>
+                      {feedback === 'correct' ? '✓' : '✗'}
+                    </div>
+                  )}
+                </div>
+              )}
               
               {/* The actual placed card */}
               <div
@@ -442,33 +450,61 @@ function OurTimeline() {
             </div>
           ))}
           
-          {/* Large drop zone at the END */}
-          {currentCard && placedCards.length > 0 && (
+          {/* Drop zone at the END - only show when dragging */}
+          {isDragging && currentCard && (
             <div
               onDragOver={(e) => handleDragOver(e, placedCards.length)}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, placedCards.length)}
               className={`
                 transition-all duration-200 rounded-lg
-                ${dragOverIndex === placedCards.length && tempPlacementIndex === placedCards.length
-                  ? 'min-h-40 border-4 border-dashed border-nyt-blue bg-nyt-blue bg-opacity-10' 
-                  : 'min-h-24 border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-nyt-blue hover:bg-nyt-blue hover:bg-opacity-5'}
-                flex items-center justify-center text-center p-4
+                ${dragOverIndex === placedCards.length
+                  ? 'min-h-32 border-4 border-dashed border-nyt-blue bg-nyt-blue bg-opacity-10' 
+                  : 'min-h-24 border-2 border-dashed border-gray-400 dark:border-gray-500'}
+                flex items-center justify-center text-center p-4 mb-3
               `}
             >
-              {dragOverIndex === placedCards.length && tempPlacementIndex === placedCards.length ? (
-                <div className="text-center">
-                  <div className="text-nyt-blue font-bold text-lg mb-1">{currentCard.title}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Release to place at end of timeline</div>
+              <span className="text-gray-600 dark:text-gray-400 text-sm">
+                Drop to place at end
+              </span>
+            </div>
+          )}
+          
+          {/* Show current card at END if placed there temporarily */}
+          {tempPlacementIndex === placedCards.length && currentCard && (
+            <div
+              className={`
+                bg-nyt-blue rounded-lg shadow-lg p-4 sm:p-5 mb-3
+                transition-all duration-200
+                relative
+              `}
+            >
+              <h3 className="font-bold text-lg sm:text-xl text-white mb-2">
+                {currentCard.title}
+              </h3>
+              <p className="text-sm sm:text-base text-gray-100">
+                {currentCard.description}
+              </p>
+              {feedback !== null && (
+                <div className={`absolute top-2 right-2 text-3xl text-white`}>
+                  {feedback === 'correct' ? '✓' : '✗'}
                 </div>
-              ) : (
-                <span className="text-gray-500 dark:text-gray-400 font-semibold">
-                  Drop here to place at end
-                </span>
               )}
             </div>
           )}
         </div>
+
+        {/* Confirm Button - Bottom position */}
+        {tempPlacementIndex !== null && feedback === null && !isComplete && (
+          <div className="flex justify-center mb-6">
+            <button
+              onClick={handleConfirm}
+              className="px-6 py-3 bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 rounded-full font-semibold hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors shadow-lg"
+            >
+              Confirm Placement
+            </button>
+          </div>
+        )}
 
         {/* New Game button when completed */}
         {isComplete && (
