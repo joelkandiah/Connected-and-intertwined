@@ -14,7 +14,9 @@ export default defineConfig({
         name: 'Sofia and Joel\'s Puzzle Celebration',
         short_name: 'Wedding Puzzles',
         description: 'Connections, Strands, and Crosswords for our wedding celebration',
-        theme_color: '#ffffff',
+        theme_color: '#f9a8d4',
+        background_color: '#ffffff',
+        display: 'standalone',
         icons: [
           {
             src: 'pwa-192x192.png',
