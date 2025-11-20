@@ -226,59 +226,56 @@ function OurTimeline() {
 
   // Touch events for mobile
   const touchStartPos = useRef(null);
-  const touchMoveThreshold = 10; // pixels to determine if it's a drag vs scroll
 
   const handleTouchStart = (e) => {
     if (isComplete || feedback !== null) return;
+    e.preventDefault(); // Always prevent default to disable native scrolling
     const touch = e.touches[0];
     touchStartPos.current = { x: touch.clientX, y: touch.clientY };
-    // Don't prevent default - allow scrolling to work
+    setIsDragging(true);
   };
 
   const handleTouchMove = (e) => {
     if (isComplete || feedback !== null || !touchStartPos.current) return;
+    e.preventDefault(); // Always prevent default
     
     const touch = e.touches[0];
-    const deltaX = Math.abs(touch.clientX - touchStartPos.current.x);
-    const deltaY = Math.abs(touch.clientY - touchStartPos.current.y);
+    const placedCardsContainer = document.getElementById('placed-cards-container');
+    if (!placedCardsContainer) return;
     
-    // Only treat as drag if moved more than threshold
-    if (deltaX > touchMoveThreshold || deltaY > touchMoveThreshold) {
-      setIsDragging(true);
-      e.preventDefault(); // Only prevent scroll once we're sure it's a drag
-      
-      const placedCardsContainer = document.getElementById('placed-cards-container');
-      if (!placedCardsContainer) return;
-      
-      const cards = Array.from(placedCardsContainer.children);
-      
-      // Auto-scroll when near edges
-      const viewportHeight = window.innerHeight;
-      const scrollThreshold = 100; // pixels from edge to trigger scroll
-      
-      if (touch.clientY < scrollThreshold) {
-        window.scrollBy(0, -5);
-      } else if (touch.clientY > viewportHeight - scrollThreshold) {
-        window.scrollBy(0, 5);
+    const cards = Array.from(placedCardsContainer.children);
+    
+    // Auto-scroll based on touch location
+    const viewportHeight = window.innerHeight;
+    const scrollThreshold = 150; // pixels from edge to trigger scroll
+    const scrollSpeed = 8; // pixels per frame
+    
+    if (touch.clientY < scrollThreshold) {
+      // Near top - scroll up
+      const intensity = (scrollThreshold - touch.clientY) / scrollThreshold;
+      window.scrollBy(0, -scrollSpeed * intensity);
+    } else if (touch.clientY > viewportHeight - scrollThreshold) {
+      // Near bottom - scroll down
+      const intensity = (touch.clientY - (viewportHeight - scrollThreshold)) / scrollThreshold;
+      window.scrollBy(0, scrollSpeed * intensity);
+    }
+    
+    // Find which position we're hovering over
+    for (let i = 0; i < cards.length; i++) {
+      const rect = cards[i].getBoundingClientRect();
+      if (touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+        setDragOverIndex(i);
+        setTempPlacementIndex(i);
+        break;
       }
-      
-      // Find which position we're hovering over
-      for (let i = 0; i < cards.length; i++) {
-        const rect = cards[i].getBoundingClientRect();
-        if (touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-          setDragOverIndex(i);
-          setTempPlacementIndex(i);
-          break;
-        }
-      }
-      
-      // Check if we're below all cards
-      if (cards.length > 0) {
-        const lastRect = cards[cards.length - 1].getBoundingClientRect();
-        if (touch.clientY > lastRect.bottom) {
-          setDragOverIndex(cards.length);
-          setTempPlacementIndex(cards.length);
-        }
+    }
+    
+    // Check if we're below all cards
+    if (cards.length > 0) {
+      const lastRect = cards[cards.length - 1].getBoundingClientRect();
+      if (touch.clientY > lastRect.bottom) {
+        setDragOverIndex(cards.length);
+        setTempPlacementIndex(cards.length);
       }
     }
   };
@@ -412,19 +409,6 @@ function OurTimeline() {
         <div className="mb-6" id="placed-cards-container">
           {placedCards.map((card, index) => (
             <div key={`placed-${card.id}`}>
-              {/* Drop zone BEFORE this card - only show when hovering, no text since preview shows placement */}
-              {dragOverIndex === index && currentCard && (
-                <div
-                  onDragOver={(e) => handleDragOver(e, index)}
-                  onDragLeave={handleDragLeave}
-                  onDrop={(e) => handleDrop(e, index)}
-                  className={`
-                    transition-all duration-200 rounded-lg mb-3
-                    h-4 border-2 border-dashed border-nyt-blue bg-nyt-blue bg-opacity-10
-                  `}
-                />
-              )}
-              
               {/* Invisible drop zone trigger - always present during drag to detect hover */}
               {isDragging && currentCard && dragOverIndex !== index && tempPlacementIndex !== index && (
                 <div
@@ -436,14 +420,26 @@ function OurTimeline() {
                 />
               )}
               
-              {/* Show current card in this position if placed here temporarily */}
+              {/* Show current card in this position if placed here temporarily - Make it draggable to reposition */}
               {tempPlacementIndex === index && currentCard && (
                 <div
+                  draggable={feedback === null}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
                   className={`
                     bg-nyt-blue rounded-lg shadow-lg p-4 sm:p-5 mb-3
+                    ${feedback === null ? 'cursor-move' : ''}
+                    ${isDragging ? 'opacity-50' : 'opacity-100'}
                     transition-all duration-200
                     relative
                   `}
+                  style={{
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none'
+                  }}
                 >
                   <h3 className="font-bold text-lg sm:text-xl text-white mb-2">
                     {currentCard.title}
@@ -479,19 +475,6 @@ function OurTimeline() {
             </div>
           ))}
           
-          {/* Drop zone at the END - only show when hovering, minimal design */}
-          {dragOverIndex === placedCards.length && currentCard && (
-            <div
-              onDragOver={(e) => handleDragOver(e, placedCards.length)}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, placedCards.length)}
-              className={`
-                transition-all duration-200 rounded-lg
-                h-4 border-2 border-dashed border-nyt-blue bg-nyt-blue bg-opacity-10 mb-3
-              `}
-            />
-          )}
-          
           {/* Invisible drop zone trigger for end - always present during drag */}
           {isDragging && currentCard && dragOverIndex !== placedCards.length && tempPlacementIndex !== placedCards.length && (
             <div
@@ -503,14 +486,26 @@ function OurTimeline() {
             />
           )}
           
-          {/* Show current card at END if placed there temporarily */}
+          {/* Show current card at END if placed there temporarily - Make it draggable to reposition */}
           {tempPlacementIndex === placedCards.length && currentCard && (
             <div
+              draggable={feedback === null}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
               className={`
                 bg-nyt-blue rounded-lg shadow-lg p-4 sm:p-5 mb-3
+                ${feedback === null ? 'cursor-move' : ''}
+                ${isDragging ? 'opacity-50' : 'opacity-100'}
                 transition-all duration-200
                 relative
               `}
+              style={{
+                userSelect: 'none',
+                WebkitUserSelect: 'none'
+              }}
             >
               <h3 className="font-bold text-lg sm:text-xl text-white mb-2">
                 {currentCard.title}
