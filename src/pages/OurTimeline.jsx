@@ -23,6 +23,14 @@ function OurTimeline() {
   const isInitialMount = useRef(true);
   const autoScrollRaf = useRef(null);
   const currentTouchY = useRef(null);
+  const wrapperRef = useRef(null);
+  const handleTouchStartRef = useRef(null);
+  const lastCheckTime = useRef(0);
+
+  // Keep the latest handleTouchStart in a ref so we don't need to re-bind listeners
+  useEffect(() => {
+    handleTouchStartRef.current = handleTouchStart;
+  });
 
   // Initialize game
   useEffect(() => {
@@ -136,35 +144,24 @@ function OurTimeline() {
   }, [isTimerRunning, isComplete]);
 
   // Fix passive event listener issue for touch events
+  // Fix passive event listener issue for touch events - Event Delegation Optimization
   useEffect(() => {
-    const handleTouchStartNonPassive = (e) => {
-      handleTouchStart(e);
+    const handleTouchStartDelegated = (e) => {
+      if (handleTouchStartRef.current) {
+        handleTouchStartRef.current(e);
+      }
     };
 
-    const handleTouchMoveNonPassive = (e) => {
-      handleTouchMove(e);
-    };
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
 
-    const handleTouchEndNonPassive = (e) => {
-      handleTouchEnd(e);
-    };
-
-    // Attach touch event listeners with passive: false
-    const draggableElements = document.querySelectorAll('[draggable="true"]');
-    draggableElements.forEach(element => {
-      element.addEventListener('touchstart', handleTouchStartNonPassive, { passive: false });
-      element.addEventListener('touchmove', handleTouchMoveNonPassive, { passive: false });
-      element.addEventListener('touchend', handleTouchEndNonPassive, { passive: false });
-    });
+    // Attach single listener to wrapper with passive: false
+    wrapper.addEventListener('touchstart', handleTouchStartDelegated, { passive: false });
 
     return () => {
-      draggableElements.forEach(element => {
-        element.removeEventListener('touchstart', handleTouchStartNonPassive);
-        element.removeEventListener('touchmove', handleTouchMoveNonPassive);
-        element.removeEventListener('touchend', handleTouchEndNonPassive);
-      });
+      wrapper.removeEventListener('touchstart', handleTouchStartDelegated);
     };
-  }, [currentCard, tempPlacementIndex, placedCards, isComplete, feedback]); // Re-run when cards change
+  }, []); // Run once on mount
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -335,7 +332,12 @@ function OurTimeline() {
       floatingCardRef.current.style.top = `${touch.clientY - dragOffset.current.y}px`;
     }
 
-    checkDragPosition(touch.clientY);
+    // Throttle the expensive checkDragPosition (Read DOM)
+    const now = Date.now();
+    if (now - lastCheckTime.current > 50) { // Run max once every 50ms
+      checkDragPosition(touch.clientY);
+      lastCheckTime.current = now;
+    }
   };
 
   const handleTouchEndWindow = (e) => {
@@ -421,7 +423,7 @@ function OurTimeline() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8 px-3 sm:px-4">
+    <div ref={wrapperRef} className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8 px-3 sm:px-4">
       {/* Completion Modal */}
       {showCompletionModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center p-4" style={{ zIndex: 30 }}>
