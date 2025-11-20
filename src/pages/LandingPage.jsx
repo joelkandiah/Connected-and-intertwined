@@ -45,7 +45,8 @@ const LandingPage = () => {
   const puzzles = useMemo(() => [
     { name: 'Connections', path: '/connections', description: 'Find groups of four!' },
     { name: 'The Mini', path: '/wedding-crossword', description: 'Wedding crossword puzzle' },
-    { name: 'Wedding Strands', path: '/wedding-strands', description: 'Find the hidden words' }
+    { name: 'Wedding Strands', path: '/wedding-strands', description: 'Find the hidden words' },
+    { name: 'Our Timeline', path: '/our-timeline', description: 'Arrange events in order' }
   ], []);
 
   return (
@@ -80,7 +81,7 @@ const LandingPage = () => {
         </div>
 
         {/* Puzzle buttons */}
-        <div className="grid md:grid-cols-3 gap-6 sm:gap-3 sm:scale-90 mt-16 sm:mt-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-3 sm:scale-90 mt-16 sm:mt-8">
           {puzzles.map((puzzle, index) => (
             <Link
               key={puzzle.path}
