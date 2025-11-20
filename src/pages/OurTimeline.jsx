@@ -5,22 +5,31 @@ import flashbackData from '../data/flashback.json';
 const STORAGE_KEY = 'our-timeline-progress';
 
 function OurTimeline() {
-  const [cards, setCards] = useState([]);
+  const [placedCards, setPlacedCards] = useState([]); // Cards already placed in timeline
+  const [currentCard, setCurrentCard] = useState(null); // Card to be placed
+  const [remainingCards, setRemainingCards] = useState([]); // Cards not yet shown
+  const [score, setScore] = useState(0);
+  const [totalAttempts, setTotalAttempts] = useState(0);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
   const [isComplete, setIsComplete] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [draggedIndex, setDraggedIndex] = useState(null);
-  const [dragOverIndex, setDragOverIndex] = useState(null);
+  const [feedback, setFeedback] = useState(null); // 'correct' or 'incorrect'
+  const [tempPlacementIndex, setTempPlacementIndex] = useState(null); // Where user is trying to place
   const timerRef = useRef(null);
   const isInitialMount = useRef(true);
 
-  // Load saved state
+  // Initialize game
   useEffect(() => {
     const savedState = localStorage.getItem(STORAGE_KEY);
     if (savedState) {
       const state = JSON.parse(savedState);
-      setCards(state.cards || []);
+      setPlacedCards(state.placedCards || []);
+      setCurrentCard(state.currentCard || null);
+      setRemainingCards(state.remainingCards || []);
+      setScore(state.score || 0);
+      setTotalAttempts(state.totalAttempts || 0);
       setElapsedTime(state.elapsedTime || 0);
       setIsComplete(state.isComplete || false);
       
@@ -28,11 +37,37 @@ function OurTimeline() {
         setShowCompletionModal(false);
       }
     } else {
-      // Initialize with shuffled cards
-      const shuffled = [...flashbackData.events].sort(() => Math.random() - 0.5);
-      setCards(shuffled);
+      // Initialize new game
+      initializeNewGame();
     }
   }, []);
+
+  const initializeNewGame = () => {
+    const allEvents = [...flashbackData.events];
+    // Shuffle all events
+    const shuffled = allEvents.sort(() => Math.random() - 0.5);
+    
+    // Pick first card as starting card (already placed)
+    const firstCard = shuffled[0];
+    setPlacedCards([firstCard]);
+    
+    // Pick second card as current card to place
+    const secondCard = shuffled[1];
+    setCurrentCard(secondCard);
+    
+    // Remaining cards
+    const remaining = shuffled.slice(2);
+    setRemainingCards(remaining);
+    
+    setScore(0);
+    setTotalAttempts(0);
+    setIsComplete(false);
+    setShowCompletionModal(false);
+    setElapsedTime(0);
+    setIsTimerRunning(true);
+    setFeedback(null);
+    setTempPlacementIndex(null);
+  };
 
   // Save state
   useEffect(() => {
@@ -42,11 +77,15 @@ function OurTimeline() {
     }
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      cards,
+      placedCards,
+      currentCard,
+      remainingCards,
+      score,
+      totalAttempts,
       elapsedTime,
       isComplete
     }));
-  }, [cards, elapsedTime, isComplete]);
+  }, [placedCards, currentCard, remainingCards, score, totalAttempts, elapsedTime, isComplete]);
 
   // Timer logic - only runs when page is visible
   useEffect(() => {
@@ -98,36 +137,25 @@ function OurTimeline() {
     return `${minutes}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const checkIfCorrect = (currentCards) => {
-    // Check if all cards are in the correct chronological order
-    for (let i = 0; i < currentCards.length - 1; i++) {
-      const current = new Date(currentCards[i].sortDate);
-      const next = new Date(currentCards[i + 1].sortDate);
-      if (current > next) {
-        return false;
+  const findCorrectPosition = (card, existingCards) => {
+    // Find where this card should be placed in the existing timeline
+    const cardDate = new Date(card.sortDate);
+    
+    for (let i = 0; i < existingCards.length; i++) {
+      const existingDate = new Date(existingCards[i].sortDate);
+      if (cardDate < existingDate) {
+        return i; // Should be inserted before this card
       }
     }
-    return true;
-  };
-
-  const handleDragStart = (e, index) => {
-    if (isComplete) return;
-    setDraggedIndex(index);
-    e.dataTransfer.effectAllowed = 'move';
-    // For mobile, we don't want to show the default ghost image
-    if (e.dataTransfer.setDragImage) {
-      const canvas = document.createElement('canvas');
-      canvas.width = 1;
-      canvas.height = 1;
-      e.dataTransfer.setDragImage(canvas, 0, 0);
-    }
+    return existingCards.length; // Should be at the end
   };
 
   const handleDragOver = (e, index) => {
-    if (isComplete) return;
+    if (isComplete || feedback !== null) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     setDragOverIndex(index);
+    setTempPlacementIndex(index);
   };
 
   const handleDragLeave = () => {
@@ -135,100 +163,100 @@ function OurTimeline() {
   };
 
   const handleDrop = (e, dropIndex) => {
-    if (isComplete) return;
+    if (isComplete || feedback !== null) return;
     e.preventDefault();
-    
-    if (draggedIndex === null || draggedIndex === dropIndex) {
-      setDraggedIndex(null);
-      setDragOverIndex(null);
-      return;
-    }
-
-    const newCards = [...cards];
-    const [draggedCard] = newCards.splice(draggedIndex, 1);
-    newCards.splice(dropIndex, 0, draggedCard);
-    
-    setCards(newCards);
-    setDraggedIndex(null);
     setDragOverIndex(null);
+    setTempPlacementIndex(dropIndex);
+  };
 
-    // Check if the order is correct
-    if (checkIfCorrect(newCards)) {
-      setIsComplete(true);
-      setShowCompletionModal(true);
-      setIsTimerRunning(false);
+  const handleConfirm = () => {
+    if (tempPlacementIndex === null || !currentCard) return;
+
+    const correctPosition = findCorrectPosition(currentCard, placedCards);
+    const isCorrect = tempPlacementIndex === correctPosition;
+    
+    setTotalAttempts(prev => prev + 1);
+    
+    if (isCorrect) {
+      setScore(prev => prev + 1);
+      setFeedback('correct');
+    } else {
+      setFeedback('incorrect');
     }
-  };
 
-  const handleDragEnd = () => {
-    setDraggedIndex(null);
-    setDragOverIndex(null);
-  };
-
-  // Touch events for mobile
-  const touchStartPos = useRef(null);
-  const touchCardRef = useRef(null);
-
-  const handleTouchStart = (e, index) => {
-    if (isComplete) return;
-    e.preventDefault(); // Prevent scrolling
-    const touch = e.touches[0];
-    touchStartPos.current = { x: touch.clientX, y: touch.clientY };
-    setDraggedIndex(index);
-    touchCardRef.current = e.currentTarget;
-  };
-
-  const handleTouchMove = (e, index) => {
-    if (isComplete || draggedIndex === null) return;
-    e.preventDefault(); // Prevent scrolling
-    
-    const touch = e.touches[0];
-    const element = e.currentTarget.parentElement;
-    const cards = Array.from(element.children);
-    
-    // Find which card we're hovering over
-    for (let i = 0; i < cards.length; i++) {
-      const rect = cards[i].getBoundingClientRect();
-      if (touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-        setDragOverIndex(i);
-        break;
-      }
-    }
-  };
-
-  const handleTouchEnd = (e, index) => {
-    if (isComplete) return;
-    e.preventDefault(); // Prevent scrolling
-    
-    if (draggedIndex !== null && dragOverIndex !== null && draggedIndex !== dragOverIndex) {
-      const newCards = [...cards];
-      const [draggedCard] = newCards.splice(draggedIndex, 1);
-      newCards.splice(dragOverIndex, 0, draggedCard);
+    // After a delay, place the card and move to next
+    setTimeout(() => {
+      // Insert at correct position
+      const newPlacedCards = [...placedCards];
+      newPlacedCards.splice(correctPosition, 0, currentCard);
+      setPlacedCards(newPlacedCards);
       
-      setCards(newCards);
-
-      // Check if the order is correct
-      if (checkIfCorrect(newCards)) {
+      // Move to next card
+      if (remainingCards.length > 0) {
+        setCurrentCard(remainingCards[0]);
+        setRemainingCards(remainingCards.slice(1));
+        setFeedback(null);
+        setTempPlacementIndex(null);
+        setDragOverIndex(null);
+      } else {
+        // Game complete
+        setCurrentCard(null);
         setIsComplete(true);
         setShowCompletionModal(true);
         setIsTimerRunning(false);
       }
+    }, 2000);
+  };
+
+  // Touch events for mobile
+  const touchStartPos = useRef(null);
+
+  const handleTouchStart = (e) => {
+    if (isComplete || feedback !== null) return;
+    e.preventDefault(); // Prevent scrolling
+    const touch = e.touches[0];
+    touchStartPos.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const handleTouchMove = (e) => {
+    if (isComplete || feedback !== null) return;
+    e.preventDefault(); // Prevent scrolling
+    
+    const touch = e.touches[0];
+    const placedCardsContainer = document.getElementById('placed-cards-container');
+    if (!placedCardsContainer) return;
+    
+    const cards = Array.from(placedCardsContainer.children);
+    
+    // Find which position we're hovering over
+    for (let i = 0; i < cards.length; i++) {
+      const rect = cards[i].getBoundingClientRect();
+      if (touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+        setDragOverIndex(i);
+        setTempPlacementIndex(i);
+        break;
+      }
     }
     
-    setDraggedIndex(null);
-    setDragOverIndex(null);
+    // Check if we're below all cards
+    if (cards.length > 0) {
+      const lastRect = cards[cards.length - 1].getBoundingClientRect();
+      if (touch.clientY > lastRect.bottom) {
+        setDragOverIndex(cards.length);
+        setTempPlacementIndex(cards.length);
+      }
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (isComplete || feedback !== null) return;
+    e.preventDefault(); // Prevent scrolling
     touchStartPos.current = null;
-    touchCardRef.current = null;
   };
 
   const handleNewGame = () => {
     localStorage.removeItem(STORAGE_KEY);
-    const shuffled = [...flashbackData.events].sort(() => Math.random() - 0.5);
-    setCards(shuffled);
-    setElapsedTime(0);
-    setIsComplete(false);
-    setShowCompletionModal(false);
-    setIsTimerRunning(true);
+    initializeNewGame();
   };
 
   const handleShowPuzzle = () => {
@@ -244,7 +272,8 @@ function OurTimeline() {
             <div className="text-center">
               <div className="text-6xl mb-4">🎉</div>
               <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Congratulations!</h2>
-              <p className="text-lg text-gray-700 dark:text-gray-300 mb-2">You've arranged our timeline correctly!</p>
+              <p className="text-lg text-gray-700 dark:text-gray-300 mb-2">You completed the timeline!</p>
+              <p className="text-xl font-bold text-nyt-blue mb-2">Score: {score} out of {totalAttempts}</p>
               <p className="text-base text-gray-600 dark:text-gray-400 mb-6">Time: {formatTime(elapsedTime)}</p>
               <div className="flex gap-3 justify-center">
                 <button
@@ -268,60 +297,120 @@ function OurTimeline() {
       <div className="w-full max-w-[min(96vw,650px)] mx-auto">
         <header className="text-center mb-6 sm:mb-8">
           <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)'}} className="font-bold mb-2 text-gray-900 dark:text-gray-100">Our Timeline</h1>
-          <p style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}} className="text-gray-600 dark:text-gray-300">Arrange the events in chronological order</p>
+          <p style={{fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'}} className="text-gray-600 dark:text-gray-300">Place each event in chronological order</p>
           
-          {/* Timer */}
-          <div className="mt-4 text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
-            {formatTime(elapsedTime)}
+          {/* Score and Timer */}
+          <div className="mt-4 flex justify-center gap-6">
+            <div className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">
+              Score: {score}/{totalAttempts}
+            </div>
+            <div className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">
+              {formatTime(elapsedTime)}
+            </div>
           </div>
         </header>
 
-        {/* Cards */}
-        <div className="space-y-3 mb-6">
-          {cards.map((card, index) => {
-            const isDragging = draggedIndex === index;
+        {/* Current Card to Place */}
+        {currentCard && !isComplete && (
+          <div className="mb-6">
+            <h3 className="text-center text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">
+              Place this event:
+            </h3>
+            <div 
+              draggable={feedback === null}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className={`
+                bg-nyt-blue rounded-lg shadow-lg p-4 sm:p-5
+                ${feedback === null ? 'cursor-move' : ''}
+                transition-all duration-200
+                touch-none
+                relative
+              `}
+              style={{
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                touchAction: 'none'
+              }}
+            >
+              <h3 className="font-bold text-lg sm:text-xl text-white mb-2">
+                {currentCard.title}
+              </h3>
+              <p className="text-sm sm:text-base text-gray-100">
+                {currentCard.description}
+              </p>
+              {feedback !== null && (
+                <div className={`absolute top-2 right-2 text-3xl`}>
+                  {feedback === 'correct' ? '✓' : '✗'}
+                </div>
+              )}
+            </div>
+            
+            {/* Confirm Button */}
+            {tempPlacementIndex !== null && feedback === null && (
+              <div className="flex justify-center mt-4">
+                <button
+                  onClick={handleConfirm}
+                  className="px-6 py-3 bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 rounded-full font-semibold hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors"
+                >
+                  Confirm Placement
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Placed Cards Timeline */}
+        <div className="space-y-3 mb-6" id="placed-cards-container">
+          {placedCards.map((card, index) => {
             const isOver = dragOverIndex === index;
             
             return (
-              <div
-                key={card.id}
-                draggable={!isComplete}
-                onDragStart={(e) => handleDragStart(e, index)}
-                onDragOver={(e) => handleDragOver(e, index)}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, index)}
-                onDragEnd={handleDragEnd}
-                onTouchStart={(e) => handleTouchStart(e, index)}
-                onTouchMove={(e) => handleTouchMove(e, index)}
-                onTouchEnd={(e) => handleTouchEnd(e, index)}
-                className={`
-                  bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-5
-                  ${!isComplete ? 'cursor-move hover:shadow-lg' : ''}
-                  ${isDragging ? 'opacity-50' : ''}
-                  ${isOver && !isDragging ? 'border-t-4 border-nyt-blue' : ''}
-                  transition-all duration-200
-                  touch-none
-                `}
-                style={{
-                  userSelect: 'none',
-                  WebkitUserSelect: 'none',
-                  touchAction: 'none'
-                }}
-              >
-                <h3 className="font-bold text-lg sm:text-xl text-gray-900 dark:text-gray-100 mb-2">
-                  {card.title}
-                </h3>
-                {isComplete && (
+              <div key={`placed-${card.id}`}>
+                {/* Drop zone before this card */}
+                {isOver && tempPlacementIndex === index && currentCard && (
+                  <div className="h-2 bg-nyt-yellow rounded mb-3"></div>
+                )}
+                
+                <div
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, index)}
+                  className={`
+                    bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-5
+                    transition-all duration-200
+                  `}
+                >
+                  <h3 className="font-bold text-lg sm:text-xl text-gray-900 dark:text-gray-100 mb-2">
+                    {card.title}
+                  </h3>
                   <p className="text-sm sm:text-base text-nyt-blue font-semibold mb-2">
                     {card.displayDate}
                   </p>
-                )}
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
-                  {card.description}
-                </p>
+                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+                    {card.description}
+                  </p>
+                </div>
               </div>
             );
           })}
+          
+          {/* Drop zone at the end */}
+          {currentCard && (
+            <div
+              onDragOver={(e) => handleDragOver(e, placedCards.length)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, placedCards.length)}
+              className={`
+                h-16 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg
+                flex items-center justify-center text-gray-500 dark:text-gray-400
+                ${dragOverIndex === placedCards.length ? 'bg-nyt-yellow bg-opacity-20' : ''}
+              `}
+            >
+              Drop here to place at end
+            </div>
+          )}
         </div>
 
         {/* New Game button when completed */}
@@ -341,10 +430,11 @@ function OurTimeline() {
         <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
           <h2 style={{fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)'}} className="font-bold mb-3 text-gray-900 dark:text-gray-100">How to Play</h2>
           <ul style={{fontSize: 'clamp(0.75rem, 2vw, 0.875rem)'}} className="space-y-2 text-gray-700 dark:text-gray-300">
-            <li>• Drag and drop the cards to arrange them in chronological order.</li>
-            <li>• Each card represents a special moment in our relationship.</li>
-            <li>• Get them all in the right order to complete the timeline!</li>
-            <li>• Your time will be saved even if you leave the page.</li>
+            <li>• You'll see one event card at a time to place in the timeline.</li>
+            <li>• Drag the card to where you think it belongs (earlier or later than existing events).</li>
+            <li>• Click "Confirm Placement" to check if you're right.</li>
+            <li>• Get 1 point for each correct placement. Your score is out of 7 total cards.</li>
+            <li>• The card will automatically move to the correct position after you confirm.</li>
           </ul>
         </div>
       </div>
