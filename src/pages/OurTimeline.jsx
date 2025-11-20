@@ -132,6 +132,37 @@ function OurTimeline() {
     };
   }, [isTimerRunning, isComplete]);
 
+  // Fix passive event listener issue for touch events
+  useEffect(() => {
+    const handleTouchStartNonPassive = (e) => {
+      handleTouchStart(e);
+    };
+    
+    const handleTouchMoveNonPassive = (e) => {
+      handleTouchMove(e);
+    };
+    
+    const handleTouchEndNonPassive = (e) => {
+      handleTouchEnd(e);
+    };
+
+    // Attach touch event listeners with passive: false
+    const draggableElements = document.querySelectorAll('[draggable="true"]');
+    draggableElements.forEach(element => {
+      element.addEventListener('touchstart', handleTouchStartNonPassive, { passive: false });
+      element.addEventListener('touchmove', handleTouchMoveNonPassive, { passive: false });
+      element.addEventListener('touchend', handleTouchEndNonPassive, { passive: false });
+    });
+
+    return () => {
+      draggableElements.forEach(element => {
+        element.removeEventListener('touchstart', handleTouchStartNonPassive);
+        element.removeEventListener('touchmove', handleTouchMoveNonPassive);
+        element.removeEventListener('touchend', handleTouchEndNonPassive);
+      });
+    };
+  }, [currentCard, tempPlacementIndex, placedCards, isComplete, feedback]); // Re-run when cards change
+
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -306,7 +337,7 @@ function OurTimeline() {
               <div className="text-6xl mb-4">🎉</div>
               <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Congratulations!</h2>
               <p className="text-lg text-gray-700 dark:text-gray-300 mb-2">You completed the timeline!</p>
-              <p className="text-xl font-bold text-nyt-blue mb-2">Score: {score} out of {totalAttempts}</p>
+              <p className="text-xl font-bold text-timeline-blue mb-2">Score: {score} out of {totalAttempts}</p>
               <p className="text-base text-gray-600 dark:text-gray-400 mb-6">Time: {formatTime(elapsedTime)}</p>
               <div className="flex gap-3 justify-center">
                 <button
@@ -353,11 +384,8 @@ function OurTimeline() {
               draggable={feedback === null}
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
               className={`
-                bg-nyt-blue rounded-lg shadow-lg p-4 sm:p-5
+                bg-timeline-blue rounded-lg shadow-lg p-4 sm:p-5
                 ${feedback === null ? 'cursor-move' : ''}
                 ${isDragging ? 'opacity-50' : 'opacity-100'}
                 transition-all duration-200
@@ -426,11 +454,8 @@ function OurTimeline() {
                   draggable={feedback === null}
                   onDragStart={handleDragStart}
                   onDragEnd={handleDragEnd}
-                  onTouchStart={handleTouchStart}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
                   className={`
-                    bg-nyt-blue rounded-lg shadow-lg p-4 sm:p-5 mb-3
+                    bg-timeline-blue rounded-lg shadow-lg p-4 sm:p-5 mb-3
                     ${feedback === null ? 'cursor-move' : ''}
                     ${isDragging ? 'opacity-50' : 'opacity-100'}
                     transition-all duration-200
@@ -465,7 +490,7 @@ function OurTimeline() {
                 <h3 className="font-bold text-lg sm:text-xl text-gray-900 dark:text-gray-100 mb-2">
                   {card.title}
                 </h3>
-                <p className="text-sm sm:text-base text-nyt-blue font-semibold mb-2">
+                <p className="text-sm sm:text-base text-timeline-blue font-semibold mb-2">
                   {card.displayDate}
                 </p>
                 <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
@@ -492,11 +517,8 @@ function OurTimeline() {
               draggable={feedback === null}
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
               className={`
-                bg-nyt-blue rounded-lg shadow-lg p-4 sm:p-5 mb-3
+                bg-timeline-blue rounded-lg shadow-lg p-4 sm:p-5 mb-3
                 ${feedback === null ? 'cursor-move' : ''}
                 ${isDragging ? 'opacity-50' : 'opacity-100'}
                 transition-all duration-200
