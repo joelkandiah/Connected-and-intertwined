@@ -328,8 +328,8 @@ function OurTimeline() {
           </div>
         </header>
 
-        {/* Current Card to Place - Only show when NOT dragging */}
-        {currentCard && !isComplete && !isDragging && tempPlacementIndex === null && (
+        {/* Current Card to Place - Keep visible but semi-transparent when dragging */}
+        {currentCard && !isComplete && tempPlacementIndex === null && (
           <div className="mb-6">
             <h3 className="text-center text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">
               Place this event:
@@ -344,6 +344,7 @@ function OurTimeline() {
               className={`
                 bg-nyt-blue rounded-lg shadow-lg p-4 sm:p-5
                 ${feedback === null ? 'cursor-move' : ''}
+                ${isDragging ? 'opacity-50' : 'opacity-100'}
                 transition-all duration-200
                 touch-none
                 relative
@@ -385,26 +386,35 @@ function OurTimeline() {
         <div className="mb-6" id="placed-cards-container">
           {placedCards.map((card, index) => (
             <div key={`placed-${card.id}`}>
-              {/* Drop zone BEFORE this card - only show when dragging */}
-              {isDragging && currentCard && (
+              {/* Drop zone BEFORE this card - only show when hovering over this specific zone */}
+              {dragOverIndex === index && currentCard && (
                 <div
                   onDragOver={(e) => handleDragOver(e, index)}
                   onDragLeave={handleDragLeave}
                   onDrop={(e) => handleDrop(e, index)}
                   className={`
                     transition-all duration-200 rounded-lg mb-3
-                    ${dragOverIndex === index 
-                      ? 'min-h-32 border-4 border-dashed border-nyt-blue bg-nyt-blue bg-opacity-10' 
-                      : 'min-h-20 border-2 border-dashed border-gray-400 dark:border-gray-500'}
+                    min-h-32 border-4 border-dashed border-nyt-blue bg-nyt-blue bg-opacity-10
                     flex items-center justify-center p-4 text-center
                   `}
                 >
                   <div className="text-center">
-                    <div className="text-gray-600 dark:text-gray-400 text-sm">
+                    <div className="text-gray-600 dark:text-gray-400 text-sm font-semibold">
                       Drop to place before "{card.title}"
                     </div>
                   </div>
                 </div>
+              )}
+              
+              {/* Invisible drop zone trigger - always present during drag to detect hover */}
+              {isDragging && currentCard && dragOverIndex !== index && tempPlacementIndex !== index && (
+                <div
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, index)}
+                  className="h-8 mb-3"
+                  style={{ opacity: 0, pointerEvents: 'auto' }}
+                />
               )}
               
               {/* Show current card in this position if placed here temporarily */}
@@ -450,24 +460,33 @@ function OurTimeline() {
             </div>
           ))}
           
-          {/* Drop zone at the END - only show when dragging */}
-          {isDragging && currentCard && (
+          {/* Drop zone at the END - only show when hovering over end zone */}
+          {dragOverIndex === placedCards.length && currentCard && (
             <div
               onDragOver={(e) => handleDragOver(e, placedCards.length)}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, placedCards.length)}
               className={`
                 transition-all duration-200 rounded-lg
-                ${dragOverIndex === placedCards.length
-                  ? 'min-h-32 border-4 border-dashed border-nyt-blue bg-nyt-blue bg-opacity-10' 
-                  : 'min-h-24 border-2 border-dashed border-gray-400 dark:border-gray-500'}
+                min-h-32 border-4 border-dashed border-nyt-blue bg-nyt-blue bg-opacity-10
                 flex items-center justify-center text-center p-4 mb-3
               `}
             >
-              <span className="text-gray-600 dark:text-gray-400 text-sm">
+              <span className="text-gray-600 dark:text-gray-400 text-sm font-semibold">
                 Drop to place at end
               </span>
             </div>
+          )}
+          
+          {/* Invisible drop zone trigger for end - always present during drag */}
+          {isDragging && currentCard && dragOverIndex !== placedCards.length && tempPlacementIndex !== placedCards.length && (
+            <div
+              onDragOver={(e) => handleDragOver(e, placedCards.length)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, placedCards.length)}
+              className="h-16 mb-3"
+              style={{ opacity: 0, pointerEvents: 'auto' }}
+            />
           )}
           
           {/* Show current card at END if placed there temporarily */}
