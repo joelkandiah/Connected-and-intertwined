@@ -23,13 +23,15 @@ function OurTimeline() {
   const isInitialMount = useRef(true);
   const autoScrollRaf = useRef(null);
   const currentTouchY = useRef(null);
+  const currentTouchX = useRef(null);
   const wrapperRef = useRef(null);
-  const handleTouchStartRef = useRef(null);
+  const handlePointerDownRef = useRef(null);
   const lastCheckTime = useRef(0);
+  const cleanupDragRef = useRef(null);
 
-  // Keep the latest handleTouchStart in a ref so we don't need to re-bind listeners
+  // Keep the latest handlePointerDown in a ref so we don't need to re-bind listeners
   useEffect(() => {
-    handleTouchStartRef.current = handleTouchStart;
+    handlePointerDownRef.current = handlePointerDown;
   });
 
   // Initialize game
@@ -146,20 +148,20 @@ function OurTimeline() {
   // Fix passive event listener issue for touch events
   // Fix passive event listener issue for touch events - Event Delegation Optimization
   useEffect(() => {
-    const handleTouchStartDelegated = (e) => {
-      if (handleTouchStartRef.current) {
-        handleTouchStartRef.current(e);
+    const handlePointerDownDelegated = (e) => {
+      if (handlePointerDownRef.current) {
+        handlePointerDownRef.current(e);
       }
     };
 
     const wrapper = wrapperRef.current;
     if (!wrapper) return;
 
-    // Attach single listener to wrapper with passive: false
-    wrapper.addEventListener('touchstart', handleTouchStartDelegated, { passive: false });
+    // Attach single listener to wrapper
+    wrapper.addEventListener('pointerdown', handlePointerDownDelegated);
 
     return () => {
-      wrapper.removeEventListener('touchstart', handleTouchStartDelegated);
+      wrapper.removeEventListener('pointerdown', handlePointerDownDelegated);
     };
   }, []); // Run once on mount
 
@@ -262,18 +264,33 @@ function OurTimeline() {
   const isDraggingRef = useRef(false);
   const dragOffset = useRef({ x: 0, y: 0 });
 
-  const checkDragPosition = (y) => {
+  const checkDragPosition = (x, y) => {
     const placedCardsContainer = document.getElementById('placed-cards-container');
     if (!placedCardsContainer) return;
 
-    const cards = Array.from(placedCardsContainer.children);
+    const containerRect = placedCardsContainer.getBoundingClientRect();
+
+    // If we are significantly above the container, treat it as "returning to stack" (cancel)
+    // This gives a natural "pull out to cancel" feel
+    if (y < containerRect.top - 20) {
+      setDragOverIndex(null);
+      setTempPlacementIndex(null);
+      return;
+    }
+
+    // If we are in or below the container area, we default to placing it in the timeline
+    // This ensures the card doesn't "disappear" if dragged to the side or bottom
+
+    // Use specific class to avoid counting the temporary drop zones or ghost card as items
+    const cardElements = Array.from(placedCardsContainer.querySelectorAll('.placed-card-wrapper'));
 
     // Find which position we're hovering over
     let foundPosition = false;
-    for (let i = 0; i < cards.length; i++) {
-      const rect = cards[i].getBoundingClientRect();
+    for (let i = 0; i < cardElements.length; i++) {
+      const rect = cardElements[i].getBoundingClientRect();
       const midpoint = rect.top + rect.height / 2;
 
+      // Only check Y threshold for insertion points
       if (y < midpoint) {
         setDragOverIndex(i);
         setTempPlacementIndex(i);
@@ -282,10 +299,10 @@ function OurTimeline() {
       }
     }
 
-    // If not found above any card, place at the end
+    // If not found above any card (e.g. at the bottom or side), place at the end
     if (!foundPosition) {
-      setDragOverIndex(cards.length);
-      setTempPlacementIndex(cards.length);
+      setDragOverIndex(cardElements.length);
+      setTempPlacementIndex(cardElements.length);
     }
   };
 
@@ -293,6 +310,7 @@ function OurTimeline() {
     if (!isDraggingRef.current || currentTouchY.current === null) return;
 
     const y = currentTouchY.current;
+    const x = currentTouchX.current;
     const viewportHeight = window.innerHeight;
     const scrollThreshold = 100;
     const scrollSpeed = 15; // Increased speed slightly
@@ -311,71 +329,65 @@ function OurTimeline() {
       scrolled = true;
     }
 
-    if (scrolled) {
-      checkDragPosition(y);
+    if (scrolled && x !== null) {
+      checkDragPosition(x, y);
     }
 
     autoScrollRaf.current = requestAnimationFrame(performAutoScroll);
   };
 
-  const handleTouchMoveWindow = (e) => {
+  const handlePointerMove = (e) => {
     if (!isDraggingRef.current) return;
     e.preventDefault(); // Prevent scrolling
 
-    const touch = e.touches[0];
-    currentTouchY.current = touch.clientY;
+    currentTouchY.current = e.clientY;
+    currentTouchX.current = e.clientX;
 
     // Update floating card position
     if (floatingCardRef.current) {
       // Follow finger with relative offset
-      floatingCardRef.current.style.left = `${touch.clientX - dragOffset.current.x}px`;
-      floatingCardRef.current.style.top = `${touch.clientY - dragOffset.current.y}px`;
+      floatingCardRef.current.style.left = `${e.clientX - dragOffset.current.x}px`;
+      floatingCardRef.current.style.top = `${e.clientY - dragOffset.current.y}px`;
     }
 
     // Throttle the expensive checkDragPosition (Read DOM)
     const now = Date.now();
     if (now - lastCheckTime.current > 50) { // Run max once every 50ms
-      checkDragPosition(touch.clientY);
+      checkDragPosition(e.clientX, e.clientY);
       lastCheckTime.current = now;
     }
   };
 
-  const handleTouchEndWindow = (e) => {
-    if (!isDraggingRef.current) return;
-
-    isDraggingRef.current = false;
-    setIsDragging(false);
-    setIsTouchDragging(false);
-    currentTouchY.current = null;
-
-    if (autoScrollRaf.current) {
-      cancelAnimationFrame(autoScrollRaf.current);
-      autoScrollRaf.current = null;
+  const handlePointerUp = (e) => {
+    if (cleanupDragRef.current) {
+      cleanupDragRef.current();
     }
-
-    // Hide floating card
-    if (floatingCardRef.current) {
-      floatingCardRef.current.style.display = 'none';
-    }
-
-    // Clean up window listeners
-    window.removeEventListener('touchmove', handleTouchMoveWindow, { passive: false });
-    window.removeEventListener('touchend', handleTouchEndWindow);
-    window.removeEventListener('touchcancel', handleTouchEndWindow);
   };
 
-  const handleTouchStart = (e) => {
+  const handlePointerDown = (e) => {
     if (isComplete || feedback !== null) return;
 
+    // Safety cleanup if previous drag didn't finish properly
+    if (cleanupDragRef.current) {
+      cleanupDragRef.current();
+    }
+
     // Only start drag if touching a draggable element
-    const target = e.target.closest('[draggable="true"]');
+    // Handle text nodes which don't have closest method
+    const targetElement = e.target.nodeType === 3 ? e.target.parentNode : e.target;
+    const target = targetElement.closest('[draggable="true"]');
     if (!target) return;
 
     e.preventDefault(); // Prevent default to disable native scrolling
-    const touch = e.touches[0];
 
-    touchStartPos.current = { x: touch.clientX, y: touch.clientY };
-    currentTouchY.current = touch.clientY;
+    // Capture pointer events to wrapper to track outside window/iframe
+    if (wrapperRef.current) {
+      wrapperRef.current.setPointerCapture(e.pointerId);
+    }
+
+    touchStartPos.current = { x: e.clientX, y: e.clientY };
+    currentTouchY.current = e.clientY;
+    currentTouchX.current = e.clientX;
     isDraggingRef.current = true;
     setIsDragging(true);
     setIsTouchDragging(true);
@@ -385,8 +397,8 @@ function OurTimeline() {
     // Calculate offset so card doesn't jump to finger position
     const rect = target.getBoundingClientRect();
     dragOffset.current = {
-      x: touch.clientX - rect.left,
-      y: touch.clientY - rect.top
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
     };
 
     // Initialize floating card position
@@ -401,17 +413,56 @@ function OurTimeline() {
     if (autoScrollRaf.current) cancelAnimationFrame(autoScrollRaf.current);
     performAutoScroll();
 
-    // Attach window listeners to track drag outside element
-    window.addEventListener('touchmove', handleTouchMoveWindow, { passive: false });
-    window.addEventListener('touchend', handleTouchEndWindow);
-    window.addEventListener('touchcancel', handleTouchEndWindow);
+    // Attach listeners to wrapper (since we have capture)
+    const wrapper = wrapperRef.current;
+    wrapper.addEventListener('pointermove', handlePointerMove);
+    wrapper.addEventListener('pointerup', handlePointerUp);
+    wrapper.addEventListener('pointercancel', handlePointerUp);
+    wrapper.addEventListener('lostpointercapture', handlePointerUp);
 
     // Initial position check
-    checkDragPosition(touch.clientY);
+    checkDragPosition(e.clientX, e.clientY);
+
+    // Store cleanup function
+    cleanupDragRef.current = () => {
+      isDraggingRef.current = false;
+      setIsDragging(false);
+      setIsTouchDragging(false);
+      currentTouchY.current = null;
+      currentTouchX.current = null;
+
+      if (autoScrollRaf.current) {
+        cancelAnimationFrame(autoScrollRaf.current);
+        autoScrollRaf.current = null;
+      }
+
+      if (floatingCardRef.current) {
+        floatingCardRef.current.style.display = 'none';
+      }
+
+      if (wrapperRef.current) {
+        wrapperRef.current.removeEventListener('pointermove', handlePointerMove);
+        wrapperRef.current.removeEventListener('pointerup', handlePointerUp);
+        wrapperRef.current.removeEventListener('pointercancel', handlePointerUp);
+        wrapperRef.current.removeEventListener('lostpointercapture', handlePointerUp);
+        // Note: releasePointerCapture is automatic on up/cancel
+      }
+
+      cleanupDragRef.current = null;
+    };
   };
 
-  // We don't need handleTouchMove and handleTouchEnd here anymore as they are attached to window
-  // But we need to keep handleTouchStart attached to elements via the useEffect below
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (cleanupDragRef.current) {
+        cleanupDragRef.current();
+      }
+    };
+  }, []);
+
+  // We don't need handlePointerMove and handlePointerUp here anymore as they are attached to wrapper
+  // But we need to keep handlePointerDown attached to elements via the useEffect below
 
   const handleNewGame = () => {
     localStorage.removeItem(STORAGE_KEY);
@@ -488,6 +539,7 @@ function OurTimeline() {
                 ${isDragging ? 'opacity-50' : 'opacity-100'}
                 transition-all duration-200
                 relative
+                touch-none
               `}
               style={{
                 userSelect: 'none',
@@ -555,7 +607,7 @@ function OurTimeline() {
         {/* Placed Cards Timeline */}
         <div className="mb-6" id="placed-cards-container">
           {placedCards.map((card, index) => (
-            <div key={`placed-${card.id}`}>
+            <div key={`placed-${card.id}`} className="placed-card-wrapper">
               {/* Invisible drop zone trigger - always present during drag to detect hover */}
               {isDragging && currentCard && dragOverIndex !== index && tempPlacementIndex !== index && (
                 <div
@@ -579,6 +631,7 @@ function OurTimeline() {
                     ${isDragging ? 'opacity-50' : 'opacity-100'}
                     transition-all duration-200
                     relative
+                    touch-none
                   `}
                   style={{
                     userSelect: 'none',
@@ -642,6 +695,7 @@ function OurTimeline() {
                 ${isDragging ? 'opacity-50' : 'opacity-100'}
                 transition-all duration-200
                 relative
+                touch-none
               `}
               style={{
                 userSelect: 'none',
