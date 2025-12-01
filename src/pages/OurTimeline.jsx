@@ -488,7 +488,7 @@ function OurTimeline() {
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={handleNewGame}
-                  className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-green-500 text-white rounded-full font-semibold hover:from-yellow-500 hover:to-green-600 transition-colors"
+                  className="px-6 py-3 bg-gradient-to-r from-timeline-light-blue to-green-500 text-white rounded-full font-semibold hover:from-timeline-blue hover:to-green-600 transition-colors"
                 >
                   New Game
                 </button>
@@ -534,7 +534,7 @@ function OurTimeline() {
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
               className={`
-                bg-timeline-blue rounded-lg shadow-lg p-4 sm:p-5
+                bg-timeline-blue dark:bg-timeline-light-blue-alt rounded-lg shadow-lg p-4 sm:p-5
                 ${feedback === null ? 'cursor-move' : ''}
                 ${isDragging ? 'opacity-50' : 'opacity-100'}
                 transition-all duration-200
@@ -571,7 +571,7 @@ function OurTimeline() {
               // Width and position set via JS
             }}
           >
-            <div className="bg-timeline-blue rounded-lg shadow-2xl p-4 sm:p-5 opacity-90">
+            <div className="bg-timeline-blue dark:bg-timeline-light-blue-alt rounded-lg shadow-2xl p-4 sm:p-5 opacity-90">
               <h3 className="font-bold text-lg sm:text-xl text-white mb-2">
                 {currentCard.title}
               </h3>
@@ -626,7 +626,7 @@ function OurTimeline() {
                   onDragStart={handleDragStart}
                   onDragEnd={handleDragEnd}
                   className={`
-                    bg-timeline-blue rounded-lg shadow-lg p-4 sm:p-5 mb-3
+                    bg-timeline-blue dark:bg-timeline-light-blue-alt rounded-lg shadow-lg p-4 sm:p-5 mb-3
                     ${feedback === null ? 'cursor-move' : ''}
                     ${isDragging ? 'opacity-50' : 'opacity-100'}
                     transition-all duration-200
@@ -662,7 +662,7 @@ function OurTimeline() {
                 <h3 className="font-bold text-lg sm:text-xl text-gray-900 dark:text-gray-100 mb-2">
                   {card.title}
                 </h3>
-                <p className="text-sm sm:text-base text-timeline-blue font-semibold mb-2">
+                <p className="text-sm sm:text-base text-timeline-blue dark:text-timeline-light-blue font-semibold mb-2">
                   {card.displayDate}
                 </p>
                 <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
@@ -690,7 +690,7 @@ function OurTimeline() {
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
               className={`
-                bg-timeline-blue rounded-lg shadow-lg p-4 sm:p-5 mb-3
+                bg-timeline-blue dark:bg-timeline-light-blue-alt rounded-lg shadow-lg p-4 sm:p-5 mb-3
                 ${feedback === null ? 'cursor-move' : ''}
                 ${isDragging ? 'opacity-50' : 'opacity-100'}
                 transition-all duration-200
@@ -744,7 +744,7 @@ function OurTimeline() {
           <div className="flex justify-center mb-6">
             <button
               onClick={handleNewGame}
-              className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-green-500 text-white rounded-full font-semibold hover:from-yellow-500 hover:to-green-600 transition-colors"
+              className="px-6 py-3 bg-gradient-to-r from-timeline-light-blue to-green-500 text-white rounded-full font-semibold hover:from-timeline-blue hover:to-green-600 transition-colors"
               style={{ fontSize: 'clamp(0.875rem, 2vw, 1rem)' }}
             >
               New Game
