@@ -39,7 +39,7 @@ const HamburgerMenu = memo(({ darkMode, toggleDarkMode }) => {
       {/* Menu panel */}
       <div
         className={`
-          fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-2xl z-40
+          fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-2xl z-45
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
@@ -70,7 +70,7 @@ const HamburgerMenu = memo(({ darkMode, toggleDarkMode }) => {
                 onClick={closeMenu}
                 className="block py-3 px-4 text-lg font-semibold text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
-               The Mini 
+                The Mini
               </Link>
             </li>
             <li>
@@ -91,7 +91,7 @@ const HamburgerMenu = memo(({ darkMode, toggleDarkMode }) => {
                 Our Timeline
               </Link>
             </li>
-            
+
             {/* Dark mode toggle */}
             <li className="pt-4 border-t border-gray-200 dark:border-gray-700">
               <button

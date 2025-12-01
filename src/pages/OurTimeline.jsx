@@ -536,7 +536,7 @@ function OurTimeline() {
     <div ref={wrapperRef} className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8 px-3 sm:px-4">
       {/* Completion Modal */}
       {showCompletionModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center p-4" style={{ zIndex: 30 }}>
+        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4" style={{ zIndex: 30 }}>
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full">
             <div className="text-center">
               <div className="text-6xl mb-4">🎉</div>
