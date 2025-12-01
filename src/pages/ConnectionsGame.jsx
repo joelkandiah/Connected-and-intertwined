@@ -177,6 +177,12 @@ useEffect(() => {
       if (newMistakes >= 4) {
         setIsGameOver(true);
         setMessage('Game Over! You ran out of tries.');
+        
+        // Reveal all remaining unsolved categories
+        const solvedCategoryNames = solved.map(s => s.name);
+        const remainingCategories = PUZZLE.categories.filter(cat => !solvedCategoryNames.includes(cat.name));
+        setSolved(prev => [...prev, ...remainingCategories]);
+        setWords([]);
       }
 
       setSelected([]);
