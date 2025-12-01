@@ -569,7 +569,7 @@ function OurTimeline() {
       >
         <ul className="space-y-2">
           <li>• You'll see one event card at a time to place in the timeline of our relationship.</li>
-          <li>• Drag the event to when you think it happened (earlier or later than existing events).</li>
+          <li>• Drag the card to where you think it belongs (earlier or later than existing events).</li>
           <li>• Click "Confirm Placement" to check if you're right.</li>
           <li>• Get 1 point for placing each correctly.</li>
         </ul>
