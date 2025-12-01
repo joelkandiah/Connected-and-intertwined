@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import puzzleData from '../data/strands-puzzle.json';
 import StrandsCell from '../components/StrandsCell';
 import HowToPlayModal from '../components/HowToPlayModal';
+import CompletionModal from '../components/CompletionModal';
 
 // Wedding-themed Strands puzzle
 // Theme: Wedding Day
@@ -456,32 +457,24 @@ function WeddingStrands() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8 px-3 sm:px-4">
       {/* Completion Modal */}
-      {showCompletionModal && (
-        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4" style={{ zIndex: 30 }}>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full">
-            <div className="text-center">
-              <div className="text-6xl mb-4">💍</div>
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Congratulations!</h2>
-              <p className="text-lg text-gray-700 dark:text-gray-300 mb-2">You found all the words!</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Time: {formatTime(elapsedTime)}</p>
-              <div className="flex gap-3 justify-center">
-                <button
-                  onClick={handleNewGame}
-                  className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-blue-500 text-white rounded-full font-semibold hover:from-yellow-500 hover:to-green-600 transition-colors"
-                >
-                  New Game
-                </button>
-                <button
-                  onClick={handleShowPuzzle}
-                  className="px-6 py-3 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-                >
-                  Show Puzzle
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Completion Modal */}
+      <CompletionModal
+        isOpen={showCompletionModal}
+        icon="💍"
+        message="You found all the words!"
+        primaryButtonText="New Game"
+        secondaryButtonText="Show Puzzle"
+        onPrimaryAction={handleNewGame}
+        onSecondaryAction={handleShowPuzzle}
+        primaryButtonGradient="from-yellow-400 to-blue-500"
+        stats={[
+          {
+            label: 'Time',
+            value: formatTime(elapsedTime),
+            gradient: 'from-yellow-100 to-blue-100 dark:from-yellow-900/30 dark:to-blue-900/30'
+          }
+        ]}
+      />
 
       <HowToPlayModal
         isOpen={showHowToPlay}
@@ -663,15 +656,22 @@ function WeddingStrands() {
           </div>
         )}
 
-        {/* New Game button when complete */}
+        {/* New Game Button */}
         {isComplete && (
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center gap-3 sm:gap-4">
             <button
               onClick={handleNewGame}
-              className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-blue-500 text-white rounded-full font-semibold hover:from-yellow-500 hover:to-green-600 transition-colors"
-              style={{ fontSize: 'clamp(0.875rem, 2vw, 1rem)' }}
+              className="px-5 sm:px-6 py-2.5 bg-gradient-to-r from-yellow-400 to-blue-500 text-white rounded-full font-semibold hover:brightness-110 transition-all transform hover:scale-105 shadow-md"
+              style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
             >
               New Game
+            </button>
+            <button
+              onClick={() => setShowCompletionModal(true)}
+              className="px-5 sm:px-6 py-2.5 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
+            >
+              Show Time
             </button>
           </div>
         )}
