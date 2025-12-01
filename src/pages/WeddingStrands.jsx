@@ -488,10 +488,9 @@ function WeddingStrands() {
         onClose={() => setShowHowToPlay(false)}
       >
         <ul className="space-y-2">
-          <li>• Drag across adjacent letters to form words</li>
-          <li>• Find all the hidden wedding-themed words</li>
-          <li>• Look for the special spangram word (marked with ⭐)</li>
-          <li>• The spangram spans across the puzzle</li>
+          <li>• Find all the hidden wedding-themed words.</li>
+          <li>• Drag across adjacent letters to form words.</li>
+          <li>• Look for the special spangram that spans across the puzzle (marked with ⭐)</li>
           <li>• Try to find all words as quickly as possible!</li>
         </ul>
       </HowToPlayModal>
@@ -724,10 +723,10 @@ function WeddingStrands() {
             How to Play
           </h2>
           <ul style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }} className="space-y-2 text-gray-700 dark:text-gray-300">
-            <li>• Drag across adjacent letters to form words</li>
-            <li>• Find all the hidden wedding-themed words</li>
-            <li>• Look for the special spangram word (marked with ⭐)</li>
-            <li>• The spangram spans across the puzzle</li>
+            <li>• Drag across adjacent letters to form words.</li>
+            <li>• Find all the hidden wedding-themed words.</li>
+            <li>• Look for the special spangram word (marked with ⭐).</li>
+            <li>• The spangram spans across the puzzle.</li>
             <li>• Try to find all words as quickly as possible!</li>
           </ul>
         </div>

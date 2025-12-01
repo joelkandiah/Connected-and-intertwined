@@ -595,13 +595,9 @@ const Crossword = () => {
           onClose={() => setShowHowToPlay(false)}
         >
           <ul className="space-y-2">
-            <li>• Click on a cell to select it, then type to fill in letters</li>
-            <li>• Click the same cell again or press Enter to toggle between Across and Down</li>
-            <li>• Use arrow keys to navigate between cells</li>
-            <li>• Press Backspace to delete the current letter or move to the previous cell</li>
-            <li>• Click on a clue to jump to that word</li>
-            <li>• Use Check Word to verify your answer for the current word</li>
-            <li>• Your progress is automatically saved!</li>
+            <li>• Complete the grid of words as quick as you can.</li>
+            <li>• Select a cell to reveal each clue.</li>
+            <li>• Clicking or Tapping on a cell switches between Across and Down.</li>
           </ul>
         </HowToPlayModal>
 
@@ -764,12 +760,12 @@ const Crossword = () => {
         <div className="mt-8 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
           <h2 className="text-lg sm:text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">How to Play</h2>
           <ul className="space-y-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">
-            <li>• Click on a cell to select it, then type to fill in letters</li>
-            <li>• Click the same cell again or press Enter to toggle between Across and Down</li>
-            <li>• Use arrow keys to navigate between cells</li>
-            <li>• Press Backspace to delete the current letter or move to the previous cell</li>
-            <li>• Click on a clue to jump to that word</li>
-            <li>• Use Check Word to verify your answer for the current word</li>
+            <li>• Click on a cell to select it, then type to fill in letters.</li>
+            <li>• Click the same cell again or press Enter to toggle between Across and Down.</li>
+            <li>• Use arrow keys to navigate between cells.</li>
+            <li>• Press Backspace to delete the current letter or move to the previous cell.</li>
+            <li>• Click on a clue to jump to that word.</li>
+            <li>• Use Check Word to verify your answer for the current word.</li>
             <li>• Your progress is automatically saved!</li>
           </ul>
         </div>

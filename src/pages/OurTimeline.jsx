@@ -568,11 +568,10 @@ function OurTimeline() {
         onClose={() => setShowHowToPlay(false)}
       >
         <ul className="space-y-2">
-          <li>• You'll see one event card at a time to place in the timeline.</li>
-          <li>• Drag the card to where you think it belongs (earlier or later than existing events).</li>
+          <li>• You'll see one event card at a time to place in the timeline of our relationship.</li>
+          <li>• Drag the event to when you think it happened (earlier or later than existing events).</li>
           <li>• Click "Confirm Placement" to check if you're right.</li>
-          <li>• Get 1 point for each correct placement. Your score is out of 7 total cards.</li>
-          <li>• The card will automatically move to the correct position after you confirm.</li>
+          <li>• Get 1 point for placing each correctly.</li>
         </ul>
       </HowToPlayModal>
 
@@ -750,7 +749,7 @@ function OurTimeline() {
         <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
           <h2 style={{ fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)' }} className="font-bold mb-3 text-gray-900 dark:text-gray-100">How to Play</h2>
           <ul style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }} className="space-y-2 text-gray-700 dark:text-gray-300">
-            <li>• You'll see one event card at a time to place in the timeline.</li>
+            <li>• You'll see one event card at a time to place in the timeline of our relationship.</li>
             <li>• Drag the card to where you think it belongs (earlier or later than existing events).</li>
             <li>• Click "Confirm Placement" to check if you're right.</li>
             <li>• Get 1 point for each correct placement. Your score is out of 7 total cards.</li>
