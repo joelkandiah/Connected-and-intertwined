@@ -531,7 +531,7 @@ function OurTimeline() {
               <div className="text-6xl mb-4">🎉</div>
               <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Congratulations!</h2>
               <p className="text-lg text-gray-700 dark:text-gray-300 mb-2">You completed the timeline!</p>
-              <p className="text-xl font-bold text-timeline-blue mb-2">Score: {score} out of {totalAttempts}</p>
+              <p className="text-xl font-bold text-timeline-blue dark:text-timeline-light-blue mb-2">Score: {score} out of {totalAttempts}</p>
               <p className="text-base text-gray-600 dark:text-gray-400 mb-6">Time: {formatTime(elapsedTime)}</p>
               <div className="flex gap-3 justify-center">
                 <button
