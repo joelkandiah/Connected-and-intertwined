@@ -473,6 +473,54 @@ function OurTimeline() {
     setShowCompletionModal(false);
   };
 
+  // Helper function to render draggable current card at a given position
+  const renderDraggableCard = (position) => (
+    tempPlacementIndex === position && currentCard && (
+      <div
+        draggable={feedback === null}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        className={`
+          bg-timeline-blue dark:bg-timeline-light-blue-alt rounded-lg shadow-lg p-4 sm:p-5 mb-3
+          ${feedback === null ? 'cursor-move' : ''}
+          ${isDragging ? 'opacity-50' : 'opacity-100'}
+          transition-all duration-200
+          relative
+          touch-none
+        `}
+        style={{
+          userSelect: 'none',
+          WebkitUserSelect: 'none'
+        }}
+      >
+        <h3 className="font-bold text-lg sm:text-xl text-white mb-2">
+          {currentCard.title}
+        </h3>
+        <p className="text-sm sm:text-base text-gray-100">
+          {currentCard.description}
+        </p>
+        {feedback !== null && (
+          <div className={`absolute top-2 right-2 text-3xl text-white`}>
+            {feedback === 'correct' ? '✓' : '✗'}
+          </div>
+        )}
+      </div>
+    )
+  );
+
+  // Helper function to render invisible drop zone
+  const renderDropZone = (position, height = 'h-8') => (
+    isDragging && currentCard && dragOverIndex !== position && tempPlacementIndex !== position && (
+      <div
+        onDragOver={(e) => handleDragOver(e, position)}
+        onDragLeave={handleDragLeave}
+        onDrop={(e) => handleDrop(e, position)}
+        className={`${height} mb-3`}
+        style={{ opacity: 0, pointerEvents: 'auto' }}
+      />
+    )
+  );
+
   return (
     <div ref={wrapperRef} className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8 px-3 sm:px-4">
       {/* Completion Modal */}
@@ -609,48 +657,10 @@ function OurTimeline() {
           {placedCards.map((card, index) => (
             <div key={`placed-${card.id}`} className="placed-card-wrapper">
               {/* Invisible drop zone trigger - always present during drag to detect hover */}
-              {isDragging && currentCard && dragOverIndex !== index && tempPlacementIndex !== index && (
-                <div
-                  onDragOver={(e) => handleDragOver(e, index)}
-                  onDragLeave={handleDragLeave}
-                  onDrop={(e) => handleDrop(e, index)}
-                  className="h-8 mb-3"
-                  style={{ opacity: 0, pointerEvents: 'auto' }}
-                />
-              )}
+              {renderDropZone(index)}
 
               {/* Show current card in this position if placed here temporarily - Make it draggable to reposition */}
-              {tempPlacementIndex === index && currentCard && (
-                <div
-                  draggable={feedback === null}
-                  onDragStart={handleDragStart}
-                  onDragEnd={handleDragEnd}
-                  className={`
-                    bg-timeline-blue dark:bg-timeline-light-blue-alt rounded-lg shadow-lg p-4 sm:p-5 mb-3
-                    ${feedback === null ? 'cursor-move' : ''}
-                    ${isDragging ? 'opacity-50' : 'opacity-100'}
-                    transition-all duration-200
-                    relative
-                    touch-none
-                  `}
-                  style={{
-                    userSelect: 'none',
-                    WebkitUserSelect: 'none'
-                  }}
-                >
-                  <h3 className="font-bold text-lg sm:text-xl text-white mb-2">
-                    {currentCard.title}
-                  </h3>
-                  <p className="text-sm sm:text-base text-gray-100">
-                    {currentCard.description}
-                  </p>
-                  {feedback !== null && (
-                    <div className={`absolute top-2 right-2 text-3xl text-white`}>
-                      {feedback === 'correct' ? '✓' : '✗'}
-                    </div>
-                  )}
-                </div>
-              )}
+              {renderDraggableCard(index)}
 
               {/* The actual placed card */}
               <div
@@ -672,49 +682,9 @@ function OurTimeline() {
             </div>
           ))}
 
-          {/* Invisible drop zone trigger for end - always present during drag */}
-          {isDragging && currentCard && dragOverIndex !== placedCards.length && tempPlacementIndex !== placedCards.length && (
-            <div
-              onDragOver={(e) => handleDragOver(e, placedCards.length)}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, placedCards.length)}
-              className="h-16 mb-3"
-              style={{ opacity: 0, pointerEvents: 'auto' }}
-            />
-          )}
-
-          {/* Show current card at END if placed there temporarily - Make it draggable to reposition */}
-          {tempPlacementIndex === placedCards.length && currentCard && (
-            <div
-              draggable={feedback === null}
-              onDragStart={handleDragStart}
-              onDragEnd={handleDragEnd}
-              className={`
-                bg-timeline-blue dark:bg-timeline-light-blue-alt rounded-lg shadow-lg p-4 sm:p-5 mb-3
-                ${feedback === null ? 'cursor-move' : ''}
-                ${isDragging ? 'opacity-50' : 'opacity-100'}
-                transition-all duration-200
-                relative
-                touch-none
-              `}
-              style={{
-                userSelect: 'none',
-                WebkitUserSelect: 'none'
-              }}
-            >
-              <h3 className="font-bold text-lg sm:text-xl text-white mb-2">
-                {currentCard.title}
-              </h3>
-              <p className="text-sm sm:text-base text-gray-100">
-                {currentCard.description}
-              </p>
-              {feedback !== null && (
-                <div className={`absolute top-2 right-2 text-3xl text-white`}>
-                  {feedback === 'correct' ? '✓' : '✗'}
-                </div>
-              )}
-            </div>
-          )}
+          {/* End position - drop zone and draggable card use same logic as other positions */}
+          {renderDropZone(placedCards.length, 'h-16')}
+          {renderDraggableCard(placedCards.length)}
         </div>
 
         {/* Confirm Button - Bottom position with Cancel option */}
