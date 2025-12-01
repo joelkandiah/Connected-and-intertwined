@@ -334,7 +334,7 @@ function ConnectionsGame() {
               >
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none space-y-2">
                   {/* Category name at top */}
-                  <h3 className="font-semibold text-center mb-2 uppercase text-gray-900 text-gray-900 text-gray-900 text-gray-900 text-gray-900 text-gray-900 text-gray-900 text-gray-900 text-gray-900">{solving.name}</h3>
+                  <h3 className="font-semibold text-center mb-2 uppercase text-gray-900">{solving.name}</h3>
                   <div className="flex gap-1 sm:gap-2">
                     {solving.words.map(word => (
                       <div key={word} className="flex items-center justify-center aspect-square px-2 py-1 font-semibold uppercase text-center rounded-md" style={{ fontSize: 'clamp(0.7rem, 2.5vw, 1rem)' }}>
