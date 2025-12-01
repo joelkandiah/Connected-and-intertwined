@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import puzzleData from '../data/strands-puzzle.json';
 import StrandsCell from '../components/StrandsCell';
+import HowToPlayModal from '../components/HowToPlayModal';
 
 // Wedding-themed Strands puzzle
 // Theme: Wedding Day
@@ -33,6 +34,16 @@ function WeddingStrands() {
   const isInitialMount = useRef(true);
   const touchStartTimeRef = useRef(null);
   const layoutCacheRef = useRef({ centers: {}, rects: {} });
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+
+  // Check for first time visit
+  useEffect(() => {
+    const hasSeenHowToPlay = localStorage.getItem('wedding-strands-how-to-play');
+    if (!hasSeenHowToPlay) {
+      setShowHowToPlay(true);
+      localStorage.setItem('wedding-strands-how-to-play', 'true');
+    }
+  }, []);
 
   // Refs for event handlers to avoid re-renders
   const selectedCellsRef = useRef(selectedCells);
@@ -471,6 +482,19 @@ function WeddingStrands() {
           </div>
         </div>
       )}
+
+      <HowToPlayModal
+        isOpen={showHowToPlay}
+        onClose={() => setShowHowToPlay(false)}
+      >
+        <ul className="space-y-2">
+          <li>• Drag across adjacent letters to form words</li>
+          <li>• Find all the hidden wedding-themed words</li>
+          <li>• Look for the special spangram word (marked with ⭐)</li>
+          <li>• The spangram spans across the puzzle</li>
+          <li>• Try to find all words as quickly as possible!</li>
+        </ul>
+      </HowToPlayModal>
 
       <div className="w-full max-w-[min(96vw,650px)] mx-auto">
         <header className="text-center mb-6 sm:mb-8">

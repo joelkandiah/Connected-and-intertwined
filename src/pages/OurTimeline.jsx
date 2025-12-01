@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import flashbackData from '../data/flashback.json';
+import HowToPlayModal from '../components/HowToPlayModal';
 
 // Storage key for persisting game state
 const STORAGE_KEY = 'our-timeline-progress';
@@ -28,6 +29,16 @@ function OurTimeline() {
   const handlePointerDownRef = useRef(null);
   const lastCheckTime = useRef(0);
   const cleanupDragRef = useRef(null);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+
+  // Check for first time visit
+  useEffect(() => {
+    const hasSeenHowToPlay = localStorage.getItem('our-timeline-wedding-how-to-play');
+    if (!hasSeenHowToPlay) {
+      setShowHowToPlay(true);
+      localStorage.setItem('our-timeline-wedding-how-to-play', 'true');
+    }
+  }, []);
 
   // Keep the latest handlePointerDown in a ref so we don't need to re-bind listeners
   useEffect(() => {
@@ -551,6 +562,19 @@ function OurTimeline() {
           </div>
         </div>
       )}
+
+      <HowToPlayModal
+        isOpen={showHowToPlay}
+        onClose={() => setShowHowToPlay(false)}
+      >
+        <ul className="space-y-2">
+          <li>• You'll see one event card at a time to place in the timeline.</li>
+          <li>• Drag the card to where you think it belongs (earlier or later than existing events).</li>
+          <li>• Click "Confirm Placement" to check if you're right.</li>
+          <li>• Get 1 point for each correct placement. Your score is out of 7 total cards.</li>
+          <li>• The card will automatically move to the correct position after you confirm.</li>
+        </ul>
+      </HowToPlayModal>
 
       <div className="w-full max-w-[min(96vw,650px)] mx-auto">
         <header className="text-center mb-6 sm:mb-8">

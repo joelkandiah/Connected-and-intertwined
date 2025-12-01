@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Cell from './Cell';
 import ClueList from './ClueList';
+import HowToPlayModal from './HowToPlayModal';
 import puzzleData from '../data/wedding-crossword.json';
 import { saveCrosswordProgress, loadCrosswordProgress, clearCrosswordProgress } from '../utils/storage';
 
@@ -18,6 +19,16 @@ const Crossword = () => {
   const inputRef = useRef(null);
   const timerIntervalRef = useRef(null);
   const lastKeyEventRef = useRef(0);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+
+  // Check for first time visit
+  useEffect(() => {
+    const hasSeenHowToPlay = localStorage.getItem('wedding-crossword-how-to-play');
+    if (!hasSeenHowToPlay) {
+      setShowHowToPlay(true);
+      localStorage.setItem('wedding-crossword-how-to-play', 'true');
+    }
+  }, []);
 
   // Initialize grid from puzzle data
   useEffect(() => {
@@ -578,6 +589,21 @@ const Crossword = () => {
             </div>
           </div>
         )}
+
+        <HowToPlayModal
+          isOpen={showHowToPlay}
+          onClose={() => setShowHowToPlay(false)}
+        >
+          <ul className="space-y-2">
+            <li>• Click on a cell to select it, then type to fill in letters</li>
+            <li>• Click the same cell again or press Enter to toggle between Across and Down</li>
+            <li>• Use arrow keys to navigate between cells</li>
+            <li>• Press Backspace to delete the current letter or move to the previous cell</li>
+            <li>• Click on a clue to jump to that word</li>
+            <li>• Use Check Word to verify your answer for the current word</li>
+            <li>• Your progress is automatically saved!</li>
+          </ul>
+        </HowToPlayModal>
 
         {/* Hidden input for mobile keyboard */}
         <input
