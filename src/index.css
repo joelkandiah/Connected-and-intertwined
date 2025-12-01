@@ -1,3 +1,8 @@
+/* Prevent browser/system auto–force-dark */
+:root {
+  color-scheme: light dark;
+}
+
 @import "tailwindcss";
 
 @variant dark (.dark &);
