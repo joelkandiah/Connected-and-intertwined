@@ -198,6 +198,41 @@ function WeddingStrands() {
     });
   };
 
+  const isCellInFoundWord = useCallback((row, col) => {
+    return foundWords.some(word => {
+      const wordDef = WORD_DEFINITIONS.find(wd => wd.word === word);
+      if (!wordDef) return false;
+      return wordDef.positions.some(([r, c]) => r === row && c === col);
+    });
+  }, [foundWords]);
+
+  const trySelectCell = useCallback((currentSelected, row, col, cellKey, letter) => {
+    if (isCellInFoundWord(row, col)) return null;
+
+    const isAlreadySelected = currentSelected.some(c => c.key === cellKey);
+
+    if (isAlreadySelected) {
+      // If clicking the last cell in the selection, remove it (undo)
+      if (currentSelected.length > 0 && currentSelected[currentSelected.length - 1].key === cellKey) {
+        return currentSelected.slice(0, -1);
+      }
+      return currentSelected;
+    }
+
+    // If no cells selected, start new selection
+    if (currentSelected.length === 0) {
+      return [{ row, col, key: cellKey, letter }];
+    }
+
+    // Check if adjacent to last cell
+    const lastCell = currentSelected[currentSelected.length - 1];
+    if (areAdjacent(lastCell, { row, col })) {
+      return [...currentSelected, { row, col, key: cellKey, letter }];
+    }
+
+    return null; // Invalid selection attempt
+  }, [isCellInFoundWord]);
+
   const handleSubmit = useCallback(() => {
     const currentSelected = selectedCellsRef.current;
     if (currentSelected.length < 3) {
@@ -242,59 +277,66 @@ function WeddingStrands() {
     if (isCompleteRef.current || !isTapModeRef.current) return;
 
     const cellKey = getCellKey(row, col);
-    const currentSelected = selectedCellsRef.current;
-    const isAlreadySelected = currentSelected.some(c => c.key === cellKey);
+    const letter = PUZZLE_GRID[row][col];
 
-    if (isAlreadySelected) {
-      // If clicking the last cell in the selection, remove it
-      if (currentSelected.length > 0 && currentSelected[currentSelected.length - 1].key === cellKey) {
-        setSelectedCells(prev => prev.slice(0, -1));
+    setSelectedCells(prev => {
+      const newSelection = trySelectCell(prev, row, col, cellKey, letter);
+      if (newSelection) {
+        return newSelection;
+      } else {
+        // Only show error if we failed to add a non-selected cell
+        const isAlreadySelected = prev.some(c => c.key === cellKey);
+        if (!isAlreadySelected) {
+          setMessage('Must select adjacent letters!');
+          setTimeout(() => setMessage(''), 1500);
+        }
+        return prev;
       }
-      return;
-    }
-
-    // If no cells selected, start new selection
-    if (currentSelected.length === 0) {
-      setSelectedCells([{ row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
-      return;
-    }
-
-    // Check if adjacent to last cell
-    const lastCell = currentSelected[currentSelected.length - 1];
-    if (areAdjacent(lastCell, { row, col })) {
-      setSelectedCells(prev => [...prev, { row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
-    } else {
-      setMessage('Must select adjacent letters!');
-      setTimeout(() => setMessage(''), 1500);
-    }
-  }, []);
+    });
+  }, [trySelectCell]);
 
   const handleCellMouseDown = useCallback((row, col) => {
     if (isCompleteRef.current || isTapModeRef.current) return;
+    if (isCellInFoundWord(row, col)) return;
+
     setIsDragging(true);
     const cellKey = getCellKey(row, col);
-    setSelectedCells([{ row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
-  }, []);
+    const letter = PUZZLE_GRID[row][col];
+
+    setSelectedCells(prev => {
+      // Only add if not already selected to avoid flicker/undo during drag
+      const isAlreadySelected = prev.some(c => c.key === cellKey);
+      if (isAlreadySelected) return prev;
+
+      const newSelection = trySelectCell(prev, row, col, cellKey, letter);
+      return newSelection || prev;
+    });
+  }, [isCellInFoundWord, trySelectCell]);
 
   const handleCellMouseEnter = useCallback((row, col) => {
     if (!isDraggingRef.current || isCompleteRef.current || isTapModeRef.current) return;
 
     const cellKey = getCellKey(row, col);
-    const currentSelected = selectedCellsRef.current;
-    const isAlreadySelected = currentSelected.some(c => c.key === cellKey);
+    const letter = PUZZLE_GRID[row][col];
 
-    if (!isAlreadySelected && currentSelected.length > 0) {
-      const lastCell = currentSelected[currentSelected.length - 1];
-      if (areAdjacent(lastCell, { row, col })) {
-        setSelectedCells(prev => [...prev, { row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
-      }
-    }
-  }, []);
+    setSelectedCells(prev => {
+      // Only add if not already selected to avoid flicker/undo during drag
+      const isAlreadySelected = prev.some(c => c.key === cellKey);
+      if (isAlreadySelected) return prev;
+
+      // Mouse enter should only extend selection, not start a new one
+      if (prev.length === 0) return prev;
+
+      const newSelection = trySelectCell(prev, row, col, cellKey, letter);
+      return newSelection || prev;
+    });
+  }, [trySelectCell]);
 
   const handleMouseUp = useCallback(() => {
-    if (isDraggingRef.current && selectedCellsRef.current.length >= 3) {
-      handleSubmit();
-    } else {
+    if (isDraggingRef.current) {
+      if (selectedCellsRef.current.length >= 3) {
+        handleSubmit();
+      }
       setIsDragging(false);
     }
   }, [handleSubmit]);
@@ -309,6 +351,8 @@ function WeddingStrands() {
       return;
     }
 
+    if (isCellInFoundWord(row, col)) return;
+
     // In drag mode, start dragging
     touchStartTimeRef.current = Date.now();
     setIsDragging(true);
@@ -317,8 +361,16 @@ function WeddingStrands() {
     measureLayout();
 
     const cellKey = getCellKey(row, col);
-    setSelectedCells([{ row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
-  }, []);
+    const letter = PUZZLE_GRID[row][col];
+
+    setSelectedCells(prev => {
+      const isAlreadySelected = prev.some(c => c.key === cellKey);
+      if (isAlreadySelected) return prev;
+
+      const newSelection = trySelectCell(prev, row, col, cellKey, letter);
+      return newSelection || prev;
+    });
+  }, [isCellInFoundWord, trySelectCell]);
 
   const handleSetButtonRef = useCallback((r, c, el) => {
     if (el) buttonRefs.current[getCellKey(r, c)] = el;
@@ -363,22 +415,18 @@ function WeddingStrands() {
 
     if (targetCell) {
       const { row, col, key: cellKey } = targetCell;
+      const letter = PUZZLE_GRID[row][col];
 
       setSelectedCells(prev => {
-        // Check if this cell is already in the selection
+        // Only add if not already selected to avoid flicker/undo during drag
         const isAlreadySelected = prev.some(c => c.key === cellKey);
+        if (isAlreadySelected) return prev;
 
-        if (!isAlreadySelected && prev.length > 0) {
-          const lastCell = prev[prev.length - 1];
-          if (areAdjacent(lastCell, { row, col })) {
-            return [...prev, { row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }];
-          }
-        }
-
-        return prev;
+        const newSelection = trySelectCell(prev, row, col, cellKey, letter);
+        return newSelection || prev;
       });
     }
-  }, []);
+  }, [trySelectCell]);
 
   const handleTouchEnd = useCallback((e) => {
     if (isTapModeRef.current) return; // Tap mode handles selection differently
@@ -447,14 +495,6 @@ function WeddingStrands() {
     return selectedCells.some(c => c.row === row && c.col === col);
   };
 
-  const isCellInFoundWord = (row, col) => {
-    return foundWords.some(word => {
-      const wordDef = WORD_DEFINITIONS.find(wd => wd.word === word);
-      if (!wordDef) return false;
-      return wordDef.positions.some(([r, c]) => r === row && c === col);
-    });
-  };
-
   const getRemainingWords = () => {
     return WORD_DEFINITIONS.filter(wd => !foundWords.includes(wd.word));
   };
@@ -495,9 +535,9 @@ function WeddingStrands() {
 
       <div className="w-full max-w-[min(96vw,650px)] mx-auto">
         <header className="text-center mb-6 sm:mb-8">
-          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }} className="font-bold mb-2 text-gray-900 dark:text-gray-100">Strands</h1>
-          <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.25rem)' }} className="text-gray-600 dark:text-gray-300"> Wedding Edition</p>
-          <p style={{ fontSize: 'clamp(0.55rem, 2vw, 0.75rem)' }} className="text-gray-500 dark:text-gray-400 mt-2">
+          <h1 className="text-responsive-h1 font-bold mb-2 text-gray-900 dark:text-gray-100">Strands</h1>
+          <p className="text-responsive-h2 text-gray-600 dark:text-gray-300"> Wedding Edition</p>
+          <p className="text-responsive-sm text-gray-500 dark:text-gray-400 mt-2">
             Find the hidden words! • Drag to select letters • Find the pangram!
           </p>
         </header>
@@ -518,21 +558,19 @@ function WeddingStrands() {
             <div className="bg-white border-2 border-gray-300 rounded-full p-1 inline-flex">
               <button
                 onClick={() => setIsTapMode(false)}
-                className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors ${!isTapMode
+                className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors text-responsive-base ${!isTapMode
                   ? 'bg-gray-900 text-white'
                   : 'bg-white text-gray-700 hover:bg-gray-100'
                   }`}
-                style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}
               >
                 Drag Mode
               </button>
               <button
                 onClick={() => setIsTapMode(true)}
-                className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors ${isTapMode
+                className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors text-responsive-base ${isTapMode
                   ? 'bg-gray-900 text-white'
                   : 'bg-white text-gray-700 hover:bg-gray-100'
                   }`}
-                style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}
               >
                 Tap Mode
               </button>
@@ -634,27 +672,24 @@ function WeddingStrands() {
           <div className="flex flex-wrap justify-center gap-6 sm:gap-8 mb-6">
             <button
               onClick={handleClear}
-              className="btn-control"
-              style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}
+              className="btn-control text-responsive-base"
               disabled={selectedCells.length === 0}
             >
               Clear
             </button>
             <button
               onClick={handleSubmit}
-              className={`btn-control ${selectedCells.length >= 3
+              className={`btn-control text-responsive-base ${selectedCells.length >= 3
                 ? '!bg-gray-900 dark:!bg-gray-200 !text-white dark:!text-gray-900 hover:!bg-gray-700 dark:hover:!bg-gray-100'
-                : '!bg-gray-300 dark:!bg-gray-600 !text-gray-500 dark:!text-gray-400 cursor-not-allowed'
+                : 'opacity-50 cursor-not-allowed'
                 }`}
               disabled={selectedCells.length < 3}
-              style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}
             >
               Submit
             </button>
             <button
               onClick={() => setShowHint(!showHint)}
-              className="btn-control"
-              style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}
+              className="btn-control text-responsive-base"
             >
               {showHint ? 'Hide' : 'Show'} Hints
             </button>
@@ -666,15 +701,13 @@ function WeddingStrands() {
           <div className="flex justify-center gap-6 sm:gap-8">
             <button
               onClick={handleNewGame}
-              className="btn-primary bg-gradient-to-r from-yellow-400 to-blue-500"
-              style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
+              className="btn-primary bg-gradient-to-r from-yellow-400 to-blue-500 text-responsive-base"
             >
               New Game
             </button>
             <button
               onClick={() => setShowCompletionModal(true)}
-              className="btn-secondary"
-              style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
+              className="btn-secondary text-responsive-base"
             >
               Show Time
             </button>
@@ -683,7 +716,7 @@ function WeddingStrands() {
 
         {/* Found Words List */}
         <div className="mt-8 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-          <h2 style={{ fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)' }} className="font-bold mb-3 text-gray-900 dark:text-gray-100">
+          <h2 className="text-responsive-h2 font-bold mb-3 text-gray-900 dark:text-gray-100">
             Found Words
           </h2>
           <div className="space-y-2">
@@ -693,13 +726,12 @@ function WeddingStrands() {
                 <div
                   key={index}
                   className={`
-                    px-3 py-2 rounded-lg font-semibold
+                    px-3 py-2 rounded-lg font-semibold text-responsive-base
                     ${wordData?.isSpangram
                       ? 'bg-nyt-yellow text-gray-900'
                       : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
                     }
                   `}
-                  style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}
                 >
                   {word} {wordData?.isSpangram && '⭐ Spangram'}
                 </div>
@@ -710,10 +742,10 @@ function WeddingStrands() {
           {/* Hints */}
           {showHint && getRemainingWords().length > 0 && (
             <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <h3 className="font-semibold mb-2 text-gray-900 dark:text-gray-100" style={{ fontSize: 'clamp(0.875rem, 2vw, 1rem)' }}>
+              <h3 className="font-semibold mb-2 text-gray-900 dark:text-gray-100 text-responsive-base">
                 Remaining Word Hints:
               </h3>
-              <ul className="space-y-1 text-gray-600 dark:text-gray-300" style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}>
+              <ul className="space-y-1 text-gray-600 dark:text-gray-300 text-responsive-base">
                 {getRemainingWords().map((wd, index) => (
                   <li key={index}>• {wd.hint} {wd.isSpangram && '(Spangram)'}</li>
                 ))}
@@ -724,10 +756,10 @@ function WeddingStrands() {
 
         {/* How to Play */}
         <div className="mt-8 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-          <h2 style={{ fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)' }} className="font-bold mb-3 text-gray-900 dark:text-gray-100">
+          <h2 className="text-responsive-h2 font-bold mb-3 text-gray-900 dark:text-gray-100">
             How to Play
           </h2>
-          <ul style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }} className="space-y-2 text-gray-700 dark:text-gray-300">
+          <ul className="space-y-2 text-gray-700 dark:text-gray-300 text-responsive-base">
             <li>• Drag across adjacent letters to form words.</li>
             <li>• Find all the hidden wedding-themed words.</li>
             <li>• Look for the special spangram word (marked with ⭐).</li>
