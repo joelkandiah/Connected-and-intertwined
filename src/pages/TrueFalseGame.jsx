@@ -80,7 +80,7 @@ function TrueFalseGame() {
     }, [currentIndex, score, answered, isGameOver, viewOnlyMode]);
 
     const handleAnswer = (userAnswer) => {
-        if (isGameOver || viewOnlyMode || isDragging) return;
+        if (isGameOver || viewOnlyMode) return;
 
         const currentFact = facts[currentIndex];
         const isCorrect = userAnswer === currentFact.answer;
