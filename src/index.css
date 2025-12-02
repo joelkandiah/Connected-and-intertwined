@@ -69,7 +69,7 @@
 }
 
 @utility btn-cancel {
-  @apply btn-secondary px-6 sm:px-8 py-4;
+  @apply btn-secondary;
 }
 
 @utility btn-crossword {
