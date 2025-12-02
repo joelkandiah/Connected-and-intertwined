@@ -214,7 +214,7 @@ function TrueFalseGame() {
                 secondaryButtonText="Show Results"
                 onPrimaryAction={handleNewGame}
                 onSecondaryAction={handleShowResults}
-                primaryButtonGradient="from-green-400 to-blue-500"
+                primaryButtonGradient="from-green-400 to-red-700"
                 stats={[
                     {
                         label: 'Score',
@@ -235,9 +235,8 @@ function TrueFalseGame() {
                 <ul className="space-y-2">
                     <li>• Read each fact about the couple carefully.</li>
                     <li>• Decide if the statement is TRUE or FALSE.</li>
-                    <li>• On desktop: Click the True (green) or False (red) button.</li>
-                    <li>• On mobile: Swipe right for TRUE ✓ or left for FALSE ✗.</li>
-                    <li>• Use keyboard: Press Arrow Right or 'T' for True, Arrow Left or 'F' for False.</li>
+                    <li>• Click the True (green) or False (red) button.</li>
+                    <li>• Or swipe right for True or left for False.</li>
                     <li>• See how many you can get correct!</li>
                 </ul>
             </HowToPlayModal>
@@ -254,7 +253,7 @@ function TrueFalseGame() {
                     <div className="text-center mb-6">
                         <div className="inline-flex items-center gap-3">
                             <span className="text-responsive-base text-gray-600 dark:text-gray-300 font-semibold">
-                                Fact {progress + 1} of {total}
+                                Fact {progress == total ? progress : progress + 1} of {total}
                             </span>
                         </div>
                         <div className="w-full max-w-xs mx-auto mt-3 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -404,7 +403,7 @@ function TrueFalseGame() {
                         <div className="flex justify-center gap-6 sm:gap-8 mt-8">
                             <button
                                 onClick={handleNewGame}
-                                className="btn-primary bg-gradient-to-r from-green-400 to-blue-500 text-responsive-base"
+                                className="btn-primary bg-gradient-to-r from-green-400 to-red-700 text-responsive-base"
                             >
                                 New Game
                             </button>
@@ -424,9 +423,8 @@ function TrueFalseGame() {
                     <ul className="text-responsive-base space-y-2 text-gray-700 dark:text-gray-300">
                         <li>• Read each fact about the couple carefully.</li>
                         <li>• Decide if the statement is TRUE or FALSE.</li>
-                        <li>• On desktop: Click the True (green) or False (red) button.</li>
-                        <li>• On mobile: Swipe right for TRUE ✓ or left for FALSE ✗.</li>
-                        <li>• Use keyboard: Press Arrow Right or 'T' for True, Arrow Left or 'F' for False.</li>
+                        <li>• Click the True (green) or False (red) button.</li>
+                        <li>• Or swipe right for True or left for False.</li>
                         <li>• See how many you can get correct!</li>
                     </ul>
                 </div>

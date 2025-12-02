@@ -73,8 +73,8 @@ const LandingPage = () => {
       {/* Main content */}
       <div className="relative z-10 max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 style={{fontSize: 'clamp(2rem, 5vw, 3rem)', paddingTop: '60px'}} className="font-bold mb-2 animate-fadeIn text-gray-900 dark:text-gray-100">
-                Welcome to our wedding! 💕
+          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', paddingTop: '60px' }} className="font-bold mb-2 animate-fadeIn text-gray-900 dark:text-gray-100">
+            Welcome to our wedding! 💕
           </h1>
           <p className="text-2xl md:text-3xl text-gray-600 dark:text-gray-300 animate-fadeIn" style={{ animationDelay: '0.3s' }}>
             Sofia and Joel invite you to try some of our favourite puzzles with a wedding day twist!
@@ -82,7 +82,7 @@ const LandingPage = () => {
         </div>
 
         {/* Puzzle buttons */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-3 sm:scale-90 mt-16 sm:mt-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-3 sm:scale-90 mt-16 sm:mt-8">
           {puzzles.map((puzzle, index) => (
             <Link
               key={puzzle.path}
@@ -99,7 +99,7 @@ const LandingPage = () => {
                 →
               </div>
             </Link>
-            
+
           ))}
         </div>
 

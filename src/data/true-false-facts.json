@@ -2,38 +2,53 @@
   "facts": [
     {
       "id": 1,
-      "statement": "The couple met at a coffee shop in downtown Seattle.",
+      "statement": "Joel and Sofia are each born a year either side of the millenium.",
       "answer": true
     },
     {
       "id": 2,
-      "statement": "They got engaged on top of the Eiffel Tower.",
+      "statement": "Sofia and Joel got engaged in North Carolina.",
       "answer": false
     },
     {
       "id": 3,
-      "statement": "Both the bride and groom love hiking in the mountains.",
+      "statement": "Sofia and Joel once did a couples costume as Edward and Bella from Twilight.",
       "answer": true
     },
     {
       "id": 4,
-      "statement": "Their first date was at an Italian restaurant.",
-      "answer": false
+      "statement": "The year before Joel met Sofia, his office had her name on it.",
+      "answer": true
     },
     {
       "id": 5,
-      "statement": "They have a pet golden retriever named Max.",
+      "statement": "Sofia moved to the UK without owning a raincoat or umbrella.",
       "answer": true
     },
     {
       "id": 6,
-      "statement": "The couple has traveled to over 20 countries together.",
+      "statement": "Joel has had to go to the Emergency Room more times than Sofia since they met",
       "answer": false
     },
     {
       "id": 7,
-      "statement": "They both studied at the same university.",
+      "statement": "Joel had never travelled to the US before he met Sofia.",
+      "answer": false
+    },
+    {
+      "id": 8,
+      "statement": "Sofia shares a middle name with one of Joel's sisters.",
       "answer": true
+    },
+    {
+      "id": 9,
+      "statement": "Sofia and Joel have both had a pet with the same name.",
+      "answer": false
+    },
+    {
+      "id": 10,
+      "statement": "Sofia first visited Joel's hometown (Thame) without him.",
+      "answer": true 
     }
   ]
 }
