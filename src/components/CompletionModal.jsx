@@ -17,9 +17,9 @@ const CompletionModal = ({
 
     return (
         <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4" style={{ zIndex: 30 }}>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full animate-fade-in">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full animate-fade">
                 <div className="text-center">
-                    <div className="text-6xl mb-4 animate-bounce-slow">{icon}</div>
+                    <div className="text-6xl mb-4 animate-bounce">{icon}</div>
                     <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{title}</h2>
                     {message && (
                         <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">{message}</p>

@@ -235,7 +235,6 @@ function ConnectionsGame() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8 px-3 sm:px-4">
       {/* Completion Modal */}
-      {/* Completion Modal */}
       <CompletionModal
         isOpen={showCompletionModal}
         icon={mistakes < 4 ? "🎉" : "😔"}
