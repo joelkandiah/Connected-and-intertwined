@@ -708,7 +708,7 @@ const WeddingCrossword = () => {
               </button>
               <button
                 onClick={handleReset}
-                className="btn-control text-sm bg-purple-100 dark:bg-purple-900/50 border-purple-300 dark:border-purple-700 hover:bg-purple-200 dark:hover:bg-purple-900/70"
+                className="btn-control text-sm !bg-purple-100 dark:!bg-purple-900/50 !border-purple-300 dark:!border-purple-700 hover:!bg-purple-200 dark:hover:!bg-purple-900/70"
               >
                 Reset Puzzle
               </button>
