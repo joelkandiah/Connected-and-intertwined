@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import flashbackData from '../data/flashback.json';
 import HowToPlayModal from '../components/HowToPlayModal';
+import CompletionModal from '../components/CompletionModal';
 
 // Storage key for persisting game state
 const STORAGE_KEY = 'our-timeline-progress';
@@ -535,33 +536,28 @@ function OurTimeline() {
   return (
     <div ref={wrapperRef} className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8 px-3 sm:px-4">
       {/* Completion Modal */}
-      {showCompletionModal && (
-        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4" style={{ zIndex: 30 }}>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full">
-            <div className="text-center">
-              <div className="text-6xl mb-4">🎉</div>
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Congratulations!</h2>
-              <p className="text-lg text-gray-700 dark:text-gray-300 mb-2">You completed the timeline!</p>
-              <p className="text-xl font-bold text-timeline-blue dark:text-timeline-light-blue mb-2">Score: {score} out of {totalAttempts}</p>
-              <p className="text-base text-gray-600 dark:text-gray-400 mb-6">Time: {formatTime(elapsedTime)}</p>
-              <div className="flex gap-3 justify-center">
-                <button
-                  onClick={handleNewGame}
-                  className="px-6 py-3 bg-gradient-to-r from-timeline-light-blue to-green-500 text-white rounded-full font-semibold hover:from-timeline-blue hover:to-green-600 transition-colors"
-                >
-                  New Game
-                </button>
-                <button
-                  onClick={handleShowPuzzle}
-                  className="px-6 py-3 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-                >
-                  Show Timeline
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <CompletionModal
+        isOpen={showCompletionModal}
+        icon="🎉"
+        message="You completed the timeline!"
+        primaryButtonText="New Game"
+        secondaryButtonText="Show Timeline"
+        onPrimaryAction={handleNewGame}
+        onSecondaryAction={handleShowPuzzle}
+        primaryButtonGradient="from-timeline-light-blue to-green-500"
+        stats={[
+          {
+            label: 'Score',
+            value: `${score}/${totalAttempts}`,
+            gradient: 'from-blue-100 to-green-100 dark:from-blue-900/30 dark:to-green-900/30'
+          },
+          {
+            label: 'Time',
+            value: formatTime(elapsedTime),
+            gradient: 'from-blue-100 to-green-100 dark:from-blue-900/30 dark:to-green-900/30'
+          }
+        ]}
+      />
 
       <HowToPlayModal
         isOpen={showHowToPlay}
@@ -732,15 +728,22 @@ function OurTimeline() {
           </div>
         )}
 
-        {/* New Game button when completed */}
+        {/* New Game Button */}
         {isComplete && (
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center gap-3 sm:gap-4 mb-6">
             <button
               onClick={handleNewGame}
-              className="px-6 py-3 bg-gradient-to-r from-timeline-light-blue to-green-500 text-white rounded-full font-semibold hover:from-timeline-blue hover:to-green-600 transition-colors"
-              style={{ fontSize: 'clamp(0.875rem, 2vw, 1rem)' }}
+              className="px-5 sm:px-6 py-2.5 bg-gradient-to-r from-timeline-light-blue to-green-500 text-white rounded-full font-semibold hover:brightness-110 transition-all transform hover:scale-105 shadow-md"
+              style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
             >
               New Game
+            </button>
+            <button
+              onClick={() => setShowCompletionModal(true)}
+              className="px-5 sm:px-6 py-2.5 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
+            >
+              Show Score
             </button>
           </div>
         )}
