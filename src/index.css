@@ -90,8 +90,28 @@ h2,
 h3,
 .nyt-conn-subheading {
   font-family:
-    "Franklin Gothic Medium",
     "Arial Narrow",
     Arial,
     sans-serif;
+}
+
+/* Responsive Text Utilities */
+@utility text-responsive-h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+@utility text-responsive-h2 {
+  font-size: clamp(1.125rem, 2.5vw, 1.25rem);
+}
+
+@utility text-responsive-body {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+}
+
+@utility text-responsive-base {
+  font-size: clamp(0.75rem, 2vw, 0.875rem);
+}
+
+@utility text-responsive-sm {
+  font-size: clamp(0.55rem, 2vw, 0.75rem);
 }
