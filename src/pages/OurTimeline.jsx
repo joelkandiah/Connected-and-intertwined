@@ -46,6 +46,33 @@ function OurTimeline() {
     handlePointerDownRef.current = handlePointerDown;
   });
 
+  const initializeNewGame = () => {
+    const allEvents = [...flashbackData.events];
+    // Shuffle all events
+    const shuffled = allEvents.sort(() => Math.random() - 0.5);
+
+    // Pick first card as starting card (already placed)
+    const firstCard = shuffled[0];
+    setPlacedCards([firstCard]);
+
+    // Pick second card as current card to place
+    const secondCard = shuffled[1];
+    setCurrentCard(secondCard);
+
+    // Remaining cards
+    const remaining = shuffled.slice(2);
+    setRemainingCards(remaining);
+
+    setScore(0);
+    setTotalAttempts(0);
+    setIsComplete(false);
+    setShowCompletionModal(false);
+    setElapsedTime(0);
+    setIsTimerRunning(true);
+    setFeedback(null);
+    setTempPlacementIndex(null);
+  };
+
   // Initialize game
   useEffect(() => {
     const savedState = localStorage.getItem(STORAGE_KEY);
@@ -73,33 +100,6 @@ function OurTimeline() {
       initializeNewGame();
     }
   }, []);
-
-  const initializeNewGame = () => {
-    const allEvents = [...flashbackData.events];
-    // Shuffle all events
-    const shuffled = allEvents.sort(() => Math.random() - 0.5);
-
-    // Pick first card as starting card (already placed)
-    const firstCard = shuffled[0];
-    setPlacedCards([firstCard]);
-
-    // Pick second card as current card to place
-    const secondCard = shuffled[1];
-    setCurrentCard(secondCard);
-
-    // Remaining cards
-    const remaining = shuffled.slice(2);
-    setRemainingCards(remaining);
-
-    setScore(0);
-    setTotalAttempts(0);
-    setIsComplete(false);
-    setShowCompletionModal(false);
-    setElapsedTime(0);
-    setIsTimerRunning(true);
-    setFeedback(null);
-    setTempPlacementIndex(null);
-  };
 
   // Save state
   useEffect(() => {
