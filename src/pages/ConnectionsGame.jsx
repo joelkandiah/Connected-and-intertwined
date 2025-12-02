@@ -43,22 +43,27 @@ function ConnectionsGame() {
     let stateToLoad = null; // We'll set this if a valid state is found
 
     if (savedState) {
-      const state = JSON.parse(savedState);
+      try {
+        const state = JSON.parse(savedState);
 
-      // 1. Check for a fully COMPLETE state (words.length = 0 is expected)
-      const isGameComplete = state.solved && state.solved.length === PUZZLE.categories.length;
+        // 1. Check for a fully COMPLETE state (words.length = 0 is expected)
+        const isGameComplete = state.solved && state.solved.length === PUZZLE.categories.length;
 
-      // 2. Check for a playable MID-GAME state (words.length > 0 is expected)
-      const isGamePlayable = state.words && state.words.length > 0;
+        // 2. Check for a playable MID-GAME state (words.length > 0 is expected)
+        const isGamePlayable = state.words && state.words.length > 0;
 
-      if (isGameComplete || isGamePlayable) {
-        // State is valid (either fully solved or mid-play)
-        stateToLoad = state;
-      } else {
-        // Case: Saved state exists but has 0 words and is NOT marked as complete.
-        // This is the corrupted state, so we ignore it and proceed to new game.
-        console.error("Corrupted/Blank save state detected. Starting new game.");
-        localStorage.removeItem(STORAGE_KEY); // Clean up the bad save
+        if (isGameComplete || isGamePlayable) {
+          // State is valid (either fully solved or mid-play)
+          stateToLoad = state;
+        } else {
+          // Case: Saved state exists but has 0 words and is NOT marked as complete.
+          // This is the corrupted state, so we ignore it and proceed to new game.
+          console.error("Corrupted/Blank save state detected. Starting new game.");
+          localStorage.removeItem(STORAGE_KEY); // Clean up the bad save
+        }
+      } catch (error) {
+        console.error("Failed to parse save state:", error);
+        localStorage.removeItem(STORAGE_KEY);
       }
     }
 
@@ -250,7 +255,7 @@ function ConnectionsGame() {
         secondaryButtonText="Show Puzzle"
         onPrimaryAction={handleNewGame}
         onSecondaryAction={handleShowPuzzle}
-        primaryButtonGradient={mistakes < 4 ? "from-yellow-400 to-green-500" : "from-gray-500 to-gray-700"}
+        primaryButtonGradient="from-yellow-400 to-green-500"
         stats={[
           {
             label: 'Score',
@@ -385,17 +390,17 @@ function ConnectionsGame() {
 
         {/* New Game button in view-only mode */}
         {viewOnlyMode && (
-          <div className="flex justify-center mb-6 gap-3 sm:gap-4">
+          <div className="flex justify-center mb-6 gap-6 sm:gap-8">
             <button
               onClick={handleNewGame}
-              className="px-5 sm:px-6 py-2.5 bg-gradient-to-r from-yellow-400 to-green-500 text-white rounded-full font-semibold hover:brightness-110 transition-all transform hover:scale-105 shadow-md"
+              className="btn-primary bg-gradient-to-r from-yellow-400 to-green-500"
               style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
             >
               New Game
             </button>
             <button
               onClick={() => setShowCompletionModal(true)}
-              className="px-5 sm:px-6 py-2.5 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              className="btn-secondary"
               style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
             >
               Show Score
@@ -405,18 +410,18 @@ function ConnectionsGame() {
 
         {/* Controls */}
         {!isGameOver && !viewOnlyMode && (words.length > 0 || rearranging || solving) && (
-          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
-            <button onClick={handleShuffle} className="px-4 sm:px-6 py-2 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}>Shuffle</button>
-            <button onClick={handleDeselectAll} className="px-4 sm:px-6 py-2 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }} disabled={selected.length === 0}>Deselect All</button>
-            <button onClick={handleSubmit} className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors ${selected.length === 4 ? 'bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-100' : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'}`} disabled={selected.length !== 4} style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}>Submit</button>
+          <div className="flex flex-wrap justify-center gap-6 sm:gap-8 mb-6">
+            <button onClick={handleShuffle} className="btn-control" style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}>Shuffle</button>
+            <button onClick={handleDeselectAll} className="btn-control" style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }} disabled={selected.length === 0}>Deselect All</button>
+            <button onClick={handleSubmit} className={`btn-control ${selected.length === 4 ? '!bg-gray-900 dark:!bg-gray-200 !text-white dark:!text-gray-900 hover:!bg-gray-700 dark:hover:!bg-gray-100' : '!bg-gray-300 dark:!bg-gray-600 !text-gray-500 dark:!text-gray-400 cursor-not-allowed'}`} disabled={selected.length !== 4} style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}>Submit</button>
           </div>
         )}
 
         {/* New Game */}
         {isGameOver && !viewOnlyMode && (
-          <div className="flex justify-center gap-3 sm:gap-4">
-            <button onClick={handleNewGame} className="px-5 sm:px-6 py-2.5 bg-gradient-to-r from-yellow-400 to-green-500 text-white rounded-full font-semibold hover:brightness-110 transition-all transform hover:scale-105 shadow-md" style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}>New Game</button>
-            <button onClick={() => setShowCompletionModal(true)} className="px-5 sm:px-6 py-2.5 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors" style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}>Show Score</button>
+          <div className="flex justify-center gap-6 sm:gap-8">
+            <button onClick={handleNewGame} className="btn-primary bg-gradient-to-r from-yellow-400 to-green-500" style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}>New Game</button>
+            <button onClick={() => setShowCompletionModal(true)} className="btn-secondary" style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}>Show Score</button>
           </div>
         )}
 

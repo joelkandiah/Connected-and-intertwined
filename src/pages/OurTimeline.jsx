@@ -46,28 +46,6 @@ function OurTimeline() {
     handlePointerDownRef.current = handlePointerDown;
   });
 
-  // Initialize game
-  useEffect(() => {
-    const savedState = localStorage.getItem(STORAGE_KEY);
-    if (savedState) {
-      const state = JSON.parse(savedState);
-      setPlacedCards(state.placedCards || []);
-      setCurrentCard(state.currentCard || null);
-      setRemainingCards(state.remainingCards || []);
-      setScore(state.score || 0);
-      setTotalAttempts(state.totalAttempts || 0);
-      setElapsedTime(state.elapsedTime || 0);
-      setIsComplete(state.isComplete || false);
-
-      if (state.isComplete) {
-        setShowCompletionModal(false);
-      }
-    } else {
-      // Initialize new game
-      initializeNewGame();
-    }
-  }, []);
-
   const initializeNewGame = () => {
     const allEvents = [...flashbackData.events];
     // Shuffle all events
@@ -94,6 +72,34 @@ function OurTimeline() {
     setFeedback(null);
     setTempPlacementIndex(null);
   };
+
+  // Initialize game
+  useEffect(() => {
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    if (savedState) {
+      try {
+        const state = JSON.parse(savedState);
+        setPlacedCards(state.placedCards || []);
+        setCurrentCard(state.currentCard || null);
+        setRemainingCards(state.remainingCards || []);
+        setScore(state.score || 0);
+        setTotalAttempts(state.totalAttempts || 0);
+        setElapsedTime(state.elapsedTime || 0);
+        setIsComplete(state.isComplete || false);
+
+        if (state.isComplete) {
+          setShowCompletionModal(false);
+        }
+      } catch (error) {
+        console.error("Failed to parse save state:", error);
+        localStorage.removeItem(STORAGE_KEY);
+        initializeNewGame();
+      }
+    } else {
+      // Initialize new game
+      initializeNewGame();
+    }
+  }, []);
 
   // Save state
   useEffect(() => {
@@ -658,13 +664,13 @@ function OurTimeline() {
                 setDragOverIndex(null);
                 setIsDragging(false);
               }}
-              className="px-6 py-3 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              className="btn-cancel"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirm}
-              className="px-6 py-3 bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 rounded-full font-semibold hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors shadow-lg"
+              className="btn-confirm"
             >
               Confirm Placement
             </button>
@@ -708,20 +714,20 @@ function OurTimeline() {
 
         {/* Confirm Button - Bottom position with Cancel option */}
         {tempPlacementIndex !== null && feedback === null && !isComplete && (
-          <div className="flex justify-center gap-3 mb-6">
+          <div className="flex justify-center gap-6 sm:gap-8 mb-6">
             <button
               onClick={() => {
                 setTempPlacementIndex(null);
                 setDragOverIndex(null);
                 setIsDragging(false);
               }}
-              className="px-6 py-3 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              className="btn-cancel"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirm}
-              className="px-6 py-3 bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 rounded-full font-semibold hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors shadow-lg"
+              className="btn-confirm"
             >
               Confirm Placement
             </button>
@@ -730,17 +736,17 @@ function OurTimeline() {
 
         {/* New Game Button */}
         {isComplete && (
-          <div className="flex justify-center gap-3 sm:gap-4 mb-6">
+          <div className="flex justify-center gap-6 sm:gap-8 mb-6">
             <button
               onClick={handleNewGame}
-              className="px-5 sm:px-6 py-2.5 bg-gradient-to-r from-timeline-light-blue to-green-500 text-white rounded-full font-semibold hover:brightness-110 transition-all transform hover:scale-105 shadow-md"
+              className="btn-primary bg-gradient-to-r from-timeline-light-blue to-green-500"
               style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
             >
               New Game
             </button>
             <button
               onClick={() => setShowCompletionModal(true)}
-              className="px-5 sm:px-6 py-2.5 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              className="btn-secondary"
               style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
             >
               Show Score

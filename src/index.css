@@ -33,6 +33,49 @@
   }
 }
 
+/* Button Utilities */
+@utility btn-base {
+  @apply rounded-full font-semibold transition-colors;
+}
+
+@utility btn-primary {
+  @apply btn-base px-6 sm:px-8 py-4;
+  @apply text-white shadow-md;
+  @apply hover:brightness-110 transition-all transform hover:scale-105;
+}
+
+@utility btn-secondary {
+  @apply btn-base px-6 sm:px-8 py-4;
+  @apply bg-white dark:bg-gray-700;
+  @apply border-2 border-gray-300 dark:border-gray-600;
+  @apply text-gray-900 dark:text-gray-100;
+  @apply hover:bg-gray-50 dark:hover:bg-gray-600;
+}
+
+@utility btn-control {
+  @apply btn-base px-6 sm:px-8 py-4;
+  @apply bg-white dark:bg-gray-700;
+  @apply border-2 border-gray-300 dark:border-gray-600;
+  @apply text-gray-900 dark:text-gray-100;
+  @apply hover:bg-gray-100 dark:hover:bg-gray-600;
+}
+
+@utility btn-confirm {
+  @apply btn-base px-6 sm:px-8 py-4;
+  @apply bg-gray-900 dark:bg-gray-200;
+  @apply text-white dark:text-gray-900;
+  @apply hover:bg-gray-700 dark:hover:bg-gray-100;
+  @apply shadow-lg;
+}
+
+@utility btn-cancel {
+  @apply btn-secondary;
+}
+
+@utility btn-crossword {
+  @apply btn-secondary text-sm;
+}
+
 /* For headers similar to Connections category headers */
 h1,
 h2,
