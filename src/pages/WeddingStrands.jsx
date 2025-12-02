@@ -361,8 +361,16 @@ function WeddingStrands() {
     measureLayout();
 
     const cellKey = getCellKey(row, col);
-    setSelectedCells([{ row, col, key: cellKey, letter: PUZZLE_GRID[row][col] }]);
-  }, [isCellInFoundWord]);
+    const letter = PUZZLE_GRID[row][col];
+
+    setSelectedCells(prev => {
+      const isAlreadySelected = prev.some(c => c.key === cellKey);
+      if (isAlreadySelected) return prev;
+
+      const newSelection = trySelectCell(prev, row, col, cellKey, letter);
+      return newSelection || prev;
+    });
+  }, [isCellInFoundWord, trySelectCell]);
 
   const handleSetButtonRef = useCallback((r, c, el) => {
     if (el) buttonRefs.current[getCellKey(r, c)] = el;
