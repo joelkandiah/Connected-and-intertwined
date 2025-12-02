@@ -22,6 +22,7 @@ function TrueFalseGame() {
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
     const [isDragging, setIsDragging] = useState(false);
     const dragStartPos = useRef({ x: 0, y: 0 });
+    const dragOffsetRef = useRef({ x: 0, y: 0 }); // Track offset in ref for reliable access in event handlers
     const cardRef = useRef(null);
 
     // Check for first time visit
@@ -147,7 +148,9 @@ function TrueFalseGame() {
         const deltaX = clientX - dragStartPos.current.x;
         const deltaY = clientY - dragStartPos.current.y;
 
-        setDragOffset({ x: deltaX, y: deltaY });
+        const newOffset = { x: deltaX, y: deltaY };
+        dragOffsetRef.current = newOffset; // Update ref for reliable access in handleDragEnd
+        setDragOffset(newOffset);
     };
 
     const handleDragEnd = () => {
@@ -155,7 +158,8 @@ function TrueFalseGame() {
 
         setIsDragging(false);
 
-        const offsetX = dragOffset.x;
+        // Use ref value for reliable access in event handlers (state may be stale due to closures)
+        const offsetX = dragOffsetRef.current.x;
 
         // Check if swipe threshold was exceeded
         if (Math.abs(offsetX) >= SWIPE_THRESHOLD) {
@@ -164,6 +168,7 @@ function TrueFalseGame() {
         }
 
         // Reset drag offset
+        dragOffsetRef.current = { x: 0, y: 0 };
         setDragOffset({ x: 0, y: 0 });
     };
 
