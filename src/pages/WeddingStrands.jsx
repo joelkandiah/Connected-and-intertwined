@@ -99,13 +99,18 @@ function WeddingStrands() {
   useEffect(() => {
     const savedState = localStorage.getItem(STORAGE_KEY);
     if (savedState) {
-      const state = JSON.parse(savedState);
-      setFoundWords(state.foundWords || []);
-      setElapsedTime(state.elapsedTime || 0);
-      setIsComplete(state.isComplete || false);
+      try {
+        const state = JSON.parse(savedState);
+        setFoundWords(state.foundWords || []);
+        setElapsedTime(state.elapsedTime || 0);
+        setIsComplete(state.isComplete || false);
 
-      if (state.foundWords && state.foundWords.length === WORD_DEFINITIONS.length) {
-        setIsComplete(true);
+        if (state.foundWords && state.foundWords.length === WORD_DEFINITIONS.length) {
+          setIsComplete(true);
+        }
+      } catch (error) {
+        console.error("Failed to parse save state:", error);
+        localStorage.removeItem(STORAGE_KEY);
       }
     }
   }, []);

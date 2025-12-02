@@ -43,22 +43,27 @@ function ConnectionsGame() {
     let stateToLoad = null; // We'll set this if a valid state is found
 
     if (savedState) {
-      const state = JSON.parse(savedState);
+      try {
+        const state = JSON.parse(savedState);
 
-      // 1. Check for a fully COMPLETE state (words.length = 0 is expected)
-      const isGameComplete = state.solved && state.solved.length === PUZZLE.categories.length;
+        // 1. Check for a fully COMPLETE state (words.length = 0 is expected)
+        const isGameComplete = state.solved && state.solved.length === PUZZLE.categories.length;
 
-      // 2. Check for a playable MID-GAME state (words.length > 0 is expected)
-      const isGamePlayable = state.words && state.words.length > 0;
+        // 2. Check for a playable MID-GAME state (words.length > 0 is expected)
+        const isGamePlayable = state.words && state.words.length > 0;
 
-      if (isGameComplete || isGamePlayable) {
-        // State is valid (either fully solved or mid-play)
-        stateToLoad = state;
-      } else {
-        // Case: Saved state exists but has 0 words and is NOT marked as complete.
-        // This is the corrupted state, so we ignore it and proceed to new game.
-        console.error("Corrupted/Blank save state detected. Starting new game.");
-        localStorage.removeItem(STORAGE_KEY); // Clean up the bad save
+        if (isGameComplete || isGamePlayable) {
+          // State is valid (either fully solved or mid-play)
+          stateToLoad = state;
+        } else {
+          // Case: Saved state exists but has 0 words and is NOT marked as complete.
+          // This is the corrupted state, so we ignore it and proceed to new game.
+          console.error("Corrupted/Blank save state detected. Starting new game.");
+          localStorage.removeItem(STORAGE_KEY); // Clean up the bad save
+        }
+      } catch (error) {
+        console.error("Failed to parse save state:", error);
+        localStorage.removeItem(STORAGE_KEY);
       }
     }
 
@@ -250,7 +255,7 @@ function ConnectionsGame() {
         secondaryButtonText="Show Puzzle"
         onPrimaryAction={handleNewGame}
         onSecondaryAction={handleShowPuzzle}
-        primaryButtonGradient={mistakes < 4 ? "from-yellow-400 to-green-500" : "from-gray-500 to-gray-700"}
+        primaryButtonGradient="from-yellow-400 to-green-500"
         stats={[
           {
             label: 'Score',

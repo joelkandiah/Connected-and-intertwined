@@ -50,17 +50,23 @@ function OurTimeline() {
   useEffect(() => {
     const savedState = localStorage.getItem(STORAGE_KEY);
     if (savedState) {
-      const state = JSON.parse(savedState);
-      setPlacedCards(state.placedCards || []);
-      setCurrentCard(state.currentCard || null);
-      setRemainingCards(state.remainingCards || []);
-      setScore(state.score || 0);
-      setTotalAttempts(state.totalAttempts || 0);
-      setElapsedTime(state.elapsedTime || 0);
-      setIsComplete(state.isComplete || false);
+      try {
+        const state = JSON.parse(savedState);
+        setPlacedCards(state.placedCards || []);
+        setCurrentCard(state.currentCard || null);
+        setRemainingCards(state.remainingCards || []);
+        setScore(state.score || 0);
+        setTotalAttempts(state.totalAttempts || 0);
+        setElapsedTime(state.elapsedTime || 0);
+        setIsComplete(state.isComplete || false);
 
-      if (state.isComplete) {
-        setShowCompletionModal(false);
+        if (state.isComplete) {
+          setShowCompletionModal(false);
+        }
+      } catch (error) {
+        console.error("Failed to parse save state:", error);
+        localStorage.removeItem(STORAGE_KEY);
+        initializeNewGame();
       }
     } else {
       // Initialize new game
