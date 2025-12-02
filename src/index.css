@@ -19,6 +19,8 @@
   --color-timeline-light-blue-alt: #638ec9;
 
   --animate-slide-in: slideIn 0.6s ease-out;
+  --animate-swipe-left: swipeLeft 0.5s ease-out;
+  --animate-swipe-right: swipeRight 0.5s ease-out;
 }
 
 @keyframes slideIn {
@@ -30,6 +32,20 @@
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes swipeLeft {
+  to {
+    transform: translateX(-150%) rotate(-30deg);
+    opacity: 0;
+  }
+}
+
+@keyframes swipeRight {
+  to {
+    transform: translateX(150%) rotate(30deg);
+    opacity: 0;
   }
 }
 
@@ -74,6 +90,20 @@
 
 @utility btn-crossword {
   @apply btn-secondary text-sm;
+}
+
+@utility btn-true {
+  @apply btn-control bg-green-500 dark:bg-green-600;
+  @apply text-white;
+  @apply hover:bg-green-600 dark:hover:bg-green-700;
+  @apply border-green-600 dark:border-green-700;
+}
+
+@utility btn-false {
+  @apply btn-control bg-red-500 dark:bg-red-600;
+  @apply text-white;
+  @apply hover:bg-red-600 dark:hover:bg-red-700;
+  @apply border-red-600 dark:border-red-700;
 }
 
 /* For headers similar to Connections category headers */

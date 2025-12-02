@@ -91,6 +91,15 @@ const HamburgerMenu = memo(({ darkMode, toggleDarkMode }) => {
                 Our Timeline
               </Link>
             </li>
+            <li>
+              <Link
+                to="/true-false"
+                onClick={closeMenu}
+                className="block py-3 px-4 text-lg font-semibold text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                True or False
+              </Link>
+            </li>
 
             {/* Dark mode toggle */}
             <li className="pt-4 border-t border-gray-200 dark:border-gray-700">

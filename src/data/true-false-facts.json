@@ -1,0 +1,39 @@
+{
+  "facts": [
+    {
+      "id": 1,
+      "statement": "The couple met at a coffee shop in downtown Seattle.",
+      "answer": true
+    },
+    {
+      "id": 2,
+      "statement": "They got engaged on top of the Eiffel Tower.",
+      "answer": false
+    },
+    {
+      "id": 3,
+      "statement": "Both the bride and groom love hiking in the mountains.",
+      "answer": true
+    },
+    {
+      "id": 4,
+      "statement": "Their first date was at an Italian restaurant.",
+      "answer": false
+    },
+    {
+      "id": 5,
+      "statement": "They have a pet golden retriever named Max.",
+      "answer": true
+    },
+    {
+      "id": 6,
+      "statement": "The couple has traveled to over 20 countries together.",
+      "answer": false
+    },
+    {
+      "id": 7,
+      "statement": "They both studied at the same university.",
+      "answer": true
+    }
+  ]
+}
