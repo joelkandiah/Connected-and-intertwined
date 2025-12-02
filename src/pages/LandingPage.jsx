@@ -46,7 +46,8 @@ const LandingPage = () => {
     { name: 'Connections', path: '/connections', description: 'Find groups of four!' },
     { name: 'The Mini', path: '/wedding-crossword', description: 'Wedding crossword puzzle' },
     { name: 'Wedding Strands', path: '/wedding-strands', description: 'Find the hidden words' },
-    { name: 'Our Timeline', path: '/our-timeline', description: 'Arrange events in order' }
+    { name: 'Our Timeline', path: '/our-timeline', description: 'Arrange events in order' },
+    { name: 'True or False', path: '/true-false', description: 'Test your knowledge!' }
   ], []);
 
   return (

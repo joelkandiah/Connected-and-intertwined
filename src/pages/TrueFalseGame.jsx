@@ -6,6 +6,7 @@ import CompletionModal from '../components/CompletionModal';
 const STORAGE_KEY = 'true-false-wedding-progress';
 const SWIPE_THRESHOLD = 100; // pixels to trigger swipe
 const HINT_THRESHOLD = 30; // pixels to show hint
+const ANIMATION_DURATION = 500; // Duration in ms for swipe animation (must match CSS)
 
 function TrueFalseGame() {
     const [facts] = useState(FACTS_DATA.facts);
@@ -97,6 +98,7 @@ function TrueFalseGame() {
         setAnswered(newAnswered);
 
         // Trigger swipe animation
+        setIsDragging(false); // Reset drag state when triggering swipe
         setSwipeDirection(userAnswer ? 'right' : 'left');
 
         // After animation completes, move to next fact or end game
@@ -109,7 +111,7 @@ function TrueFalseGame() {
             } else {
                 setCurrentIndex(currentIndex + 1);
             }
-        }, 500); // Match animation duration
+        }, ANIMATION_DURATION);
     };
 
     const handleNewGame = () => {
@@ -235,22 +237,23 @@ function TrueFalseGame() {
                     <li>• Decide if the statement is TRUE or FALSE.</li>
                     <li>• On desktop: Click the True (green) or False (red) button.</li>
                     <li>• On mobile: Swipe right for TRUE ✓ or left for FALSE ✗.</li>
+                    <li>• Use keyboard: Press Arrow Right or 'T' for True, Arrow Left or 'F' for False.</li>
                     <li>• See how many you can get correct!</li>
                 </ul>
             </HowToPlayModal>
 
             <div className="w-full max-w-[min(96vw,650px)] mx-auto">
                 <header className="text-center mb-6 sm:mb-8">
-                    <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }} className="font-bold mb-2 text-gray-900 dark:text-gray-100">True or False</h1>
-                    <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.25rem)' }} className="text-gray-600 dark:text-gray-300">Wedding Edition</p>
-                    <p style={{ fontSize: 'clamp(0.55rem, 2vw, 0.75rem)' }} className="text-gray-500 dark:text-gray-400 mt-2">Guess the facts about the couple!</p>
+                    <h1 className="text-responsive-h1 font-bold mb-2 text-gray-900 dark:text-gray-100">True or False</h1>
+                    <p className="text-responsive-body text-gray-600 dark:text-gray-300">Wedding Edition</p>
+                    <p className="text-responsive-sm text-gray-500 dark:text-gray-400 mt-2">Guess the facts about the couple!</p>
                 </header>
 
                 {/* Progress indicator */}
                 {!viewOnlyMode && (
                     <div className="text-center mb-6">
                         <div className="inline-flex items-center gap-3">
-                            <span style={{ fontSize: 'clamp(0.875rem, 2vw, 1rem)' }} className="text-gray-600 dark:text-gray-300 font-semibold">
+                            <span className="text-responsive-base text-gray-600 dark:text-gray-300 font-semibold">
                                 Fact {progress + 1} of {total}
                             </span>
                         </div>
@@ -268,15 +271,18 @@ function TrueFalseGame() {
                     <div className="relative mb-8" style={{ minHeight: '400px' }}>
                         <div
                             ref={cardRef}
+                            role="region"
+                            aria-label="Interactive question card - swipe right for True, left for False"
+                            tabIndex={0}
                             className={`
                 absolute inset-0 mx-auto max-w-md
                 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8
                 flex items-center justify-center
                 cursor-grab active:cursor-grabbing
-                transition-all
+                focus:outline-none focus:ring-2 focus:ring-blue-500
                 ${swipeDirection === 'left' ? 'animate-swipe-left' : ''}
                 ${swipeDirection === 'right' ? 'animate-swipe-right' : ''}
-                ${isDragging ? 'scale-105 shadow-3xl' : ''}
+                ${isDragging ? 'scale-105' : ''}
               `}
                             style={{
                                 transform: getCardTransform(),
@@ -292,6 +298,13 @@ function TrueFalseGame() {
                             onTouchStart={handleDragStart}
                             onTouchMove={handleDragMove}
                             onTouchEnd={handleDragEnd}
+                            onKeyDown={(e) => {
+                                if (e.key === 'ArrowRight' || e.key === 't' || e.key === 'T') {
+                                    handleAnswer(true);
+                                } else if (e.key === 'ArrowLeft' || e.key === 'f' || e.key === 'F') {
+                                    handleAnswer(false);
+                                }
+                            }}
                         >
                             <p
                                 style={{ fontSize: 'clamp(1.25rem, 3vw, 1.75rem)' }}
@@ -324,17 +337,19 @@ function TrueFalseGame() {
                     <div className="flex justify-center gap-6 sm:gap-8 mb-6">
                         <button
                             onClick={() => handleAnswer(false)}
-                            className="btn-false"
+                            className="btn-false text-responsive-base"
                             disabled={isDragging || swipeDirection !== null}
-                            style={{ fontSize: 'clamp(0.875rem, 2vw, 1rem)' }}
+                            aria-disabled={isDragging || swipeDirection !== null}
+                            aria-label="Answer False"
                         >
                             ✗ False
                         </button>
                         <button
                             onClick={() => handleAnswer(true)}
-                            className="btn-true"
+                            className="btn-true text-responsive-base"
                             disabled={isDragging || swipeDirection !== null}
-                            style={{ fontSize: 'clamp(0.875rem, 2vw, 1rem)' }}
+                            aria-disabled={isDragging || swipeDirection !== null}
+                            aria-label="Answer True"
                         >
                             ✓ True
                         </button>
@@ -344,7 +359,7 @@ function TrueFalseGame() {
                 {/* View-only mode: Show results */}
                 {viewOnlyMode && (
                     <div className="space-y-4 mb-6">
-                        <h2 style={{ fontSize: 'clamp(1.25rem, 2.5vw, 1.5rem)' }} className="font-bold text-center mb-6 text-gray-900 dark:text-gray-100">
+                        <h2 className="text-responsive-h2 font-bold text-center mb-6 text-gray-900 dark:text-gray-100">
                             Your Results: {score}/{facts.length}
                         </h2>
                         {facts.map((fact, idx) => {
@@ -369,10 +384,10 @@ function TrueFalseGame() {
                                             {isCorrect ? '✓' : '✗'}
                                         </div>
                                         <div className="flex-1">
-                                            <p style={{ fontSize: 'clamp(0.875rem, 2vw, 1rem)' }} className="text-gray-900 dark:text-gray-100 mb-2">
+                                            <p className="text-responsive-base text-gray-900 dark:text-gray-100 mb-2">
                                                 {fact.statement}
                                             </p>
-                                            <p style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }} className="text-gray-600 dark:text-gray-400">
+                                            <p className="text-responsive-base text-gray-600 dark:text-gray-400">
                                                 Correct answer: <span className="font-semibold">{fact.answer ? 'TRUE' : 'FALSE'}</span>
                                                 {userAnswerData && (
                                                     <span className="ml-2">
@@ -389,15 +404,13 @@ function TrueFalseGame() {
                         <div className="flex justify-center gap-6 sm:gap-8 mt-8">
                             <button
                                 onClick={handleNewGame}
-                                className="btn-primary bg-gradient-to-r from-green-400 to-blue-500"
-                                style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
+                                className="btn-primary bg-gradient-to-r from-green-400 to-blue-500 text-responsive-base"
                             >
                                 New Game
                             </button>
                             <button
                                 onClick={() => setShowCompletionModal(true)}
-                                className="btn-secondary"
-                                style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
+                                className="btn-secondary text-responsive-base"
                             >
                                 Show Score
                             </button>
@@ -407,12 +420,13 @@ function TrueFalseGame() {
 
                 {/* How to Play section */}
                 <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                    <h2 style={{ fontSize: 'clamp(1.125rem, 2.5vw, 1.25rem)' }} className="font-bold mb-3 text-gray-900 dark:text-gray-100">How to Play</h2>
-                    <ul style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }} className="space-y-2 text-gray-700 dark:text-gray-300">
+                    <h2 className="text-responsive-h2 font-bold mb-3 text-gray-900 dark:text-gray-100">How to Play</h2>
+                    <ul className="text-responsive-base space-y-2 text-gray-700 dark:text-gray-300">
                         <li>• Read each fact about the couple carefully.</li>
                         <li>• Decide if the statement is TRUE or FALSE.</li>
                         <li>• On desktop: Click the True (green) or False (red) button.</li>
                         <li>• On mobile: Swipe right for TRUE ✓ or left for FALSE ✗.</li>
+                        <li>• Use keyboard: Press Arrow Right or 'T' for True, Arrow Left or 'F' for False.</li>
                         <li>• See how many you can get correct!</li>
                     </ul>
                 </div>
