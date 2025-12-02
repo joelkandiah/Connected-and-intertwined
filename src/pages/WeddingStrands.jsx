@@ -626,10 +626,10 @@ function WeddingStrands() {
 
         {/* Controls */}
         {!isComplete && (
-          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
+          <div className="flex flex-wrap justify-center gap-6 sm:gap-8 mb-6">
             <button
               onClick={handleClear}
-              className="px-4 sm:px-6 py-2 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+              className="btn-control"
               style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}
               disabled={selectedCells.length === 0}
             >
@@ -637,9 +637,9 @@ function WeddingStrands() {
             </button>
             <button
               onClick={handleSubmit}
-              className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors ${selectedCells.length >= 3
-                ? 'bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-100'
-                : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+              className={`btn-control ${selectedCells.length >= 3
+                ? '!bg-gray-900 dark:!bg-gray-200 !text-white dark:!text-gray-900 hover:!bg-gray-700 dark:hover:!bg-gray-100'
+                : '!bg-gray-300 dark:!bg-gray-600 !text-gray-500 dark:!text-gray-400 cursor-not-allowed'
                 }`}
               disabled={selectedCells.length < 3}
               style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}
@@ -648,7 +648,7 @@ function WeddingStrands() {
             </button>
             <button
               onClick={() => setShowHint(!showHint)}
-              className="px-4 sm:px-6 py-2 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+              className="btn-control"
               style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)' }}
             >
               {showHint ? 'Hide' : 'Show'} Hints
@@ -658,17 +658,17 @@ function WeddingStrands() {
 
         {/* New Game Button */}
         {isComplete && (
-          <div className="flex justify-center gap-3 sm:gap-4">
+          <div className="flex justify-center gap-6 sm:gap-8">
             <button
               onClick={handleNewGame}
-              className="px-5 sm:px-6 py-2.5 bg-gradient-to-r from-yellow-400 to-blue-500 text-white rounded-full font-semibold hover:brightness-110 transition-all transform hover:scale-105 shadow-md"
+              className="btn-primary bg-gradient-to-r from-yellow-400 to-blue-500"
               style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
             >
               New Game
             </button>
             <button
               onClick={() => setShowCompletionModal(true)}
-              className="px-5 sm:px-6 py-2.5 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              className="btn-secondary"
               style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
             >
               Show Time

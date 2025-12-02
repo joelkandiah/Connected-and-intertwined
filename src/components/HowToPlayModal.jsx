@@ -23,7 +23,7 @@ const HowToPlayModal = ({ isOpen, onClose, title = "How to Play", children }) =>
                     </div>
                     <button
                         onClick={onClose}
-                        className="px-5 sm:px-6 py-2.5 bg-gray-900 dark:bg-gray-200 text-white dark:text-gray-900 rounded-full font-semibold hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors"
+                        className="btn-confirm"
                         style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
                     >
                         Let's Play!

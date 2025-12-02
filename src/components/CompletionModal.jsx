@@ -47,10 +47,10 @@ const CompletionModal = ({
                         </div>
                     )}
 
-                    <div className="flex gap-3 sm:gap-4 justify-center">
+                    <div className="flex gap-6 sm:gap-8 justify-center">
                         <button
                             onClick={onPrimaryAction}
-                            className={`px-5 sm:px-6 py-2.5 bg-gradient-to-r ${primaryButtonGradient} text-white rounded-full font-semibold hover:brightness-110 transition-all transform hover:scale-105 shadow-md`}
+                            className={`btn-primary bg-gradient-to-r ${primaryButtonGradient}`}
                             style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
                         >
                             {primaryButtonText}
@@ -58,7 +58,7 @@ const CompletionModal = ({
                         {onSecondaryAction && (
                             <button
                                 onClick={onSecondaryAction}
-                                className="px-5 sm:px-6 py-2.5 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                                className="btn-secondary"
                                 style={{ fontSize: 'clamp(0.8rem, 2vw, 0.875rem)' }}
                             >
                                 {secondaryButtonText}

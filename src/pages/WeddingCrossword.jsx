@@ -678,52 +678,52 @@ const WeddingCrossword = () => {
 
           {/* Control buttons */}
           {!viewOnlyMode ? (
-            <div className="flex flex-wrap gap-2 justify-center">
+            <div className="flex flex-wrap gap-6 sm:gap-8 justify-center">
               <button
                 onClick={handleCheck}
-                className="px-5 py-2.5 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors text-sm"
+                className="btn-control text-sm"
                 disabled={!selectedCell}
               >
                 Check Word
               </button>
               <button
                 onClick={handleReveal}
-                className="px-5 py-2.5 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors text-sm"
+                className="btn-control text-sm"
                 disabled={!selectedCell}
               >
                 Reveal Word
               </button>
               <button
                 onClick={handleClear}
-                className="px-5 py-2.5 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors text-sm"
+                className="btn-control text-sm"
                 disabled={!selectedCell}
               >
                 Clear Word
               </button>
               <button
                 onClick={handleRevealAll}
-                className="px-5 py-2.5 bg-pink-100 dark:bg-pink-900/50 border-2 border-pink-300 dark:border-pink-700 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-pink-200 dark:hover:bg-pink-900/70 transition-colors text-sm"
+                className="btn-control text-sm bg-pink-100 dark:bg-pink-900/50 border-pink-300 dark:border-pink-700 hover:bg-pink-200 dark:hover:bg-pink-900/70"
               >
                 Reveal All
               </button>
               <button
                 onClick={handleReset}
-                className="px-5 py-2.5 bg-purple-100 dark:bg-purple-900/50 border-2 border-purple-300 dark:border-purple-700 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-purple-200 dark:hover:bg-purple-900/70 transition-colors text-sm"
+                className="btn-control text-sm bg-purple-100 dark:bg-purple-900/50 border-purple-300 dark:border-purple-700 hover:bg-purple-200 dark:hover:bg-purple-900/70"
               >
                 Reset Puzzle
               </button>
             </div>
           ) : (
-            <div className="flex justify-center gap-3 sm:gap-4">
+            <div className="flex justify-center gap-6 sm:gap-8">
               <button
                 onClick={handleNewGame}
-                className="px-5 py-2.5 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full font-semibold hover:brightness-110 transition-all transform hover:scale-105 shadow-md text-sm"
+                className="btn-primary bg-gradient-to-r from-pink-500 to-purple-500 text-sm"
               >
                 New Game
               </button>
               <button
                 onClick={() => setShowCompletionModal(true)}
-                className="px-5 py-2.5 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors text-sm"
+                className="btn-secondary text-sm"
               >
                 Show Time
               </button>
