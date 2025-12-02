@@ -702,7 +702,7 @@ const WeddingCrossword = () => {
               </button>
               <button
                 onClick={handleRevealAll}
-                className="btn-control text-sm bg-pink-100 dark:bg-pink-900/50 border-pink-300 dark:border-pink-700 hover:bg-pink-200 dark:hover:bg-pink-900/70"
+                className="btn-control text-sm !bg-pink-100 dark:!bg-pink-900/50 !border-pink-300 dark:!border-pink-700 hover:!bg-pink-200 dark:hover:!bg-pink-900/70"
               >
                 Reveal All
               </button>
