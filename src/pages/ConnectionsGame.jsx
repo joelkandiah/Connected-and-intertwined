@@ -17,6 +17,7 @@ const STORAGE_KEY = 'connections-wedding-progress';
 
 function ConnectionsGame() {
   const puzzleData = use(puzzlePromise);
+  const CATEGORIES = useMemo(() => puzzleData.categories, [puzzleData]);
   const [words, setWords] = useState([]);
   const [selected, setSelected] = useState([]);
   const [solved, setSolved] = useState([]);
@@ -51,7 +52,7 @@ function ConnectionsGame() {
         const state = JSON.parse(savedState);
 
         // 1. Check for a fully COMPLETE state (words.length = 0 is expected)
-        const isGameComplete = state.solved && state.solved.length === puzzleData.categories.length;
+        const isGameComplete = state.solved && state.solved.length === CATEGORIES.length;
 
         // 2. Check for a playable MID-GAME state (words.length > 0 is expected)
         const isGamePlayable = state.words && state.words.length > 0;
@@ -86,7 +87,7 @@ function ConnectionsGame() {
       setRearranging(null);
 
       // Final safety check for a completed game
-      if (state.solved && state.solved.length === puzzleData.categories.length) {
+      if (state.solved && state.solved.length === CATEGORIES.length) {
         setViewOnlyMode(true);
         setIsGameOver(true);
         setShowCompletionModal(false);
@@ -99,7 +100,7 @@ function ConnectionsGame() {
 
     } else {
       // --- INITIALIZE NEW GAME (No valid state to load) ---
-      const allWords = puzzleData.categories.flatMap(cat =>
+      const allWords = CATEGORIES.flatMap(cat =>
         cat.words.map(word => ({ word, category: cat.name, difficulty: cat.difficulty }))
       );
       setWords(allWords.sort(() => Math.random() - 0.5));
@@ -110,7 +111,7 @@ function ConnectionsGame() {
       setShowCompletionModal(false);
       setViewOnlyMode(false);
     }
-  }, []);
+  }, [CATEGORIES]);
 
   // Save state
   useEffect(() => {
@@ -140,7 +141,7 @@ function ConnectionsGame() {
     const categories = [...new Set(selectedData.map(item => item.category))];
 
     if (categories.length === 1) {
-      const category = puzzleData.categories.find(c => c.name === categories[0]);
+      const category = CATEGORIES.find(c => c.name === categories[0]);
       message.value = `Correct! ${category.name}`;
 
       // Step 1: rearranging tiles
@@ -172,7 +173,7 @@ function ConnectionsGame() {
                 words: selected,
                 difficulty: category.difficulty
               }];
-            if (next.length === puzzleData.categories.length) {
+            if (next.length === CATEGORIES.length) {
               setIsGameOver(true);
               setShowCompletionModal(true);
               message.value = 'Congratulations! You solved the puzzle!';
@@ -207,7 +208,7 @@ function ConnectionsGame() {
 
         // Reveal all remaining unsolved categories
         const solvedCategoryNames = solved.map(s => s.name);
-        const remainingCategories = puzzleData.categories
+        const remainingCategories = CATEGORIES
           .filter(cat => !solvedCategoryNames.includes(cat.name))
           .map(cat => ({ ...cat, isRevealed: true }));
         setSolved(prev => [...prev, ...remainingCategories]);
@@ -223,7 +224,7 @@ function ConnectionsGame() {
   const handleShuffle = () => setWords([...words].sort(() => Math.random() - 0.5));
   const handleNewGame = () => {
     localStorage.removeItem(STORAGE_KEY);
-    const allWords = puzzleData.categories.flatMap(cat =>
+    const allWords = CATEGORIES.flatMap(cat =>
       cat.words.map(word => ({ word, category: cat.name, difficulty: cat.difficulty }))
     );
     setWords(allWords.sort(() => Math.random() - 0.5));
