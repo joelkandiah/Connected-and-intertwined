@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, use } from 'react';
+import { useState, useEffect, useRef, useCallback, use, useMemo } from 'react';
 import { useSignal } from '@preact/signals-react';
 import StrandsCell from '../components/StrandsCell';
 import HowToPlayModal from '../components/HowToPlayModal';
@@ -12,8 +12,8 @@ function WeddingStrands() {
   const puzzleData = use(puzzlePromise);
   const [selectedCells, setSelectedCells] = useState([]);
 
-  const PUZZLE_GRID = puzzleData.grid;
-  const WORD_DEFINITIONS = puzzleData.words;
+  const PUZZLE_GRID = useMemo(() => puzzleData.grid, [puzzleData]);
+  const WORD_DEFINITIONS = useMemo(() => puzzleData.words, [puzzleData]);
   const [foundWords, setFoundWords] = useState([]);
   const message = useSignal('');
   const [isComplete, setIsComplete] = useState(false);
