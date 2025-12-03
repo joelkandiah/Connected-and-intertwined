@@ -1,12 +1,15 @@
-import { useState, useEffect, useRef } from 'react';
-import flashbackData from '../data/flashback.json';
+import { useState, useEffect, useRef, use } from 'react';
+
 import HowToPlayModal from '../components/HowToPlayModal';
 import CompletionModal from '../components/CompletionModal';
+
+const flashbackPromise = import('../data/flashback.json').then(m => m.default || m);
 
 // Storage key for persisting game state
 const STORAGE_KEY = 'our-timeline-progress';
 
 function OurTimeline() {
+  const flashbackData = use(flashbackPromise);
   const [placedCards, setPlacedCards] = useState([]); // Cards already placed in timeline
   const [currentCard, setCurrentCard] = useState(null); // Card to be placed
   const [remainingCards, setRemainingCards] = useState([]); // Cards not yet shown

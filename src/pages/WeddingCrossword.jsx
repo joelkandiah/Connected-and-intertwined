@@ -1,12 +1,15 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, use } from 'react';
 import Cell from '../components/Cell';
 import ClueList from '../components/ClueList';
 import HowToPlayModal from '../components/HowToPlayModal';
 import CompletionModal from '../components/CompletionModal';
-import puzzleData from '../data/wedding-crossword.json';
+
 import { saveCrosswordProgress, loadCrosswordProgress, clearCrosswordProgress } from '../utils/storage';
 
+const puzzlePromise = import('../data/wedding-crossword.json').then(m => m.default || m);
+
 const WeddingCrossword = () => {
+  const puzzleData = use(puzzlePromise);
   const [grid, setGrid] = useState([]);
   const [selectedCell, setSelectedCell] = useState(null);
   const [direction, setDirection] = useState('across'); // 'across' or 'down'

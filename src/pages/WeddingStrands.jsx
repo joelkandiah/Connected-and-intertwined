@@ -1,27 +1,21 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import puzzleData from '../data/strands-puzzle.json';
+import { useState, useEffect, useRef, useCallback, use } from 'react';
+import { useSignal } from '@preact/signals-react';
 import StrandsCell from '../components/StrandsCell';
 import HowToPlayModal from '../components/HowToPlayModal';
 import CompletionModal from '../components/CompletionModal';
 
-// Wedding-themed Strands puzzle
-// Theme: Wedding Day
-// Spangram: CEREMONY (spans across the grid)
-// Other words: BRIDE, GROOM, VOWS, RING, TOAST, DANCE, LOVE, ROSES, UNITY, MARRY
-
-// Rotated 90 degrees - now 8 rows x 6 columns (tall and thin)
-const PUZZLE_GRID = puzzleData.grid;
-
-// Define word positions in the grid (row, col pairs for each letter)
-// Grid is now rotated 90 degrees (8 rows x 6 columns)
-const WORD_DEFINITIONS = puzzleData.words;
+const puzzlePromise = import('../data/strands-puzzle.json').then(m => m.default || m);
 
 const STORAGE_KEY = 'wedding-strands-progress';
 
 function WeddingStrands() {
+  const puzzleData = use(puzzlePromise);
   const [selectedCells, setSelectedCells] = useState([]);
+
+  const PUZZLE_GRID = puzzleData.grid;
+  const WORD_DEFINITIONS = puzzleData.words;
   const [foundWords, setFoundWords] = useState([]);
-  const [message, setMessage] = useState('');
+  const message = useSignal('');
   const [isComplete, setIsComplete] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -236,8 +230,8 @@ function WeddingStrands() {
   const handleSubmit = useCallback(() => {
     const currentSelected = selectedCellsRef.current;
     if (currentSelected.length < 3) {
-      setMessage('Word too short!');
-      setTimeout(() => setMessage(''), 2000);
+      message.value = 'Word too short!';
+      setTimeout(() => message.value = '', 2000);
       setSelectedCells([]);
       return;
     }
@@ -254,20 +248,20 @@ function WeddingStrands() {
     if (foundWordDef && !currentFoundWords.includes(foundWordDef.word)) {
       const newFoundWords = [...currentFoundWords, foundWordDef.word];
       setFoundWords(newFoundWords);
-      setMessage(foundWordDef.isSpangram ? '🎉 Spangram found!' : 'Great job!');
+      message.value = foundWordDef.isSpangram ? '🎉 Spangram found!' : 'Great job!';
 
       if (newFoundWords.length === WORD_DEFINITIONS.length) {
         setIsComplete(true);
         setShowCompletionModal(true);
       }
 
-      setTimeout(() => setMessage(''), 2000);
+      setTimeout(() => message.value = '', 2000);
     } else if (currentFoundWords.includes(word)) {
-      setMessage('Already found!');
-      setTimeout(() => setMessage(''), 2000);
+      message.value = 'Already found!';
+      setTimeout(() => message.value = '', 2000);
     } else {
-      setMessage('Not in word list or Invalid word!');
-      setTimeout(() => setMessage(''), 2000);
+      message.value = 'Not in word list or Invalid word!';
+      setTimeout(() => message.value = '', 2000);
     }
 
     setSelectedCells([]);
@@ -287,8 +281,8 @@ function WeddingStrands() {
         // Only show error if we failed to add a non-selected cell
         const isAlreadySelected = prev.some(c => c.key === cellKey);
         if (!isAlreadySelected) {
-          setMessage('Must select adjacent letters!');
-          setTimeout(() => setMessage(''), 1500);
+          message.value = 'Must select adjacent letters!';
+          setTimeout(() => message.value = '', 1500);
         }
         return prev;
       }
@@ -480,7 +474,7 @@ function WeddingStrands() {
     localStorage.removeItem(STORAGE_KEY);
     setSelectedCells([]);
     setFoundWords([]);
-    setMessage('');
+    message.value = '';
     setIsComplete(false);
     setShowCompletionModal(false);
     setElapsedTime(0);
@@ -661,9 +655,9 @@ function WeddingStrands() {
         )}
 
         {/* Message */}
-        {message && (
+        {message.value && (
           <div className="text-center mb-4 font-semibold text-base sm:text-lg text-gray-900 dark:text-gray-100">
-            {message}
+            {message.value}
           </div>
         )}
 

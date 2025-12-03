@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import FACTS_DATA from '../data/true-false-facts.json';
+import { useState, useEffect, useRef, use } from 'react';
+
 import HowToPlayModal from '../components/HowToPlayModal';
 import CompletionModal from '../components/CompletionModal';
 
@@ -8,8 +8,10 @@ const SWIPE_THRESHOLD = 100; // pixels to trigger swipe
 const HINT_THRESHOLD = 30; // pixels to show hint
 const ANIMATION_DURATION = 500; // Duration in ms for swipe animation (must match CSS)
 
+const factsPromise = import('../data/true-false-facts.json').then(m => (m.default || m).facts);
+
 function TrueFalseGame() {
-    const [facts] = useState(FACTS_DATA.facts);
+    const facts = use(factsPromise);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [score, setScore] = useState(0);
     const [answered, setAnswered] = useState([]);
@@ -24,6 +26,7 @@ function TrueFalseGame() {
     const [isDragging, setIsDragging] = useState(false);
     const dragStartPos = useRef({ x: 0, y: 0 });
     const dragOffsetRef = useRef({ x: 0, y: 0 }); // Track offset in ref for reliable access in event handlers
+    const swipeStartOffset = useRef({ x: 0, y: 0 }); // Store offset when swipe animation starts
     const cardRef = useRef(null);
 
     // Check for first time visit
@@ -97,6 +100,9 @@ function TrueFalseGame() {
 
         setAnswered(newAnswered);
 
+        // Store current drag offset for animation continuity
+        swipeStartOffset.current = { ...dragOffsetRef.current };
+
         // Trigger swipe animation
         setIsDragging(false); // Reset drag state when triggering swipe
         setSwipeDirection(userAnswer ? 'right' : 'left');
@@ -104,6 +110,8 @@ function TrueFalseGame() {
         // After animation completes, move to next fact or end game
         setTimeout(() => {
             setSwipeDirection(null);
+            swipeStartOffset.current = { x: 0, y: 0 };
+            setDragOffset({ x: 0, y: 0 });
 
             if (currentIndex + 1 >= facts.length) {
                 setIsGameOver(true);
@@ -174,10 +182,12 @@ function TrueFalseGame() {
         setDragOffset({ x: 0, y: 0 });
     };
 
-    // Calculate card transform based on drag
     const getCardTransform = () => {
         if (swipeDirection) {
-            return ''; // Let animation class handle it
+            // Start animation from the dragged position
+            const startOffset = swipeStartOffset.current;
+            const rotation = startOffset.x / 20;
+            return `translate(${startOffset.x}px, ${startOffset.y * 0.3}px) rotate(${rotation}deg)`;
         }
         if (isDragging) {
             const rotation = dragOffset.x / 20; // Subtle rotation during drag
