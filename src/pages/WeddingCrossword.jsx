@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, use } from 'react';
+import React, { useState, useEffect, useCallback, useRef, use, useMemo } from 'react';
 import Cell from '../components/Cell';
 import ClueList from '../components/ClueList';
 import HowToPlayModal from '../components/HowToPlayModal';
@@ -10,6 +10,9 @@ const puzzlePromise = import('../data/wedding-crossword.json').then(m => m.defau
 
 const WeddingCrossword = () => {
   const puzzleData = use(puzzlePromise);
+  const PUZZLE_GRID = useMemo(() => puzzleData.grid, [puzzleData]);
+  const PUZZLE_CLUES = useMemo(() => puzzleData.clues, [puzzleData]);
+  const PUZZLE_SIZE = useMemo(() => puzzleData.size, [puzzleData]);
   const [grid, setGrid] = useState([]);
   const [selectedCell, setSelectedCell] = useState(null);
   const [direction, setDirection] = useState('across'); // 'across' or 'down'
@@ -37,7 +40,7 @@ const WeddingCrossword = () => {
   // Initialize grid from puzzle data
   useEffect(() => {
     const savedProgress = loadCrosswordProgress();
-    const initialGrid = puzzleData.grid.map((row, rowIndex) =>
+    const initialGrid = PUZZLE_GRID.map((row, rowIndex) =>
       row.split('').map((char, colIndex) => ({
         isBlock: char === '#',
         solution: char === '#' ? null : char,
@@ -56,8 +59,8 @@ const WeddingCrossword = () => {
       }
     };
 
-    Object.entries(puzzleData.clues.across).forEach(([num, data]) => addClueNumber(data, num));
-    Object.entries(puzzleData.clues.down).forEach(([num, data]) => addClueNumber(data, num));
+    Object.entries(PUZZLE_CLUES.across).forEach(([num, data]) => addClueNumber(data, num));
+    Object.entries(PUZZLE_CLUES.down).forEach(([num, data]) => addClueNumber(data, num));
 
     // Restore saved progress
     if (savedProgress && savedProgress.grid) {
@@ -201,11 +204,11 @@ const WeddingCrossword = () => {
     const firstCell = grid[wordCells[0].row][wordCells[0].col];
     const number = firstCell.number;
 
-    if (number && puzzleData.clues[direction][number]) {
+    if (number && PUZZLE_CLUES[direction][number]) {
       return {
         number,
         direction,
-        clue: puzzleData.clues[direction][number].clue
+        clue: PUZZLE_CLUES[direction][number].clue
       };
     }
 
@@ -538,7 +541,7 @@ const WeddingCrossword = () => {
   // Handle clue click
   const handleClueClick = useCallback((number, clueDirection) => {
     if (viewOnlyMode) return; // Don't allow clue clicks in view-only mode
-    const clueData = puzzleData.clues[clueDirection][number];
+    const clueData = PUZZLE_CLUES[clueDirection][number];
     if (clueData) {
       setSelectedCell({ row: clueData.row, col: clueData.col });
       setDirection(clueDirection);
@@ -630,7 +633,7 @@ const WeddingCrossword = () => {
             <div
               className="grid gap-0 bg-white dark:bg-gray-800 p-2 sm:p-4 rounded-lg shadow-lg"
               style={{
-                gridTemplateColumns: `repeat(${puzzleData.size}, minmax(0, 1fr))`,
+                gridTemplateColumns: `repeat(${PUZZLE_SIZE}, minmax(0, 1fr))`,
                 width: 'clamp(280px, 100%, 500px)',
                 maxWidth: '100vw',
                 aspectRatio: '1/1'
@@ -738,13 +741,13 @@ const WeddingCrossword = () => {
             <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-lg max-w-2xl mx-auto">
               <ClueList
                 title="Across"
-                clues={puzzleData.clues.across}
+                clues={PUZZLE_CLUES.across}
                 currentClue={currentClue}
                 onClueClick={handleClueClick}
               />
               <ClueList
                 title="Down"
-                clues={puzzleData.clues.down}
+                clues={PUZZLE_CLUES.down}
                 currentClue={currentClue}
                 onClueClick={handleClueClick}
               />
