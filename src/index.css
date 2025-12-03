@@ -1,4 +1,3 @@
-/* Prevent browser/system auto–force-dark */
 :root {
   color-scheme: light dark;
 }

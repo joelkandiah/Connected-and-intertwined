@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
-import PUZZLE from '../data/connections-puzzle.json';
+import { useState, useEffect, useMemo, use } from 'react';
+import { useSignal } from '@preact/signals-react';
+
 import HowToPlayModal from '../components/HowToPlayModal';
 import CompletionModal from '../components/CompletionModal';
 
@@ -10,14 +11,18 @@ const DIFFICULTY_COLORS = {
   4: 'bg-nyt-purple'
 };
 
+const puzzlePromise = import('../data/connections-puzzle.json').then(m => m.default || m);
+
 const STORAGE_KEY = 'connections-wedding-progress';
 
 function ConnectionsGame() {
+  const puzzleData = use(puzzlePromise);
+  const CATEGORIES = useMemo(() => puzzleData.categories, [puzzleData]);
   const [words, setWords] = useState([]);
   const [selected, setSelected] = useState([]);
   const [solved, setSolved] = useState([]);
   const [mistakes, setMistakes] = useState(0);
-  const [message, setMessage] = useState('');
+  const message = useSignal('');
   const [isGameOver, setIsGameOver] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [viewOnlyMode, setViewOnlyMode] = useState(false);
@@ -47,7 +52,7 @@ function ConnectionsGame() {
         const state = JSON.parse(savedState);
 
         // 1. Check for a fully COMPLETE state (words.length = 0 is expected)
-        const isGameComplete = state.solved && state.solved.length === PUZZLE.categories.length;
+        const isGameComplete = state.solved && state.solved.length === CATEGORIES.length;
 
         // 2. Check for a playable MID-GAME state (words.length > 0 is expected)
         const isGamePlayable = state.words && state.words.length > 0;
@@ -82,7 +87,7 @@ function ConnectionsGame() {
       setRearranging(null);
 
       // Final safety check for a completed game
-      if (state.solved && state.solved.length === PUZZLE.categories.length) {
+      if (state.solved && state.solved.length === CATEGORIES.length) {
         setViewOnlyMode(true);
         setIsGameOver(true);
         setShowCompletionModal(false);
@@ -95,7 +100,7 @@ function ConnectionsGame() {
 
     } else {
       // --- INITIALIZE NEW GAME (No valid state to load) ---
-      const allWords = PUZZLE.categories.flatMap(cat =>
+      const allWords = CATEGORIES.flatMap(cat =>
         cat.words.map(word => ({ word, category: cat.name, difficulty: cat.difficulty }))
       );
       setWords(allWords.sort(() => Math.random() - 0.5));
@@ -106,7 +111,7 @@ function ConnectionsGame() {
       setShowCompletionModal(false);
       setViewOnlyMode(false);
     }
-  }, []);
+  }, [CATEGORIES]);
 
   // Save state
   useEffect(() => {
@@ -136,8 +141,8 @@ function ConnectionsGame() {
     const categories = [...new Set(selectedData.map(item => item.category))];
 
     if (categories.length === 1) {
-      const category = PUZZLE.categories.find(c => c.name === categories[0]);
-      setMessage(`Correct! ${category.name}`);
+      const category = CATEGORIES.find(c => c.name === categories[0]);
+      message.value = `Correct! ${category.name}`;
 
       // Step 1: rearranging tiles
       setRearranging({
@@ -168,10 +173,10 @@ function ConnectionsGame() {
                 words: selected,
                 difficulty: category.difficulty
               }];
-            if (next.length === PUZZLE.categories.length) {
+            if (next.length === CATEGORIES.length) {
               setIsGameOver(true);
               setShowCompletionModal(true);
-              setMessage('Congratulations! You solved the puzzle!');
+              message.value = 'Congratulations! You solved the puzzle!';
             }
             return next;
           });
@@ -185,7 +190,7 @@ function ConnectionsGame() {
 
       }, 400);
 
-      setTimeout(() => setMessage(''), 2000);
+      setTimeout(() => message.value = '', 2000);
 
     } else {
       const newMistakes = mistakes + 1;
@@ -194,16 +199,16 @@ function ConnectionsGame() {
       const maxMatches = Math.max(...categories.map(cat =>
         selectedData.filter(item => item.category === cat).length
       ));
-      setMessage(maxMatches === 3 ? 'One away...' : 'Not quite!');
+      message.value = maxMatches === 3 ? 'One away...' : 'Not quite!';
 
       if (newMistakes >= 4) {
         setIsGameOver(true);
         setShowCompletionModal(true);
-        setMessage('Game Over! You ran out of tries.');
+        message.value = 'Game Over! You ran out of tries.';
 
         // Reveal all remaining unsolved categories
         const solvedCategoryNames = solved.map(s => s.name);
-        const remainingCategories = PUZZLE.categories
+        const remainingCategories = CATEGORIES
           .filter(cat => !solvedCategoryNames.includes(cat.name))
           .map(cat => ({ ...cat, isRevealed: true }));
         setSolved(prev => [...prev, ...remainingCategories]);
@@ -211,7 +216,7 @@ function ConnectionsGame() {
       }
 
       setSelected([]);
-      setTimeout(() => setMessage(''), 2000);
+      setTimeout(() => message.value = '', 2000);
     }
   };
 
@@ -219,7 +224,7 @@ function ConnectionsGame() {
   const handleShuffle = () => setWords([...words].sort(() => Math.random() - 0.5));
   const handleNewGame = () => {
     localStorage.removeItem(STORAGE_KEY);
-    const allWords = PUZZLE.categories.flatMap(cat =>
+    const allWords = CATEGORIES.flatMap(cat =>
       cat.words.map(word => ({ word, category: cat.name, difficulty: cat.difficulty }))
     );
     setWords(allWords.sort(() => Math.random() - 0.5));
@@ -229,7 +234,7 @@ function ConnectionsGame() {
     setIsGameOver(false);
     setShowCompletionModal(false);
     setViewOnlyMode(false);
-    setMessage('');
+    message.value = '';
   };
 
   const handleShowPuzzle = () => {
@@ -364,9 +369,9 @@ function ConnectionsGame() {
         )}
 
         {/* Message */}
-        {message && (
+        {message.value && (
           <div className="text-center mb-4 font-semibold dark:text-gray-100" style={{ fontSize: 'clamp(1rem, 2.5vw, 1.25rem)' }}>
-            {message}
+            {message.value}
           </div>
         )}
 

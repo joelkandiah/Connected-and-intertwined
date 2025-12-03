@@ -1,8 +1,11 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HamburgerMenu from './components/HamburgerMenu';
+import Loading from './components/Loading';
+import GameSkeleton from './components/GameSkeleton';
 import './App.css';
 import './index.css';
+// App component with route-specific Suspense boundaries
 
 // Lazy load page components for better performance
 const LandingPage = lazy(() => import('./pages/LandingPage'));
@@ -43,23 +46,38 @@ function App() {
     <div className="bg-gray-100 dark:bg-gray-950 min-h-screen">
       <Router basename="/Connected-and-intertwined">
         <HamburgerMenu darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-        <Suspense fallback={
-          <div className="flex items-center justify-center min-h-screen">
-            <div className="text-center">
-              <div className="text-4xl mb-4">💕</div>
-              <div className="text-xl text-gray-600 dark:text-gray-300">Loading...</div>
-            </div>
-          </div>
-        }>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/connections" element={<ConnectionsGame />} />
-            <Route path="/wedding-crossword" element={<WeddingCrossword />} />
-            <Route path="/wedding-strands" element={<WeddingStrands />} />
-            <Route path="/our-timeline" element={<OurTimeline />} />
-            <Route path="/true-false" element={<TrueFalseGame />} />
-          </Routes>
-        </Suspense>
+        <Routes>
+          <Route path="/" element={
+            <Suspense fallback={<Loading />}>
+              <LandingPage />
+            </Suspense>
+          } />
+          <Route path="/connections" element={
+            <Suspense fallback={<GameSkeleton type="grid" />}>
+              <ConnectionsGame />
+            </Suspense>
+          } />
+          <Route path="/wedding-crossword" element={
+            <Suspense fallback={<GameSkeleton type="crossword" />}>
+              <WeddingCrossword />
+            </Suspense>
+          } />
+          <Route path="/wedding-strands" element={
+            <Suspense fallback={<GameSkeleton type="grid" />}>
+              <WeddingStrands />
+            </Suspense>
+          } />
+          <Route path="/our-timeline" element={
+            <Suspense fallback={<GameSkeleton type="timeline" />}>
+              <OurTimeline />
+            </Suspense>
+          } />
+          <Route path="/true-false" element={
+            <Suspense fallback={<GameSkeleton type="card" />}>
+              <TrueFalseGame />
+            </Suspense>
+          } />
+        </Routes>
       </Router>
     </div>
   );
