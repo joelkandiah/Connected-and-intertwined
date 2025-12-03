@@ -79,7 +79,7 @@ const WeddingCrossword = () => {
     }
 
     setGrid(initialGrid);
-  }, []);
+  }, [PUZZLE_GRID, PUZZLE_CLUES]);
 
   // Save progress whenever grid or revealed cells change
   useEffect(() => {

@@ -111,7 +111,7 @@ function ConnectionsGame() {
       setShowCompletionModal(false);
       setViewOnlyMode(false);
     }
-  }, []);
+  }, [CATEGORIES]);
 
   // Save state
   useEffect(() => {
