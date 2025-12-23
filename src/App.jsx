@@ -44,7 +44,7 @@ function App() {
 
   return (
     <div className="bg-gray-100 dark:bg-gray-950 min-h-screen">
-      <Router basename="/Connected-and-intertwined">
+      <Router basename="/">
         <HamburgerMenu darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
         <Routes>
           <Route path="/" element={

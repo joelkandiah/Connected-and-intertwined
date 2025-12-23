@@ -34,7 +34,7 @@ export default defineConfig({
       }
     })
   ],
-  base: '/Connected-and-intertwined/',
+  base: '/',
   build: {
     outDir: 'dist',
     rollupOptions: {
